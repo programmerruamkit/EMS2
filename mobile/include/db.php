@@ -1,0 +1,10 @@
+<?php
+// $HOST = "RK-168N\SQLEXPRESS";
+// $USERNAME = "";
+// $PASSWORD = "";
+// $DATABASE = "EMS";
+
+$HOST = "RK02";
+$USERNAME = "sa";
+$PASSWORD = "Fpce#9084";
+$DATABASE = "TEST_EMS2";

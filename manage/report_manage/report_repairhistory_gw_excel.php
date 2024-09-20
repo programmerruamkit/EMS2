@@ -1,0 +1,221 @@
+<?php
+
+session_start();
+$path = "../";   	
+require($path.'../include/connect.php');
+$SESSION_AREA = $_SESSION["AD_AREA"];
+$ds = $_GET['ds'];
+$de = $_GET['de'];
+$rg = $_GET['rg'];
+$co = $_GET['co'];
+$cu = $_GET['cu'];
+$dt = $_GET['dt'];
+if(isset($ds)&&isset($de)){
+    $getselectdaystart = $ds;
+    $getselectdayend = $de;		
+    // $dsdate = str_replace('/', '-', $ds);
+    // $dscon = date('Y-m-d', strtotime($dsdate));
+    $start = explode("/", $ds);
+    $startd = $start[0];
+    $startif = $start[1];
+        if($startif == "01"){
+            $startm = "1";
+        }else if($startif == "02"){
+            $startm = "2";
+        }else if($startif == "03"){
+            $startm = "3";
+        }else if($startif == "04"){
+            $startm = "4";
+        }else if($startif == "05"){
+            $startm = "5";
+        }else if($startif == "06"){
+            $startm = "6";
+        }else if($startif == "07"){
+            $startm = "7";
+        }else if($startif8== "08"){
+            $startm = "8";
+        }else if($startif == "09"){
+            $startm = "9";
+        }else if($startif == "10"){
+            $startm = "10";
+        }else if($startif == "11"){
+            $startm = "11";
+        }else if($startif == "12"){
+            $startm = "12";
+        }
+    $dscon = $start[0].'/'.$startm.'/'.$start[2].' 0:00';
+
+    // $dedate = str_replace('/', '-', $de);
+    // $decon = date('Y-m-d', strtotime($dedate));		
+    $end = explode("/", $de);
+    $endd = $end[0];
+    $endif = $end[1];
+        if($endif == "01"){
+            $endm = "1";
+        }else if($endif == "02"){
+            $endm = "2";
+        }else if($endif == "03"){
+            $endm = "3";
+        }else if($endif == "04"){
+            $endm = "4";
+        }else if($endif == "05"){
+            $endm = "5";
+        }else if($endif == "06"){
+            $endm = "6";
+        }else if($endif == "07"){
+            $endm = "7";
+        }else if($endif8== "08"){
+            $endm = "8";
+        }else if($endif == "09"){
+            $endm = "9";
+        }else if($endif == "10"){
+            $endm = "10";
+        }else if($endif == "11"){
+            $endm = "11";
+        }else if($endif == "12"){
+            $endm = "12";
+        }
+    $decon = $end[0].'/'.$endm.'/'.$end[2].' 0:00';
+}else{
+    $getselectdaystart = $GETDAYEN;
+    $getselectdayend = $GETDAYEN;
+}
+if(isset($rg)){
+    $rgsub = substr($rg,0,7);
+}else{
+    $rgsub = '';
+}
+
+// echo"<pre>";
+// print_r($_GET);
+// echo"</pre>";
+// exit();
+$strExcelFileName = "รายงานประวัติการซ่อมบำรุง(".$SESSION_AREA.").xls";
+
+header("Content-Type: application/vnd.ms-excel");
+header("Content-Disposition: inline; filename=\"$strExcelFileName\"");
+header("Pragma:no-cache");
+
+?>
+<html>
+    <head>
+        <link rel="shortcut icon" href="https://img2.pic.in.th/pic/car_repair.png" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <table  border="1" style="width: 100%;">
+            <thead>
+                <tr height="30">
+                    <th colspan="18" style="text-align:center;background-color: #dedede">รายงานประวัติการซ่อมบำรุง E-Maintenance (ประจำวันที่ <?=$ds?> - <?=$de?>)</th>
+                </tr>
+				<tr height="30">
+					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">ลำดับ.</th>
+					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">บริษัท</th>
+					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">ลูกค้า</th>
+					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">วันที่</th>
+					<th colspan="3" width="15%" style="text-align:center;background-color: #dedede">ข้อมูลรถ</th>
+					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">เลข JOB</th>
+					<th colspan="10" width="60%" style="text-align:center;background-color: #dedede">รายละเอียดงานซ่อม</th>
+				</tr>
+				<tr height="30">
+					<th style="text-align:center;background-color: #dedede">ทะเบียนรถ</th>
+					<th style="text-align:center;background-color: #dedede">ทะเบียนเดิม</th>           
+					<th style="text-align:center;background-color: #dedede">เลขไมล์ล่าสุด</th>					
+					<th style="text-align:center;background-color: #dedede">ชื่องาน</th>
+					<th style="text-align:center;background-color: #dedede">รายละเอียด</th>
+					<th style="text-align:center;background-color: #dedede">ปริมาณ</th>
+					<th style="text-align:center;background-color: #dedede">ราคาต่อหน่วย</th>
+					<th style="text-align:center;background-color: #dedede">ราคาขาย</th>
+					<th style="text-align:center;background-color: #dedede">รวมเงิน</th>
+					<th style="text-align:center;background-color: #dedede">ค่าแรง</th>
+					<th style="text-align:center;background-color: #dedede">ผู้ขายอะไหล่</th>
+					<th style="text-align:center;background-color: #dedede">ชั่วโมงทำงานจริง</th>
+					<th style="text-align:center;background-color: #dedede">ชั่วโมงเก็บเงิน</th>
+				</tr>
+            </thead>
+            <tbody>                      
+				<?php			
+                								
+					if($rgsub!=''){
+						$rsrg="REGNO LIKE '%$rgsub%' AND ";
+					}else{$rsrg="";} 
+					if($ds!='' && $de!=''){
+						$rsse="OPENDATE BETWEEN '$ds' AND '$de' AND ";
+					}else{$rsse="";}
+					if($co!=''){
+						$rsco="NICKNM LIKE '%$co%' AND ";
+					}else{$rsco="";}
+					if($cu!=''){
+						$rscu="CUSCOD LIKE '%$cu%' AND ";
+					}else{$rscu="";}
+					if($dt!=''){
+						$rsdt="SPAREPARTSDETAIL LIKE '%$dt%' AND";
+					}else{$rsdt="";}
+					$wh=$rsrg.$rsse.$rsco.$rscu.$rsdt;
+					if($wh==''){
+						$rswh="OPENDATE BETWEEN '00/00/0000 00:00' AND '00/00/000 00:00' AND ";
+					}else{
+						$rswh=$wh;
+					}
+					$sql_reporthdms = "SELECT * FROM vwRKTC_MERGENEWOLD WHERE ".$rswh." 1=1";
+
+					// $wh="REGNO LIKE '%$rgsub%' AND OPENDATE BETWEEN '$dscon' AND '$decon' AND NICKNM LIKE '%$co%' AND CUSCOD LIKE '%$cu%' AND SPAREPARTSDETAIL LIKE '%$dt%'";
+					// $sql_reporthdms = "SELECT * FROM RKTC WHERE ".$wh."";
+					$query_reporthdms = sqlsrv_query($conn, $sql_reporthdms);
+					$no=0;
+					while($result_reporthdms = sqlsrv_fetch_array($query_reporthdms, SQLSRV_FETCH_ASSOC)){	
+						$no++;
+						$temp0 = $result_reporthdms['RKTCID'];
+						$temp1 = $result_reporthdms['NICKNM'];
+						$temp2 = $result_reporthdms['CUSCOD'];
+						$temp3 = $result_reporthdms['OPENDATE'];
+						$temp4 = $result_reporthdms['CLOSEDATE'];
+						$temp5 = $result_reporthdms['TAXINVOICEDATE'];
+						$temp6 = $result_reporthdms['REGNO'];
+						$temp7 = $result_reporthdms['CHASSIS'];
+						$temp8 = $result_reporthdms['MILEAGE'];
+						$temp9 = $result_reporthdms['JOBNO']; 
+						$temp10 = $result_reporthdms['TYPNAME'];
+						$temp11 = $result_reporthdms['SPAREPARTSDETAIL'];
+						$temp12 = $result_reporthdms['NET'];
+						$temp13 = $result_reporthdms['COST'];
+						$temp14 = $result_reporthdms['SELLING'];
+						$temp15 = $result_reporthdms['SPAREPARTSSELLER'];
+						$temp16 = $result_reporthdms['SUMMARY'];
+						$temp17 = $result_reporthdms['WAGES'];
+						$temp18 = $result_reporthdms['MECHANIC'];
+						$temp19 = $result_reporthdms['WORKINGHOURS'];
+						$temp20 = $result_reporthdms['COLLECTIONHOURS'];
+						
+						$regisold = "SELECT VEHICLEREGISNUMBER,REMARK FROM vwVEHICLEINFO WHERE VEHICLEREGISNUMBER = '$temp6'";
+						$queryregisold = sqlsrv_query($conn, $regisold);
+						$resultregisold = sqlsrv_fetch_array($queryregisold, SQLSRV_FETCH_ASSOC);
+						if(isset($resultregisold["REMARK"])){
+							$REMARK = str_replace('ทะเบียนเดิม', '', $resultregisold["REMARK"]);
+						}
+				?>
+				<tr height="25px">
+					<td align="center"><?php print "$no";?></td>
+					<td align="center"><?php print "$temp1";?></td>
+					<td align="center"><?php print "$temp2";?></td>
+					<td align="center"><?php print "$temp3";?></td>
+					<td align="center"><?php print "$temp6";?></td>
+					<td align="center"><?php print "$REMARK";?></td>
+					<td align="center"><?php print "$temp8";?></td>
+					<td align="center"><?php print "$temp9";?></td>
+					<td align="left"><?php print "$temp10";?></td>
+					<td align="left"><?php print "$temp11";?></td>
+					<td align="right"><?php print "$temp12";?></td>
+					<td align="right"><?php print "$temp13";?></td>
+					<td align="right"><?php print "$temp14";?></td>
+					<td align="right"><?php print "$temp16";?></td>
+					<td align="right"><?php print "$temp17";?></td>
+					<td align="left"><?php print "$temp15";?></td>
+					<td align="left"><?php print "$temp19";?></td>
+					<td align="right"><?php print "$temp20";?></td>
+				</tr>
+				<?php }; ?>
+            </tbody>
+        </table>
+    </body>
+</html>

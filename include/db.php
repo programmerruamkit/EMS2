@@ -1,0 +1,11 @@
+<?php
+
+$HOST = "RK02";
+$USERNAME = "sa";
+$PASSWORD = "Fpce#9084";
+$DATABASE = "TEST_EMS2";
+
+$HOST_OLD = "RK02";
+$USERNAME_OLD = "sa";
+$PASSWORD_OLD = 'Fpce#9084';
+$DATABASE_OLD = "RTMS"; 
