@@ -18,64 +18,64 @@ if(isset($ds)&&isset($de)){
     $start = explode("/", $ds);
     $startd = $start[0];
     $startif = $start[1];
-        if($startif == "01"){
-            $startm = "1";
-        }else if($startif == "02"){
-            $startm = "2";
-        }else if($startif == "03"){
-            $startm = "3";
-        }else if($startif == "04"){
-            $startm = "4";
-        }else if($startif == "05"){
-            $startm = "5";
-        }else if($startif == "06"){
-            $startm = "6";
-        }else if($startif == "07"){
-            $startm = "7";
-        }else if($startif8== "08"){
-            $startm = "8";
-        }else if($startif == "09"){
-            $startm = "9";
-        }else if($startif == "10"){
-            $startm = "10";
-        }else if($startif == "11"){
-            $startm = "11";
-        }else if($startif == "12"){
-            $startm = "12";
-        }
-    $dscon = $start[0].'/'.$startm.'/'.$start[2].' 0:00';
+		if($startif == "01"){
+			$startm = "01";
+		}else if($startif == "02"){
+			$startm = "02";
+		}else if($startif == "03"){
+			$startm = "03";
+		}else if($startif == "04"){
+			$startm = "04";
+		}else if($startif == "05"){
+			$startm = "05";
+		}else if($startif == "06"){
+			$startm = "06";
+		}else if($startif == "07"){
+			$startm = "07";
+		}else if($startif== "08"){
+			$startm = "08";
+		}else if($startif == "09"){
+			$startm = "09";
+		}else if($startif == "10"){
+			$startm = "10";
+		}else if($startif == "11"){
+			$startm = "11";
+		}else if($startif == "12"){
+			$startm = "12";
+		}
+	$dscon = $start[2].'-'.$startm.'-'.$start[0].' 00:00';
 
     // $dedate = str_replace('/', '-', $de);
     // $decon = date('Y-m-d', strtotime($dedate));		
     $end = explode("/", $de);
     $endd = $end[0];
     $endif = $end[1];
-        if($endif == "01"){
-            $endm = "1";
-        }else if($endif == "02"){
-            $endm = "2";
-        }else if($endif == "03"){
-            $endm = "3";
-        }else if($endif == "04"){
-            $endm = "4";
-        }else if($endif == "05"){
-            $endm = "5";
-        }else if($endif == "06"){
-            $endm = "6";
-        }else if($endif == "07"){
-            $endm = "7";
-        }else if($endif8== "08"){
-            $endm = "8";
-        }else if($endif == "09"){
-            $endm = "9";
-        }else if($endif == "10"){
-            $endm = "10";
-        }else if($endif == "11"){
-            $endm = "11";
-        }else if($endif == "12"){
-            $endm = "12";
-        }
-    $decon = $end[0].'/'.$endm.'/'.$end[2].' 0:00';
+		if($endif == "01"){
+			$endm = "01";
+		}else if($endif == "02"){
+			$endm = "02";
+		}else if($endif == "03"){
+			$endm = "03";
+		}else if($endif == "04"){
+			$endm = "04";
+		}else if($endif == "05"){
+			$endm = "05";
+		}else if($endif == "06"){
+			$endm = "06";
+		}else if($endif == "07"){
+			$endm = "07";
+		}else if($endif== "08"){
+			$endm = "08";
+		}else if($endif == "09"){
+			$endm = "09";
+		}else if($endif == "10"){
+			$endm = "10";
+		}else if($endif == "11"){
+			$endm = "11";
+		}else if($endif == "12"){
+			$endm = "12";
+		}
+	$decon = $end[2].'-'.$endm.'-'.$end[0].' 00:00';
 }else{
     $getselectdaystart = $GETDAYEN;
     $getselectdayend = $GETDAYEN;
@@ -139,8 +139,9 @@ header("Pragma:no-cache");
 					if($rgsub!=''){
 						$rsrg="REGNO LIKE '%$rgsub%' AND ";
 					}else{$rsrg="";} 
-					if($ds!='' && $de!=''){
-						$rsse="OPENDATE BETWEEN '$ds' AND '$de' AND ";
+					if($dscon!='' && $decon!=''){
+						$rsse="OPENDATECON BETWEEN '$dscon' AND '$decon' AND ";
+						// $rsse="OPENDATECON BETWEEN '$dscon' AND '$decon' AND ";
 					}else{$rsse="";}
 					if($co!=''){
 						$rsco="NICKNM LIKE '%$co%' AND ";
@@ -153,11 +154,12 @@ header("Pragma:no-cache");
 					}else{$rsdt="";}
 					$wh=$rsrg.$rsse.$rsco.$rscu.$rsdt;
 					if($wh==''){
-						$rswh="OPENDATE BETWEEN '00/00/0000 00:00' AND '00/00/000 00:00' AND ";
+						$rswh="OPENDATECON BETWEEN '00/00/0000 00:00' AND '00/00/000 00:00' AND ";
 					}else{
 						$rswh=$wh;
 					}
-					$sql_reporthdms = "SELECT * FROM vwRKTC_MERGENEWOLD WHERE ".$rswh." 1=1";
+
+					$sql_reporthdms = "SELECT * FROM vwRKTC_MERGENEWOLD_TEST WHERE ".$rswh." 1=1 ORDER BY OPENDATECON ASC";
 
 					// $wh="REGNO LIKE '%$rgsub%' AND OPENDATE BETWEEN '$dscon' AND '$decon' AND NICKNM LIKE '%$co%' AND CUSCOD LIKE '%$cu%' AND SPAREPARTSDETAIL LIKE '%$dt%'";
 					// $sql_reporthdms = "SELECT * FROM RKTC WHERE ".$wh."";
@@ -168,7 +170,7 @@ header("Pragma:no-cache");
 						$temp0 = $result_reporthdms['RKTCID'];
 						$temp1 = $result_reporthdms['NICKNM'];
 						$temp2 = $result_reporthdms['CUSCOD'];
-						$temp3 = $result_reporthdms['OPENDATE'];
+						$temp3 = $result_reporthdms['OPENDATECON'];
 						$temp4 = $result_reporthdms['CLOSEDATE'];
 						$temp5 = $result_reporthdms['TAXINVOICEDATE'];
 						$temp6 = $result_reporthdms['REGNO'];

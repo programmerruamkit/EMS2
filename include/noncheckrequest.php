@@ -88,6 +88,20 @@
             echo '<span class="badgeside blink_me">'.$count1.'</span>';
         }  
     }
+
+    if($_GET['target']==='6'){
+        // echo date("Y-m-d H:i:s");
+        // exit;
+        $sql_rprq_bm = "SELECT COUNT(RPRQ_STATUSREQUEST) COUNTSTATUS FROM vwREPAIRREQUEST WHERE RPRQ_STATUSREQUEST = 'รอส่งแผน' AND RPRQ_WORKTYPE = 'BM' AND RPRQ_AREA = '$SS_AREA'";
+        $query_rprq_bm = sqlsrv_query($conn, $sql_rprq_bm);
+        $result_rprq_bm = sqlsrv_fetch_array($query_rprq_bm, SQLSRV_FETCH_ASSOC);
+        $count1=$result_rprq_bm['COUNTSTATUS'];
+
+        $countnum=$count1;
+        if($countnum!=0){ 
+            echo '<span class="badgeside blink_me">'.$countnum.'</span>';
+        }  
+    }
     
 sqlsrv_close($conn);
 ?>

@@ -3515,8 +3515,8 @@ if($_GET["area"]=="GW"){
                                 }
                                 $query_chketmrpmdrive2 = sqlsrv_query($conn, $sql_chketmrpmdrive2);
                                 $result_chketmrpmdrive2 = sqlsrv_fetch_array($query_chketmrpmdrive2, SQLSRV_FETCH_ASSOC);
-                                $rsdrivename2 = $result_chketmrpmdrive1["RPMD_NAME"];
-                                $rsdrivecard2 = $result_chketmrpmdrive1["RPMD_CARLICENCE"];
+                                $rsdrivename2 = $result_chketmrpmdrive2["RPMD_NAME"];
+                                $rsdrivecard2 = $result_chketmrpmdrive2["RPMD_CARLICENCE"];
 
                                 if($DETAILX20=="PM"){
                                     $TECHNICIANEMPLOYEES2 = $result_seG2['NAMEASSIGN'];
@@ -6645,8 +6645,8 @@ if($_GET["area"]=="GW"){
                                 }
                                 $query_chketmrpmdrive2 = sqlsrv_query($conn, $sql_chketmrpmdrive2);
                                 $result_chketmrpmdrive2 = sqlsrv_fetch_array($query_chketmrpmdrive2, SQLSRV_FETCH_ASSOC);
-                                $rsdrivename2 = $result_chketmrpmdrive1["RPMD_NAME"];
-                                $rsdrivecard2 = $result_chketmrpmdrive1["RPMD_CARLICENCE"];
+                                $rsdrivename2 = $result_chketmrpmdrive2["RPMD_NAME"];
+                                $rsdrivecard2 = $result_chketmrpmdrive2["RPMD_CARLICENCE"];
 
                         // #################################################### OTHER PLANG2 ####################################################
                                 

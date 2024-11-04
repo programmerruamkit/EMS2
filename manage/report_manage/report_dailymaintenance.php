@@ -8,15 +8,17 @@
 	// exit();
 	$SESSION_AREA = $_SESSION["AD_AREA"];
 	if($SESSION_AREA=="AMT"){
-		$HREF="../manage/report_manage/report_dailymaintenance_amt_excel.php?ds='+datestartdetail+'&de='+dateenddetail+'&rg='+vhcrg+'&st='+status+'&area=$SESSION_AREA";
+		$HREF="../manage/report_manage/report_dailymaintenance_amt_excel.php?ds='+ds+'&de='+de+'&rg='+rg+'&st='+st+'&gp='+gp+'&tc='+tc+'&area=$SESSION_AREA";
 	}else{
-		$HREF="../manage/report_manage/report_dailymaintenance_gw_excel.php?ds='+datestartdetail+'&de='+dateenddetail+'&rg='+vhcrg+'&st='+status+'&area=$SESSION_AREA";
+		$HREF="../manage/report_manage/report_dailymaintenance_gw_excel.php?ds='+ds+'&de='+de+'&rg='+rg+'&st='+st+'&gp='+gp+'&tc='+tc+'&area=$SESSION_AREA";
 	}
 
 	$ds = $_GET['ds'];
 	$de = $_GET['de'];
 	$rg = $_GET['rg'];
 	$st = $_GET['st'];
+	$gp = $_GET['gp'];
+	$tc = $_GET['tc'];
 	if(isset($ds)&&isset($de)){
 		$getselectdaystart = $ds;
 		$getselectdayend = $de;		
@@ -66,10 +68,12 @@
 			document.getElementById('dateEnd').value = document.getElementById('dateStart').value;
 		}
 		function excel_dailymaintenance() {
-			var datestartdetail = document.getElementById('dateStart').value;
-			var dateenddetail   = document.getElementById('dateEnd').value;
-			var vhcrg   = document.getElementById('VHCRGNM').value;
-			var status   = document.getElementById('STATUSREPAIR').value;
+			var ds = document.getElementById('dateStart').value;
+			var de   = document.getElementById('dateEnd').value;
+			var rg   = document.getElementById('VHCRGNM').value;
+			var st   = document.getElementById('STATUSREPAIR').value;
+			var gp   = document.getElementById('GROUP').value;
+			var tc   = document.getElementById('TYPECUS').value;
 			window.open('<?=$HREF?>','_blank');
 		}
 		
@@ -80,21 +84,30 @@
 			var ds = $("#dateStart").val();
 			var de = $("#dateEnd").val();
 			var rg = $("#VHCRGNM").val();	
-			var st = $("#STATUSREPAIR").val();				
+			var st = $("#STATUSREPAIR").val();	
+			var gp = $("#GROUP").val();				
+			var tc = $("#TYPECUS").val();				
 			
-			if(rg==''){
-				// alert('1')
-				var getsel = "?ds="+ds+"&de="+de+"&st="+st;
-				loadViewdetail('<?=$path?>manage/report_manage/report_dailymaintenance.php'+getsel);
-			}else{
-				// alert('2')
-				var getsel = "?ds="+ds+"&de="+de+"&st="+st+"&rg="+rg;
-				loadViewdetail('<?=$path?>manage/report_manage/report_dailymaintenance.php'+getsel);
-			}
+			var getsel = "?ds="+ds+"&de="+de+"&rg="+rg+"&st="+st+"&gp="+gp+"&tc="+tc;
+			loadViewdetail('<?=$path?>manage/report_manage/report_dailymaintenance.php'+getsel);
 		} 
 	
 	</script>
 </head>
+<style>
+	.largerCheckbox2 {
+		width: 20px;
+		height: 20px;
+	}
+	.largerCheckbox1 {
+		width: 20px;
+		height: 20px;
+	}
+	.largerCheckbox {
+		width: 20px;
+		height: 20px;
+	}
+</style>
 <body>
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="INVENDATA no-border">
   <tr class="TOP">
@@ -141,9 +154,30 @@
 					</td>
 					<td width="1%" align="right">&nbsp;</td>   
                     <td width="10%" align="left">
+                        <div class="input-control select">ประเภทงาน       
+                            <select class="time" onFocus="$(this).select();" style="width: 100%;" name="GROUP" id="GROUP">
+								<option value="" <?php if(isset($gp)){if($gp=='ทั้งหมด'){echo 'selected';}}?>>ทั้งหมด</option>
+								<option value="BM" <?php if(isset($gp)){if($gp=='BM'){echo 'selected';}}?>>BM</option>
+								<option value="PM" <?php if(isset($gp)){if($gp=='PM'){echo 'selected';}}?>>PM</option>
+                            </select>
+                        </div>
+                    </td>
+					<td width="1%" align="right">&nbsp;</td>   
+                    <td width="10%" align="left">
+                        <div class="input-control select">กลุ่มลูกค้า       
+                            <select class="time" onFocus="$(this).select();" style="width: 100%;" name="TYPECUS" id="TYPECUS">
+								<option value="" <?php if(isset($tc)){if($tc=='ทั้งหมด'){echo 'selected';}}?>>ทั้งหมด</option>
+								<option value="cusout" <?php if(isset($tc)){if($tc=='cusout'){echo 'selected';}}?>>ภายนอก</option>
+								<option value="cusin" <?php if(isset($tc)){if($tc=='cusin'){echo 'selected';}}?>>ภายใน</option>
+                            </select>
+                        </div>
+                    </td>
+					<td width="1%" align="right">&nbsp;</td>   
+                    <td width="10%" align="left">
                         <div class="input-control select">สถานะ       
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="STATUSREPAIR" id="STATUSREPAIR" required>
 								<option value="ทั้งหมด" <?php if(isset($st)){if($st=='ทั้งหมด'){echo 'selected';}}?>>ทั้งหมด</option>
+								<option value="รอส่งแผน" <?php if(isset($st)){if($st=='รอส่งแผน'){echo 'selected';}}?>>รอส่งแผน</option>
 								<option value="รอตรวจสอบ" <?php if(isset($st)){if($st=='รอตรวจสอบ'){echo 'selected';}}?>>รอตรวจสอบ</option>
 								<option value="รอจ่ายงาน" <?php if(isset($st)){if($st=='รอจ่ายงาน'){echo 'selected';}}?>>รอจ่ายงาน</option>
 								<option value="รอคิวซ่อม" <?php if(isset($st)){if($st=='รอคิวซ่อม'){echo 'selected';}}?>>รอคิวซ่อม</option>
@@ -153,15 +187,16 @@
                             </select>
                         </div>
                     </td>
+					<td width="1%" align="right">&nbsp;</td>  
                     <td width="10%" align="center"><br>
                         <button class="bg-color-blue" onclick="queryreportdaily()"><font color="white"><i class="icon-search"></i> ค้นหา</font></button>
                     </td>
-                    <td width="10%" align="center"><br>
+                    <!-- <td width="10%" align="center"><br>
                         <button class="button_gray" onclick="javascript:loadViewdetail('<?=$path?>manage/report_manage/report_dailymaintenance.php');"><font color="black"><i class="fa fa-refresh"></i> รีเซ็ต</font></button>
-                    </td>
+                    </td> -->
 					<td width="30%" align="center">
 						<div class="row input-control"><br>
-							<button  title="Excel" type="button" class="bg-color-green big" onclick="excel_dailymaintenance()"><font color="white" size="4"><i class="icon-file-excel icon-large"></i> Excel รายงานซ่อมบำรุงประจำวัน</font></button>
+							<button  title="Excel" type="button" class="bg-color-green big" onclick="excel_dailymaintenance()"><font color="white" size="2"><i class="icon-file-excel icon-large"></i> Excel รายงานซ่อมบำรุงประจำวัน</font></button>
 						</div>
 					</td>
 					<td align="center"></td>
@@ -202,28 +237,11 @@
 					// echo "RG=".$rgsub."<br>";
 					// echo "DS=".$dscon."<br>";
 					// echo "DE=".$decon."<br>";
+					// echo "GP=".$gp."<br>";
+					// echo "TC=".$tc."<br>";
 					// echo "ST=".$st."<br>";
-					// $wh="";
-					if(($rgsub!="")&&($dscon!="")&&($decon!="")&&($st=="ทั้งหมด")){
-						// echo "IF=1<br>";  	
-						$wh="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_REGISHEAD = '$rgsub' AND a.RPRQ_AREA = '$SESSION_AREA'";		
-					}else if(($rgsub!="")&&($dscon!="")&&($decon!="")&&($st!="ทั้งหมด")){
-						// echo "IF=2<br>";
-						$wh="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_REGISHEAD = '$rgsub' AND a.RPRQ_STATUSREQUEST = '$st' AND a.RPRQ_AREA = '$SESSION_AREA'";	
-					}else if(($rgsub=="")&&($dscon!="")&&($decon!="")&&($st!="ทั้งหมด")&&($st!="ไม่อนุมัติ")){
-						// echo "IF=3<br>";
-						$wh="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_STATUSREQUEST = '$st' AND a.RPRQ_AREA = '$SESSION_AREA'";								
-					}else if(($rgsub=="")&&($dscon!="")&&($decon!="")&&($st=="ทั้งหมด")){
-						// echo "IF=4<br>";
-						$wh="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_AREA = '$SESSION_AREA'";												
-					}else if(($rgsub=="")&&($dscon!="")&&($decon!="")&&($st=="ไม่อนุมัติ")){
-						// echo "IF=5<br>";						
-						$wh="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_STATUSREQUEST = '$st' AND a.RPRQ_AREA = '$SESSION_AREA'";												
-					}else{
-						$wh="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_AREA = '$SESSION_AREA'";												
-					}
-					
-					$sql_reportdaily = "SELECT a.RPRQ_ID,a.RPRQ_CODE,a.RPRQ_STATUSREQUEST,a.RPRQ_REGISHEAD,a.RPRQ_REGISTAIL,a.RPRQ_CARNAMEHEAD,a.RPRQ_CARNAMETAIL,b.RPC_SUBJECT SUBJ,
+					// $where1="";
+					$sqlquery="SELECT DISTINCT a.RPRQ_ID,a.RPRQ_CODE,a.RPRQ_STATUSREQUEST,a.RPRQ_REGISHEAD,a.RPRQ_REGISTAIL,a.RPRQ_CARNAMEHEAD,a.RPRQ_CARNAMETAIL,b.RPC_SUBJECT SUBJ,
 						CASE
 							WHEN a.RPRQ_WORKTYPE = 'BM' THEN
 								CASE 
@@ -235,7 +253,7 @@
 								ELSE b.RPC_SUBJECT 
 							END ELSE RPRQ_RANKPMTYPE 
 						END RPC_SUBJECT_CON,
-						CONVERT(datetime,a.RPRQ_REQUESTCARDATE,103) RPRQ_REQUESTCARDATE,
+						-- CONVERT(datetime,a.RPRQ_REQUESTCARDATE,103) RPRQ_REQUESTCARDATE,
 						b.RPC_INCARDATE+' '+b.RPC_INCARTIME REPAIRSTART,
 						b.RPC_OUTCARDATE+' '+b.RPC_OUTCARTIME REPAIREND,
 						b.RPC_DETAIL,
@@ -243,8 +261,40 @@
 						a.RPRQ_REQUESTBY
 						FROM [dbo].[REPAIRREQUEST] a
 						INNER JOIN [dbo].[REPAIRCAUSE] b ON a.[RPRQ_CODE] = b.[RPRQ_CODE] 
-						WHERE 1=1 AND a.RPRQ_STATUS = 'Y' ".$wh."";
-					$query_reportdaily = sqlsrv_query($conn, $sql_reportdaily);
+						WHERE 1=1 ";
+					
+					$wsa="AND a.RPRQ_STATUS = 'Y' AND a.RPRQ_AREA = '$SESSION_AREA' ";
+					$wd1="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' ";
+					$wd2="AND CONVERT(datetime,a.RPRQ_CREATEDATE_REQUEST,103) BETWEEN '$dscon' AND '$decon' ";
+					$wrg="AND a.RPRQ_REGISHEAD LIKE '%$rgsub%' ";
+					$wwt="AND a.RPRQ_WORKTYPE LIKE '%$gp%' ";
+					$wtc="AND a.RPRQ_TYPECUSTOMER LIKE '%$tc%' ";
+					$wst1="AND a.RPRQ_STATUSREQUEST NOT IN('รอส่งแผน','รอตรวจสอบ','รอจ่ายงาน','ไม่อนุมัติ') ";
+					$wst2="AND a.RPRQ_STATUSREQUEST IN('รอส่งแผน','รอตรวจสอบ','รอจ่ายงาน','ไม่อนุมัติ') ";
+					$wst3="AND a.RPRQ_STATUSREQUEST LIKE '%$st%' ";
+					$order="ORDER BY a.RPRQ_STATUSREQUEST ASC";
+
+					if(isset($st)){
+						if($st=="ทั้งหมด"){
+							// echo "IF=1<br>";															
+							$sql_seRepairplan = $sqlquery.$wsa.$wd1.$wrg.$wwt.$wtc.$wst1." UNION ALL ".$sqlquery.$wsa.$wd2.$wrg.$wwt.$wtc.$wst2.$order;
+						}else if(($st=="รอส่งแผน")||($st=="รอตรวจสอบ")||($st=="รอจ่ายงาน")||($st=="ไม่อนุมัติ")){
+							// echo "IF=2<br>";															
+							$sql_seRepairplan = $sqlquery.$wsa.$wd2.$wrg.$wwt.$wtc.$wst3.$order;
+						}else if(($st=="รอคิวซ่อม")||($st=="กำลังซ่อม")||($st=="ซ่อมเสร็จสิ้น")){
+							// echo "IF=3<br>";															
+							$sql_seRepairplan = $sqlquery.$wsa.$wd1.$wrg.$wwt.$wtc.$wst3.$order;	
+						}else{
+							// echo "IF=0<br>";
+							$sql_seRepairplan = "";											
+						}
+					}else{
+						// echo "IF=0<br>";
+						$sql_seRepairplan = "";	
+					}
+					// echo "<br>";
+					// echo $sql_seRepairplan;
+					$query_reportdaily = sqlsrv_query($conn, $sql_seRepairplan);
 					$no=0;
 					while($result_reportdaily = sqlsrv_fetch_array($query_reportdaily, SQLSRV_FETCH_ASSOC)){	
 						$no++;
@@ -276,7 +326,8 @@
 				?>
 
 				<tr height="25px">
-					<td align="center"><?php print "$RPRQ_ID";?></td>
+					<td align="center"><?php print "$no";?></td>
+					<!-- <td align="center"><?php print "$RPRQ_ID";?></td> -->
 					<td align="center"><?php print "$RPRQ_STATUSREQUEST";?></td>
 					<td align="center"><?php print "$RPRQ_REGISHEAD";?></td>
 					<td align="center"><?php print "$RPRQ_CARNAMEHEAD";?></td>

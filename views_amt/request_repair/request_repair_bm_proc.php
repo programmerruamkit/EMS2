@@ -26,6 +26,8 @@
 			$proc="delete";
 		}else if($_POST["proc"]=="deleteimageonly"){
 			$proc="deleteimageonly";
+		}else if($_POST["proc"]=="send_plan"){
+			$proc="send_plan";
 		}
 	}
 	
@@ -92,7 +94,7 @@
 		$RPRQ_CREATEDATE_REQUEST = $_POST["RPRQ_CREATEDATE_REQUEST"];
 		$RPRQ_AREA = $_POST["RPRQ_AREA"];
 		$RPRQ_STATUS = 'Y';
-		$RPRQ_STATUSREQUEST = 'รอตรวจสอบ';
+		$RPRQ_STATUSREQUEST = 'รอส่งแผน';
 		$RPRQ_CREATEBY = $_SESSION["AD_PERSONCODE"];
 		$RPRQ_CREATEDATE = date("Y-m-d H:i:s");
 		$RPCIM_PROCESSBY = $_SESSION["AD_PERSONCODE"];
@@ -620,5 +622,53 @@
 		}else{
 			print "ลบข้อมูลเรียบร้อยแล้ว";	
 		}		
-	};	
+	};
+	######################################################################################################
+	if($proc=="send_plan"){
+		$RPRQ_CODE = $_POST["RPRQ_CODE"];
+		$RPRQ_REMARK = $_POST["RPRQ_REMARK"];
+		$CASE = $_POST["CASE"];
+		if($CASE=='send'){
+			$RPRQ_STATUSREQUEST = 'รอตรวจสอบ';
+		}else{
+			$RPRQ_STATUSREQUEST = 'ไม่อนุมัติ';
+		}
+		$PROCESSBY = $_SESSION["AD_PERSONCODE"];
+		$PROCESSDATE = date("Y-m-d H:i:s");
+	
+		$sql = "UPDATE REPAIRREQUEST SET 	
+				RPRQ_STATUSREQUEST = ?, 
+				RPRQ_REMARK = ?,
+				RPRQ_SENDPLAN_BY = ?,
+				RPRQ_SENDPLAN_DATE = ?
+				WHERE RPRQ_CODE = ? ";
+		$params = array(
+				$RPRQ_STATUSREQUEST, 
+				$RPRQ_REMARK,
+				$PROCESSBY, 
+				$PROCESSDATE, 
+				$RPRQ_CODE
+		);	
+		$stmt = sqlsrv_query( $conn, $sql, $params);
+
+		if( $stmt === false ) {
+			die( print_r( sqlsrv_errors(), true));
+		}else{
+			print "ส่งแผนเรียบร้อยแล้ว"; 	
+		}	
+
+		if($CASE=='not'){
+			$sql_nap = "INSERT INTO REPAIRREQUEST_NONAPPROVE (
+			RPRQ_NAP_OLD_CODE,
+			RPRQ_NAP_STATUS,
+			RPRQ_NAP_PROCESSBY,
+			RPRQ_NAP_PROCESSDATE) VALUES (?,?,?,?)";
+			$params_nap = array(
+				$RPRQ_CODE,
+				'WAIT',
+				$PROCESSBY,
+				$PROCESSDATE);
+			$stmt_nap = sqlsrv_query( $conn, $sql_nap, $params_nap);	
+		}	
+	};
 ?>

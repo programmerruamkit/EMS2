@@ -623,10 +623,10 @@ if ($JOBTYPE == 'PM') {
     // CheckifSet    
     if($AREA=='AMT'){
         $boxname_s1='สุริยา แน่นหนา';
-        $boxname_s2='อำนวย บุญมา';
+        $boxname_s2='สุริยา แน่นหนา';
         $boxname_s3='เกียรติพงษ์ สดรัมย์';
         $boxname_s4='วิชัย ประสานดี';
-        $boxname1='พงศ์ภัค มีอยู่สามเสน';
+        $boxname1='นัฏชาพรรณ สังข์จีน';
         $boxname2='บุรินชัย เบอร์ไธสง';
         $boxposition='RTD';
     }else{
@@ -1221,13 +1221,13 @@ if ($JOBTYPE == 'PM') {
             if($result_seRepaircause_check['SUBJECT'] == 'เครื่องยนต์'){
                 $boxname='สุริยา แน่นหนา';
             }else if($result_seRepaircause_check['SUBJECT'] == 'โครงสร้าง'){
-                $boxname='อำนวย บุญมา ';
+                $boxname='สุริยา แน่นหนา';
             }else if($result_seRepaircause_check['SUBJECT'] == 'ยาง ช่วงล่าง'){
                 $boxname='เกียรติพงษ์ สดรัมย์';
             }else if($result_seRepaircause_check['SUBJECT'] == 'ระบบไฟ'){
                 $boxname='วิชัย ประสานดี';
             }
-            $boxname1='พงศ์ภัค มีอยู่สามเสน';
+            $boxname1='นัฏชาพรรณ สังข์จีน'; 
             $boxname2='บุรินชัย เบอร์ไธสง';
             $boxposition='RTD';
         }else{

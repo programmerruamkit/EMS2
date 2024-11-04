@@ -15,7 +15,7 @@
     $width5 = "0%";
     $width6 = "0%";
   }else{
-    $width0 = "1%";
+    $width0 = "1%"; 
     $width1 = "3%";
     $width2 = "28%";
     $width3 = "40%";
@@ -27,13 +27,13 @@
 <table class="comtop fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr" width="100%" border="0"  cellpadding="0" cellspacing="0">
  <tr>
     <td width="<?=$width0;?>">&nbsp;</td>
-    <td width="<?=$width1;?>"><img src="../images/car_repair.png" width="48" height="48" /></td>
+    <td width="<?=$width1;?>"><img src="https://img2.pic.in.th/pic/car_repair.png" width="48" height="48" /></td>
     <td width="<?=$width2;?>">&nbsp;<strong><font size="3px"><?=$title;?> - <?php print $_SESSION['AD_AREA']; ?></font></strong></td>
     <td width="<?=$width3;?>">&nbsp;</td>
     <td width="<?=$width4;?>"><img src="<?=$AD_RU_IMG;?>" width="35" height="35" /></td>
     <td width="<?=$width5;?>">
       <div class="dropdown">&nbsp;&nbsp;<strong><?php print $_SESSION['AD_NAMETHAI']; ?></strong> | 
-        <a type="button" data-bs-toggle="dropdown" style="cursor:pointer"><strong><?php print $_SESSION['AD_ROLE_NAME']; ?></strong><img src="../images/dropdrown_new.png" width="15px"></a>
+        <a type="button" data-bs-toggle="dropdown" style="cursor:pointer"><strong><?php print $_SESSION['AD_ROLE_NAME']; ?></strong><img src="https://img2.pic.in.th/pic/dropdrown_new.png" width="15px"></a>
         <ul class="dropdown-menu">              
           <?php
             $sql_login = "SELECT * FROM vwUSERLOGIN WHERE RA_USERNAME = ? AND RA_PASSWORD = ? AND ROACTIVE = 'Y' AND ROACACTIVE = 'Y' AND AREA = ? ORDER BY RU_NAME ASC";
@@ -57,9 +57,9 @@
       </div>
     </td>
     <td width="<?=$width6;?>">
-    <a href="<?=$path;?>main/main_menu.php?menu_id=14" style="cursor:pointer"><img src="../images/cog.png" width="20px"></a>
+    <a href="<?=$path;?>main/main_menu.php?menu_id=14" style="cursor:pointer"><img src="https://img2.pic.in.th/pic/cog.png" width="20px"></a>
       <!-- <div class="dropdown">
-        <a type="button" data-bs-toggle="dropdown" style="cursor:pointer"><img src="../images/cog-dropdrown.png"
+        <a type="button" data-bs-toggle="dropdown" style="cursor:pointer"><img src="https://img2.pic.in.th/pic/cog-dropdrown.png"
             width="30px"></a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="javascript:void(0);" onclick="log_outsession('<?=$_SESSION['AD_PERSONCODE'];?>','LA2')">
@@ -100,6 +100,9 @@
         <a href="<?=$path;?>main/main_menu.php?menu_id=<?=$result_sidemenu["MN_ID"]?>" style="<?=($_GET["menu_id"]==$result_sidemenu["MN_ID"])?'color:#0CF;':''?>"><?=$result_sidemenu["MN_NAME"]?>
           <!-- AMT -->
           <?php 
+            if($result_sidemenu["MN_ID"]===19 && ($SS_ROLENAME=="TENKO" || $SS_ROLENAME=="ADMIN" || $SS_ROLENAME=="DEV")){ 
+              echo '<span id="checksiderepair"></span>'; 
+            } 
             if($result_sidemenu["MN_ID"]===26){ 
               echo '<span id="checksidebmpm"></span>'; 
             } 
@@ -112,6 +115,9 @@
           ?>
           <!-- GW -->
           <?php 
+            if($result_sidemenu["MN_ID"]===56 && ($SS_ROLENAME=="TENKO" || $SS_ROLENAME=="ADMIN" || $SS_ROLENAME=="DEV")){ 
+              echo '<span id="checksiderepair"></span>'; 
+            } 
             if($result_sidemenu["MN_ID"]===62){ 
               echo '<span id="checksidebmpm"></span>';
             } 
@@ -126,7 +132,7 @@
         <span class="divider"></span>
       <?php } ?>
     </div>
-      <a href="javascript:void(0);" class="icon" onclick="topmenu()"><b><img src="../images/menu2.png" width="25px"></b></a>
+      <a href="javascript:void(0);" class="icon" onclick="topmenu()"><b><img src="https://img2.pic.in.th/pic/menu2.png" width="25px"></b></a>
     <div id="right">
       <a href="javascript:void(0);" onclick="log_outsession('<?=$_SESSION['AD_PERSONCODE'];?>','LA2')">ออกจากระบบ</a>
     </div>

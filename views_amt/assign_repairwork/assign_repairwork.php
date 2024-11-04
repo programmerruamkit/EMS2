@@ -307,7 +307,7 @@
 										}
 									?>
 								</td>
-								<?php if($result_assign_D1['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+								<?php if($result_assign_D1['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 									<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D1['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 										<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 									</td>
@@ -395,7 +395,7 @@
 									<td align="center"><?php print $result_assign_D2['RPRQ_CARNAMETAIL']; ?></td>
 									<td align="left"><?php print $result_assign_D2['RPC_SUBJECT_CON']; ?></td>
 									<td align="left"><?php print $result_assign_D2['RPC_DETAIL']; ?></td>
-									<?php if($result_assign_D2['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+									<?php if($result_assign_D2['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 										<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D2['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 											<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 										</td>
@@ -482,7 +482,7 @@
 									<td align="center"><?php print $result_assign_D3['RPRQ_CARNAMETAIL']; ?></td>
 									<td align="left"><?php print $result_assign_D3['RPC_SUBJECT_CON']; ?></td>
 									<td align="left"><?php print $result_assign_D3['RPC_DETAIL']; ?></td>
-									<?php if($result_assign_D3['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+									<?php if($result_assign_D3['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 										<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D3['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 											<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 										</td>
@@ -569,7 +569,7 @@
 									<td align="center"><?php print $result_assign_D4['RPRQ_CARNAMETAIL']; ?></td>
 									<td align="left"><?php print $result_assign_D4['RPC_SUBJECT_CON']; ?></td>
 									<td align="left"><?php print $result_assign_D4['RPC_DETAIL']; ?></td>
-									<?php if($result_assign_D4['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+									<?php if($result_assign_D4['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 										<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D4['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 											<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 										</td>
@@ -656,7 +656,7 @@
 									<td align="center"><?php print $result_assign_D5['RPRQ_CARNAMETAIL']; ?></td>
 									<td align="left"><?php print $result_assign_D5['RPC_SUBJECT_CON']; ?></td>
 									<td align="left"><?php print $result_assign_D5['RPC_DETAIL']; ?></td>
-									<?php if($result_assign_D5['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+									<?php if($result_assign_D5['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 										<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D5['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 											<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 										</td>
@@ -743,7 +743,7 @@
 									<td align="center"><?php print $result_assign_D6['RPRQ_CARNAMETAIL']; ?></td>
 									<td align="left"><?php print $result_assign_D6['RPC_SUBJECT_CON']; ?></td>
 									<td align="left"><?php print $result_assign_D6['RPC_DETAIL']; ?></td>
-									<?php if($result_assign_D6['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+									<?php if($result_assign_D6['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 										<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D6['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 											<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 										</td>
@@ -830,7 +830,7 @@
 									<td align="center"><?php print $result_assign_D7['RPRQ_CARNAMETAIL']; ?></td>
 									<td align="left"><?php print $result_assign_D7['RPC_SUBJECT_CON']; ?></td>
 									<td align="left"><?php print $result_assign_D7['RPC_DETAIL']; ?></td>
-									<?php if($result_assign_D7['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+									<?php if($result_assign_D7['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'||$_SESSION['AD_ROLE_NAME']=='ADMIN'||$_SESSION['AD_ROLE_NAME']=='MAINTENANCE(SA)'){ ?>
 										<td align="center" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $result_assign_D7['RPRQ_CODE'];; ?>','1=1','1300','570','มอบหมายงานซ่อม');">
 											<img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24">
 										</td>

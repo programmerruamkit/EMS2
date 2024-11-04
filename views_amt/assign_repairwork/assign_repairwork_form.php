@@ -808,7 +808,9 @@
       <input type="hidden" name="RPRQ_CODE" id="RPRQ_CODE" value="<?=$RPRQ_CODE;?>"/>
       <input type="hidden" name="RPRQ_WORKTYPE" id="RPRQ_WORKTYPE" value="<?=$result_rprq['RPRQ_WORKTYPE'];?>"/>
       <input type="hidden" name="target" id="target" value="update_repair_status"/>
-      <button class="bg-color-green font-white" type="button" onclick="save_data_assign()">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp;
+      <?php if($result_rprq['RPRQ_STATUSREQUEST']!='ซ่อมเสร็จสิ้น'){ ?>
+        <button class="bg-color-green font-white" type="button" onclick="save_data_assign()">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp;
+      <?php } ?> 
       <button class="bg-color-red font-white" type="button" onclick="closeUI()">ปิดหน้าจอ</button>
     </form>
     <br><br>

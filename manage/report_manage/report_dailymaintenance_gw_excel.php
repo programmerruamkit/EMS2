@@ -12,6 +12,8 @@ $ds = $_GET['ds'];
 $de = $_GET['de'];
 $rg = $_GET['rg'];
 $st = $_GET['st'];
+$gp = $_GET['gp'];
+$tc = $_GET['tc'];
 if(isset($ds)&&isset($de)){
     $getselectdaystart = $ds;
     $getselectdayend = $de;		
@@ -49,7 +51,7 @@ header("Pragma:no-cache");
         <table  border="1" style="width: 100%;">
             <thead>
                 <tr>
-                    <td colspan="25" style="text-align:center;background-color: #dedede">สรุปผลการแจ้งซ่อมผ่านระบบ E-Maintenance (ประจำวันที่ <?=$txt_datestart_amt?>-<?=$txt_dateend_amt?>)</td>
+                    <td colspan="28" style="text-align:center;background-color: #dedede">รายงานประวัติการซ่อมบำรุง (ประจำวันที่ <?=$txt_datestart_amt?>-<?=$txt_dateend_amt?>)</td>
                 </tr>
                 <tr>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ลำดับ</td>
@@ -62,9 +64,12 @@ header("Pragma:no-cache");
                     <td colspan="2" style="text-align:center;background-color: #dedede">ประเภทงานซ่อม</td>
                     <td colspan="6" style="text-align:center;background-color: #dedede">สถานะงานซ่อม</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ช่องซ่อม</td>
-                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม</td>
-                    <td rowspan="2" style="text-align:center;background-color: #dedede">ชม. ในการซ่อม</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม (แผน)</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">ชม. ในการซ่อม (แผน)</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม (จริง)</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">ชม. ในการซ่อม (จริง)</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ผู้แจ้งซ่อม</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">วันที่แจ้งซ่อม</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ผู้รับแจ่งซ่อม</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ผู้จัดแผน</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ช่างผู้รับผิดชอบ</td>
@@ -89,25 +94,7 @@ header("Pragma:no-cache");
             <tbody>
                 <?php
                     $i = 1;       
-					if(($rgsub!="")&&($dscon!="")&&($decon!="")&&($st=="ทั้งหมด")){
-						// echo "IF=1<br>";  	
-						$wh="AND CONVERT(datetime,c.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_REGISHEAD = '$rgsub' AND a.RPRQ_AREA = '$SESSION_AREA'";		
-					}else if(($rgsub!="")&&($dscon!="")&&($decon!="")&&($st!="ทั้งหมด")){
-						// echo "IF=2<br>";
-						$wh="AND CONVERT(datetime,c.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_REGISHEAD = '$rgsub' AND a.RPRQ_STATUSREQUEST = '$st' AND a.RPRQ_AREA = '$SESSION_AREA'";	
-					}else if(($rgsub=="")&&($dscon!="")&&($decon!="")&&($st!="ทั้งหมด")&&($st!="ไม่อนุมัติ")){
-						// echo "IF=3<br>";
-						$wh="AND CONVERT(datetime,c.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_STATUSREQUEST = '$st' AND a.RPRQ_AREA = '$SESSION_AREA'";								
-					}else if(($rgsub=="")&&($dscon!="")&&($decon!="")&&($st=="ทั้งหมด")){
-						// echo "IF=4<br>";
-						$wh="AND CONVERT(datetime,c.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_AREA = '$SESSION_AREA'";												
-					}else if(($rgsub=="")&&($dscon!="")&&($decon!="")&&($st=="ไม่อนุมัติ")){
-						// echo "IF=5<br>";						
-						$wh="AND CONVERT(datetime,c.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_STATUSREQUEST = '$st' AND a.RPRQ_AREA = '$SESSION_AREA'";												
-					}else{
-						$wh="AND CONVERT(datetime,c.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' AND a.RPRQ_AREA = '$SESSION_AREA'";												
-					}
-                    $sql_seRepairplan = "SELECT 
+                    $sqlquery="SELECT 
                             -- DISTINCT
                             a.RPRQ_ID REPAIRPLANID,
                             a.RPRQ_CODE,
@@ -115,7 +102,7 @@ header("Pragma:no-cache");
                             a.RPRQ_COMPANYCASH COMPANYPAYMENT,
                             a.RPRQ_AREA AREA,
                             a.RPRQ_CARTYPE VEHICLETYPE,
-                            c.RPC_AREA REPAIRAREA,
+                            b.RPC_AREA REPAIRAREA,
                             a.RPRQ_REGISHEAD VEHICLEREGISNUMBER1,
                             a.RPRQ_REGISTAIL VEHICLEREGISNUMBER2,
                             a.RPRQ_CARNAMEHEAD THAINAME1,
@@ -125,35 +112,68 @@ header("Pragma:no-cache");
                             a.RPRQ_MILEAGEFINISH RANKPM,
                             a.RPRQ_RANKPMTYPE,
                             '' REPAIRTIME,
-                            c.RPC_INCARDATE,
-                            c.RPC_INCARTIME,
-                            c.RPC_INCARDATE +' '+ c.RPC_INCARTIME TIMEPLANSTART,
-                            c.RPC_OUTCARDATE,
-                            c.RPC_OUTCARTIME,
-                            c.RPC_OUTCARDATE +' '+ c.RPC_OUTCARTIME TIMEPLANEND,                            
-                            DATEDIFF(MINUTE, c.RPC_INCARTIME, c.RPC_OUTCARTIME) AS 'PLANMINUTE',                            
-                            CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23),
-                            c.RPC_SUBJECT SUBJ,
+                            b.RPC_INCARDATE,
+                            b.RPC_INCARTIME,
+                            b.RPC_INCARDATE +' '+ b.RPC_INCARTIME TIMEPLANSTART,
+                            b.RPC_OUTCARDATE,
+                            b.RPC_OUTCARTIME,
+                            b.RPC_OUTCARDATE +' '+ b.RPC_OUTCARTIME TIMEPLANEND,                            
+                            DATEDIFF(MINUTE, b.RPC_INCARTIME, b.RPC_OUTCARTIME) AS 'PLANMINUTE',                            
+                            CONVERT(VARCHAR(10),CONVERT(date, b.RPC_INCARDATE, 105),23),
+                            b.RPC_SUBJECT SUBJ,
                             CASE
-                                WHEN c.RPC_SUBJECT = 'EL' THEN 'ระบบไฟ'
-                                WHEN c.RPC_SUBJECT = 'TU' THEN 'ยาง-ช่วงล่าง'
-                                WHEN c.RPC_SUBJECT = 'BD' THEN 'โครงสร้าง'
-                                WHEN c.RPC_SUBJECT = 'EG' THEN 'เครื่องยนต์'
-                                WHEN c.RPC_SUBJECT = 'AC' THEN 'อุปกรณ์ประจำรถ'
-                                ELSE c.RPC_SUBJECT
+                                WHEN b.RPC_SUBJECT = 'EL' THEN 'ระบบไฟ'
+                                WHEN b.RPC_SUBJECT = 'TU' THEN 'ยาง-ช่วงล่าง'
+                                WHEN b.RPC_SUBJECT = 'BD' THEN 'โครงสร้าง'
+                                WHEN b.RPC_SUBJECT = 'EG' THEN 'เครื่องยนต์'
+                                WHEN b.RPC_SUBJECT = 'AC' THEN 'อุปกรณ์ประจำรถ'
+                                ELSE b.RPC_SUBJECT
                             END SUBJECT,
-                            c.RPC_DETAIL DETAIL,
-                            c.RPC_INCARDATE CARINPUTDATE,                            
+                            b.RPC_DETAIL DETAIL,
+                            b.RPC_INCARDATE CARINPUTDATE,                            
                             a.RPRQ_REQUESTBY,                    
                             a.RPRQ_REQUESTBY_SQ,
+                            a.RPRQ_CREATEDATE_REQUEST,
                             a.RPRQ_APPROVE,
                             a.RPRQ_STATUSREQUEST,
-                            a.RPRQ_REMARK
+                            a.RPRQ_REMARK,
+                            (SELECT TOP 1 CONVERT(VARCHAR, CONVERT(DATETIME, RPATTM_PROCESS, 101), 103)+' '+SUBSTRING(RPATTM_PROCESS, 12, 5) FROM REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT AND RPATTM_GROUP='START') AS REPAIRSTART,
+                            (SELECT TOP 1 CONVERT(VARCHAR, CONVERT(DATETIME, RPATTM_PROCESS, 101), 103)+' '+SUBSTRING(RPATTM_PROCESS, 12, 5) FROM REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT AND RPATTM_GROUP='SUCCESS') AS REPAIREND,
+                            (SELECT DISTINCT SUM(CAST(REPLACE(RPATTM_TOTAL,',','') as int)) FROM dbo.REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT) AS RPATTM_TOTAL
                         FROM
                             REPAIRREQUEST a
-                            INNER JOIN REPAIRCAUSE c ON c.RPRQ_CODE = a.RPRQ_CODE
-                        WHERE                         
-                            a.RPRQ_AREA = '$SESSION_AREA' AND a.RPRQ_STATUS = 'Y' ".$wh."";   
+                            INNER JOIN REPAIRCAUSE b ON b.RPRQ_CODE = a.RPRQ_CODE
+                        WHERE 1=1 ";
+                    $wsa="AND a.RPRQ_STATUS = 'Y' AND a.RPRQ_AREA = '$SESSION_AREA' ";
+					$wd1="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' ";
+					$wd2="AND CONVERT(datetime,a.RPRQ_CREATEDATE_REQUEST,103) BETWEEN '$dscon' AND '$decon' ";
+					$wrg="AND a.RPRQ_REGISHEAD LIKE '%$rgsub%' ";
+					$wwt="AND a.RPRQ_WORKTYPE LIKE '%$gp%' ";
+					$wtc="AND a.RPRQ_TYPECUSTOMER LIKE '%$tc%' ";
+					$wst1="AND a.RPRQ_STATUSREQUEST NOT IN('รอส่งแผน','รอตรวจสอบ','รอจ่ายงาน','ไม่อนุมัติ') ";
+					$wst2="AND a.RPRQ_STATUSREQUEST IN('รอส่งแผน','รอตรวจสอบ','รอจ่ายงาน','ไม่อนุมัติ') ";
+					$wst3="AND a.RPRQ_STATUSREQUEST LIKE '%$st%' ";
+					$order="ORDER BY a.RPRQ_STATUSREQUEST ASC";
+
+					if(isset($st)){
+						if($st=="ทั้งหมด"){
+							// echo "IF=1<br>";															
+							$sql_seRepairplan = $sqlquery.$wsa.$wd1.$wrg.$wwt.$wtc.$wst1." UNION ALL ".$sqlquery.$wsa.$wd2.$wrg.$wwt.$wtc.$wst2.$order;
+						}else if(($st=="รอส่งแผน")||($st=="รอตรวจสอบ")||($st=="รอจ่ายงาน")||($st=="ไม่อนุมัติ")){
+							// echo "IF=2<br>";															
+							$sql_seRepairplan = $sqlquery.$wsa.$wd2.$wrg.$wwt.$wtc.$wst3.$order;
+						}else if(($st=="รอคิวซ่อม")||($st=="กำลังซ่อม")||($st=="ซ่อมเสร็จสิ้น")){
+							// echo "IF=3<br>";															
+							$sql_seRepairplan = $sqlquery.$wsa.$wd1.$wrg.$wwt.$wtc.$wst3.$order;	
+						}else{
+							// echo "IF=0<br>";
+							$sql_seRepairplan = "";											
+						}
+					}else{
+						// echo "IF=0<br>";
+						$sql_seRepairplan = "";	
+					}   
+                    // echo $sql_seRepairplan."<br>";
                     $params_seRepairplan = array();
                     $query_seRepairplan = sqlsrv_query($conn, $sql_seRepairplan, $params_seRepairplan);
                     while ($result_seRepairplan = sqlsrv_fetch_array($query_seRepairplan, SQLSRV_FETCH_ASSOC)) {
@@ -167,7 +187,9 @@ header("Pragma:no-cache");
                         $status5 = ($result_seRepairplan['RPRQ_STATUSREQUEST'] == 'ซ่อมเสร็จสิ้น') ? '1' : '';
                         $status6 = ($result_seRepairplan['RPRQ_STATUSREQUEST'] == 'ไม่อนุมัติ') ? '1' : '';
 
-                        $PLANHOUR        = ($result_seRepairplan['PLANMINUTE']/60);                    
+                        $PLANHOUR1      = ($result_seRepairplan['PLANMINUTE']/60); 
+                        $RPATTM_TOTAL   = $result_seRepairplan["RPATTM_TOTAL"];
+                        $PLANHOUR2      = ($RPATTM_TOTAL/60);                  
                         //เช็คแผนว่าเป็น PM ไหน
                             if ($result_seRepairplan['REPAIRTYPE'] == 'PM') {
                                 $REPAIRTYPE = $result_seRepairplan['RPRQ_RANKPMTYPE'];
@@ -220,8 +242,11 @@ header("Pragma:no-cache");
                             <td style="text-align: center"><?=$status6?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['REPAIRAREA']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['TIMEPLANSTART']?> - <?=$result_seRepairplan['TIMEPLANEND']?></td>
-                            <td style="text-align: center"><?=number_format( $PLANHOUR,2)?></td>
+                            <td style="text-align: center"><?=number_format( $PLANHOUR1,2)?></td>
+                            <td style="text-align: center"><?=$result_seRepairplan['REPAIRSTART']?> - <?=$result_seRepairplan['REPAIREND']?></td>
+                            <td style="text-align: center"><?=number_format( $PLANHOUR2,2)?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['RPRQ_REQUESTBY']?></td>
+                            <td style="text-align: center"><?=$result_seRepairplan['RPRQ_CREATEDATE_REQUEST']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['RPRQ_REQUESTBY_SQ']?></td>
                             <td style="text-align: center"><?=$APPROVE_NAME?></td>
                             <td style="text-align: center"><?=$TECHICIAN?></td>
@@ -250,7 +275,7 @@ header("Pragma:no-cache");
                     <td style="text-align: center"><?= $sumstatus4 ?></td>
                     <td style="text-align: center"><?= $sumstatus5 ?></td>
                     <td style="text-align: center"><?= $sumstatus6 ?></td>
-                    <td colspan="8"></td>
+                    <td colspan="11"></td>
                 </tr>
             </tbody>
         </table>

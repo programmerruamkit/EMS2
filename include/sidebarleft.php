@@ -22,11 +22,11 @@ if($_GET['menu_id']==="") exit;
 			$query_menusub = sqlsrv_query($conn, $sql_menusub);
 			while($result_menusub = sqlsrv_fetch_array($query_menusub, SQLSRV_FETCH_ASSOC)){ ?>
 				<li onclick="loadViewdetail('<?=$path.$result_menusub['MN_URL']?>','<?=$result_menusub['MN_ID']?>')" style='cursor:pointer'><i class='gg-chevron-right'></i>&nbsp;&nbsp;&nbsp;<font size='3px'><?=$result_menusub['MN_NAME']?></font>
-					<?php if($menu_id==26){ ?>
-						<?php if($result_menusub['MN_ID']==27){ ?>
+					<?php if(($menu_id==26)||($menu_id==62)){ ?>
+						<?php if(($result_menusub['MN_ID']==27)||($result_menusub['MN_ID']==63)){ ?>
 							<span id="checksidebm"></span>
 						<?php } ?>
-						<?php if($result_menusub['MN_ID']==31){ ?>
+						<?php if(($result_menusub['MN_ID']==31)||($result_menusub['MN_ID']==67)){ ?>
 							<span id="checksidepm"></span>
 						<?php } ?>
 					<?php } ?>

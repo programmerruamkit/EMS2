@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
@@ -103,7 +103,7 @@
                         <td width="70%" height="35" align="left" class="bg-white">              
                           <div class="input-control select">                    
                             <?php
-                              $stmt_selrole = "SELECT * FROM ROLE_USER WHERE NOT RU_STATUS IN ('D','N') AND RU_AREA = '$SESSION_AREA'";
+                              $stmt_selrole = "SELECT * FROM ROLE_USER WHERE NOT RU_STATUS IN ('D','N') AND RU_AREA = '$SESSION_AREA' AND NOT RU_NAME = 'DEV'";
                               $query_selrole = sqlsrv_query($conn, $stmt_selrole);
                             ?>
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="RU_ID" id="RU_ID" required>

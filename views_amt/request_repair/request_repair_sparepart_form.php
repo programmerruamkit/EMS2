@@ -224,12 +224,23 @@
                                     $RPRQ_STATUSREQUEST=$result_rprq_check['RPRQ_STATUSREQUEST'];
                                     $RPRQ_WORKTYPE=$result_rprq_check['RPRQ_WORKTYPE'];
 
-                            $sql_mileage = "SELECT TOP 1 * FROM vwMILEAGE WHERE VEHICLEREGISNUMBER = '$RPSPP_REGISHEAD' ORDER BY MILEAGEID DESC ";
+                            $field="VEHICLEREGISNUMBER = '$RPSPP_REGISHEAD'";
+                    
+                            $sql_mileage = "SELECT TOP 1 * FROM TEMP_MILEAGE WHERE $field ORDER BY CREATEDATE DESC ";
                             $params_mileage = array();
                             $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
-                            $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC);   
+                            $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
+
+                            // $sql_mileage = "SELECT TOP 1 * FROM vwMILEAGE WHERE VEHICLEREGISNUMBER = '$RPSPP_REGISHEAD' ORDER BY MILEAGEID DESC ";
+                            // $params_mileage = array();
+                            // $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
+                            // $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC);  
                             if(isset($result_mileage['MAXMILEAGENUMBER'])){
-                                $MAXMILEAGENUMBER = $result_mileage['MAXMILEAGENUMBER'];
+                                if($result_mileage['MAXMILEAGENUMBER']>1000000){
+                                    $MAXMILEAGENUMBER = $result_mileage['MAXMILEAGENUMBER']-1000000;
+                                }else{
+                                    $MAXMILEAGENUMBER = $result_mileage['MAXMILEAGENUMBER'];
+                                }
                             }else{
                                 $MAXMILEAGENUMBER = 0;
                             }

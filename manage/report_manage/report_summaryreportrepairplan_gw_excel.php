@@ -170,7 +170,7 @@ header("Pragma:no-cache");
                         $result_seActualtime    = sqlsrv_fetch_array($query_seActualtime, SQLSRV_FETCH_ASSOC);
                             $ACTUALMIN     = $result_seActualtime['MIN'];
                             $ACTUALMAX     = $result_seActualtime['MAX'];
-                            $ACTUALHOUR     = ($result_seActualtime['PLANMINUTE']/60);
+                            // $ACTUALHOUR     = ($result_seActualtime['PLANMINUTE']/60);
 
                         // $sql_seActualtimeStart ="SELECT TOP 1 RPATTM_ID,RPRQ_CODE,RPC_SUBJECT,RPATTM_PROCESS,RPATTM_GROUP,RPATTM_TOTAL
                         //     FROM dbo.REPAIRACTUAL_TIME WHERE RPRQ_CODE  = '$RPRQ_CODE' AND RPC_SUBJECT = '$SUBJ' AND RPATTM_GROUP = 'START' ORDER BY RPATTM_PROCESS ASC";
@@ -178,11 +178,13 @@ header("Pragma:no-cache");
                         // $query_seActualtimeStart     = sqlsrv_query($conn, $sql_seActualtimeStart, $params_seActualtimeStart);
                         // $result_seActualtimeStart    = sqlsrv_fetch_array($query_seActualtimeStart, SQLSRV_FETCH_ASSOC);
 	
+                        $sql_seActualtimeEnd ="SELECT DISTINCT SUM(CAST(RPATTM_TOTAL as int)) AS 'RPATTM_TOTAL' 
+                        FROM dbo.REPAIRACTUAL_TIME WHERE RPRQ_CODE  = '$RPRQ_CODE' AND RPC_SUBJECT = '$SUBJ'";
                         // $sql_seActualtimeEnd ="SELECT TOP 1 RPATTM_ID,RPRQ_CODE,RPC_SUBJECT,RPATTM_PROCESS,RPATTM_GROUP,RPATTM_TOTAL
                         //     FROM dbo.REPAIRACTUAL_TIME WHERE RPRQ_CODE  = '$RPRQ_CODE' AND RPC_SUBJECT = '$SUBJ' AND RPATTM_GROUP = 'SUCCESS' ORDER BY RPATTM_PROCESS DESC";
-                        // $params_seActualtimeEnd    = array();
-                        // $query_seActualtimeEnd     = sqlsrv_query($conn, $sql_seActualtimeEnd, $params_seActualtimeEnd);
-                        // $result_seActualtimeEnd    = sqlsrv_fetch_array($query_seActualtimeEnd, SQLSRV_FETCH_ASSOC);
+                        $params_seActualtimeEnd    = array();
+                        $query_seActualtimeEnd     = sqlsrv_query($conn, $sql_seActualtimeEnd, $params_seActualtimeEnd);
+                        $result_seActualtimeEnd    = sqlsrv_fetch_array($query_seActualtimeEnd, SQLSRV_FETCH_ASSOC);
 
                             // $datestartac = $result_seActualtimeStart["RPATTM_PROCESS"];
                             // $startdate = explode(" ", $datestartac);
@@ -206,7 +208,8 @@ header("Pragma:no-cache");
                             // $endy = $enddate2[2]+543;
                             // $endymd = $enddate2[2].'/'.$enddate2[1].'/'.$enddate2[0].' '.$endtimesub;
 
-                            // $RPATTM_TOTAL = $result_seActualtimeEnd["RPATTM_TOTAL"];
+                            $RPATTM_TOTAL = $result_seActualtimeEnd["RPATTM_TOTAL"];
+                            $ACTUALHOUR     = ($RPATTM_TOTAL/60);
                             // $ACTUALHOUR = date("i:s" , mktime(0,0,$RPATTM_TOTAL,0,0,0));
                             
                         // ประมาณการ
@@ -232,7 +235,12 @@ header("Pragma:no-cache");
                                 $sparepartcost = $sparepartcost . $result_selEstimate['sparepartcost'];
                                 $wage = $wage . $result_selEstimate['wage'];
                             }
-                            $estimatecal=($hourmoney * $wage) + $sparepartcost;
+                            
+                            if ($result_seRepairplan['REPAIRTYPE'] == 'PM') {
+                                $estimatecal=$wage + $sparepartcost;
+                            }else{
+                                $estimatecal=($hourmoney * $wage) + $sparepartcost;
+                            }  
                             if($estimatecal!='0'){
                                 $estimaters=$estimatecal;
                             }else{
@@ -316,7 +324,7 @@ header("Pragma:no-cache");
                     <td style="text-align: center"><b><?= number_format($SUMACTUALHOURS,0) ?></b></td>
                     <td style="text-align: center"><b><?= number_format($SUMhourmoney,2) ?></b></td>
                     <td style="text-align: center"><b><?= number_format($SUMsparepartcost,0) ?></b></td>
-                    <td style="text-align: center"><b><?= number_format($SUM_HxW,0) ?></b></td>
+                    <td style="text-align: center"><b><?= number_format($SUMwage,0) ?></b></td>
                     <td style="text-align: center"><b><?= number_format($SUMestimaters,0) ?></b></td>
                 </tr>
             </tbody>

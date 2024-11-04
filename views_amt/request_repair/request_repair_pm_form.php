@@ -52,7 +52,7 @@
         $sql_vehicleinfo = "SELECT * FROM vwVEHICLEINFO 
         LEFT JOIN VEHICLECARTYPEMATCHGROUP ON VHCTMG_VEHICLEREGISNUMBER = VEHICLEREGISNUMBER COLLATE Thai_CI_AI
         LEFT JOIN VEHICLECARTYPE ON VEHICLECARTYPE.VHCCT_ID = VEHICLECARTYPEMATCHGROUP.VHCCT_ID
-        WHERE 1=1 AND VEHICLEGROUPDESC = 'Transport' ".$wh."";
+        WHERE 1=1 AND VEHICLEGROUPDESC = 'Transport' AND NOT VEHICLEGROUPCODE = 'VG-1403-0755' ".$wh."";
     }
     // AND VEHICLEGROUPDESC = 'Transport' 
     $query_vehicleinfo = sqlsrv_query($conn, $sql_vehicleinfo);
@@ -301,8 +301,7 @@
                                 $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
                                 $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
                             }else{
-                                // $sql_mileage = "SELECT TOP 1 * FROM vwMILEAGE WHERE VEHICLEREGISNUMBER = '".$result_vehicleinfo['VEHICLEREGISNUMBER']."' ORDER BY CREATEDATE DESC ";
-                                $sql_mileage = "SELECT TOP 1 * FROM vwMILEAGE WHERE $field ORDER BY MILEAGEID DESC ";
+                                $sql_mileage = "SELECT TOP 1 * FROM TEMP_MILEAGE WHERE $field ORDER BY CREATEDATE DESC ";
                                 $params_mileage = array();
                                 $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
                                 $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
@@ -326,9 +325,15 @@
                             }else if(($MAXMILEAGENUMBER >= '2000001') && ($MAXMILEAGENUMBER <= '3000000')){
                                 $fildsfind="MLPM_MILEAGE_2M3M";
                             }
+                            $MAXCUT = SUBSTR($MAXMILEAGENUMBER,-4);
+                            if($MAXCUT > 2000){
+                                $MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER;
+                            }else{
+                                $MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER-2000;
+                            }
 
                             // $sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfind > '".$MAXMILEAGENUMBER."' AND MLPM_AREA = '$SESSION_AREA' ORDER BY $fildsfind ASC";
-                            $sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfind > '".$MAXMILEAGENUMBER."' ORDER BY $fildsfind ASC";
+                            $sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfind > '".$MAXMILEAGENUMBER2000."' ORDER BY $fildsfind ASC";
                             $params_rankpm = array();
                             $query_rankpm = sqlsrv_query($conn, $sql_rankpm, $params_rankpm);
                             $result_rankpm = sqlsrv_fetch_array($query_rankpm, SQLSRV_FETCH_ASSOC);        

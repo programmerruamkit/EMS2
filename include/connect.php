@@ -5,11 +5,11 @@
         header('Location: ../MOBILE');
         // echo "เป็นการดูจากโทรศัพท์เคลื่อนที่";
     }
-    if (!session_id()) session_start();
+    if (!session_id()) session_start(); 
     error_reporting(0); //E_ALL แสดง error ทั้งหมด | ใส่ 0 ปิดแสดง error ทั้งหมด
     date_default_timezone_set('Asia/Bangkok');
     // FOR EMS_NEW
-    $connectionInfo = array("Database"=>$DATABASE, "UID"=>$USERNAME, "PWD"=>$PASSWORD, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
+   	$connectionInfo = array("Database"=>$DATABASE, "UID"=>$USERNAME, "PWD"=>$PASSWORD, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
     $conn = sqlsrv_connect($HOST, $connectionInfo);    
     if( $conn === false ) {
         die( print_r( sqlsrv_errors(), true));
@@ -24,12 +24,21 @@
         die( print_r( sqlsrv_errors(), true));
     }else{        
         // echo "Database Connected2.";
-    } 
+    }
+    
+    // FOR EMS_TMS
+    $connectionInfo_tms = array("Database"=>$DATABASE_TMS, "UID"=>$USERNAME_TMS, "PWD"=>$PASSWORD_TMS, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
+    $conn_tms = sqlsrv_connect($HOST_TMS, $connectionInfo_tms);    
+    if( $conn_tms === false ) {
+        die( print_r( sqlsrv_errors(), true));
+    }else{        
+        // echo "Database Connected2.";
+    }
 	###########################################################################################################
 
 	// $path='../';
 	$title="E-Maintenance";	
-	$iconimage="../images/car_repair.png";	
+	$iconimage="https://img2.pic.in.th/pic/car_repair.png";	
     
     // GETDATENOW
     $sql_getdate="SELECT  * FROM vwGETDATE";
@@ -56,4 +65,7 @@
     
     return $conn_old;
     sqlsrv_close($conn_old);
+    
+    return $conn_tms;
+    sqlsrv_close($conn_tms);
 ?>

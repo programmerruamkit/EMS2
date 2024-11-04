@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
@@ -22,7 +22,7 @@
 		$RU_CREATE_BY = $_SESSION["AD_PERSONCODE"];
 		$RU_CREATE_DATE = date("Y-m-d H:i:s");
 		
-		$sql = "INSERT INTO ROLE_USER (RU_CODE, RU_NAME, RU_IMG, RU_SORT, RU_AREA, RU_STATUS, RU_CREATE_BY, RU_CREATE_DATE) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		$sql = "INSERT INTO ROLE_USER (RU_CODE, RU_NAME, RU_IMG, RU_SORT, RU_AREA, RU_STATUS, RU_CREATE_BY, RU_CREATE_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		$params = array($RU_CODE, $RU_NAME, $RU_IMG, $RU_SORT, $RU_AREA, $RU_STATUS, $RU_CREATE_BY, $RU_CREATE_DATE);
 		
 		$stmt = sqlsrv_query( $conn, $sql, $params);

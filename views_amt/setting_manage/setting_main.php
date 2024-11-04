@@ -152,7 +152,9 @@
 						$ST_TYPE_NAME='LineNotify เตือนล่วงหน้า - ';
 					}else if($ST_TYPE=='32'){
 						$ST_TYPE_NAME='LineNotify เข้าซ่อมล่าช้า - ';
-					} 
+					}else{
+						$ST_TYPE_NAME='';
+					}
 					
 			?>
 			<tr id="<?php print $ST_CODE; ?>" height="25px" align="center">

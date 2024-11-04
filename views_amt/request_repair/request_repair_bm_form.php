@@ -894,13 +894,13 @@
               <td height="35" align="right" class="ui-state-default"><strong>ทะเบียนรถ(หัว):</strong></td>
               <td height="35" align="left">
                 <div class="input-control text">
-                  <input type="text" name="VEHICLEREGISNUMBER1" id="VEHICLEREGISNUMBER1" placeholder="ระบุทะเบียนรถ(หัว)" value="<?php echo $result_edit_repairrequest["RPRQ_REGISHEAD"];?>" class="char" onchange="select_vehiclenumber1()" onkeypress="select_vehiclenumber1()" onkeyup="select_vehiclenumber1()" onkeydown="select_vehiclenumber1()" autocomplete="off">
+                  <input type="text" name="VEHICLEREGISNUMBER1" id="VEHICLEREGISNUMBER1" placeholder="ระบุทะเบียนรถ(หัว)" value="<?php echo $result_edit_repairrequest["RPRQ_REGISHEAD"];?>" class="char" onchange="select_vehiclenumber1()" autocomplete="off">
                 </div>
               </td>
               <td height="35" align="right" class="ui-state-default"><strong>ชื่อรถ(หัว):</strong></td>
               <td height="35" align="left">
                 <div class="input-control text">
-                  <input type="text" name="THAINAME1" id="THAINAME1" placeholder="ชื่อรถ(หัว)" value="<?php echo $result_edit_repairrequest["RPRQ_CARNAMEHEAD"];?>" class="char" onchange="select_thainame1()" onkeypress="select_thainame1()" onkeyup="select_thainame1()" onkeydown="select_thainame1()" autocomplete="off">
+                  <input type="text" name="THAINAME1" id="THAINAME1" placeholder="ชื่อรถ(หัว)" value="<?php echo $result_edit_repairrequest["RPRQ_CARNAMEHEAD"];?>" class="char" onchange="select_thainame1()" autocomplete="off">
                 </div>
               </td>
               <td height="35" align="right" class="ui-state-default"><strong>ประเภทรถ:</strong></td>

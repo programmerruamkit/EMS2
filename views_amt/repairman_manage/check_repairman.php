@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 	session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
@@ -193,7 +193,7 @@
 					</tr>
 					<tr height="25px">
 						<td align="center">6</td>
-						<td align="left">อุปกรณ์ประจำรถ</td>
+						<td align="left">ช่างกะกลางคืน</td>
 						<td align="center"><input type="number" class="char" autocomplete="off" value="<?=$result_rpm6['CM_TOTAL'];?>" style="text-align:center;width:100%;height:25px" onchange="save_checkrepairman('6',this.value,'CM_TOTAL')"></td>
 						<td align="center"><input type="number" class="char" autocomplete="off" value="<?=$result_rpm6['CM_READY'];?>" style="text-align:center;width:100%;height:25px" onchange="save_checkrepairman('6',this.value,'CM_READY')"></td>
 						<td align="center"><input type="number" class="char" autocomplete="off" value="<?=$result_rpm6['CM_LEAVE'];?>" style="text-align:center;width:100%;height:25px" onchange="save_checkrepairman('6',this.value,'CM_LEAVE')"></td>
