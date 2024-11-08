@@ -329,7 +329,11 @@
                             if($MAXCUT > 2000){
                                 $MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER;
                             }else{
-                                $MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER-2000;
+                                if($_GET['ctmcomcode']=="AMT"||$_GET['ctmcomcode']=="RKS"||$_GET['ctmcomcode']=="RKR"||$_GET['ctmcomcode']=="RKL"){     
+                                    $MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER-1000;
+                                }else if($_GET['ctmcomcode']=="GW"||$_GET['ctmcomcode']=="RRC"||$_GET['ctmcomcode']=="RCC"||$_GET['ctmcomcode']=="RATC"){
+                                    $MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER-1000;
+                                }
                             }
 
                             // $sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfind > '".$MAXMILEAGENUMBER."' AND MLPM_AREA = '$SESSION_AREA' ORDER BY $fildsfind ASC";

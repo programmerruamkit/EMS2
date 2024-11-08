@@ -261,7 +261,7 @@
                                     <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>	
                                     <?php
                                         if($_GET['dateStart']=="sendplan"){
-                                            echo "<th rowspan='2' align='center' width='12%'>วันที่แจ้งซ่อม";
+                                            echo "<th rowspan='2' align='center' width='8%'>วันที่แจ้งซ่อม";
                                         }
                                     ?>
                                     <th rowspan="2" align="center" width="5%">สถานะ</th>
@@ -312,7 +312,7 @@
                                     <td align="center"><?php print $result_rprq_sonday['RPRQ_ID']; ?></td>			
                                     <?php
                                         if($_GET['dateStart']=="sendplan"){
-                                            echo '<td align="center">'.$result_rprq_sonday["RPRQ_CREATEDATE_REQUEST"].' เวลา '.$result_rprq_sonday["RPRQ_REQUESTCARTIME"].' น.</td>';
+                                            echo '<td align="center">'.$result_rprq_sonday["RPRQ_CREATEDATE_REQUEST"].'</td>';
                                         }
                                     ?>  
                                     <td align="center">                                

@@ -168,6 +168,9 @@
                           <td width="12%" align="right" bgcolor="#f9f9f9"><strong>สถานะแจ้งซ่อม</strong></td>
                           <td width="15%" align="left">                        
                             <?php	switch($result_rprq['RPRQ_STATUSREQUEST']) {
+                                case "รอส่งแผน":
+                                  $RPRQ_STATUSREQUEST="<strong><font color='brown'>รอส่งแผน</font></strong>";
+                                break;
                                 case "รอตรวจสอบ":
                                   $RPRQ_STATUSREQUEST="<strong><font color='red'>รอตรวจสอบ</font></strong>";
                                 break;
