@@ -577,6 +577,22 @@
 		}
 	};
 	######################################################################################################
+	if($target=="repairdetail"){
+		$RPRQ_CODE = $_POST["RPRQ_CODE"];  
+		$RPWD_DETAIL = $_POST["RPWD_DETAIL"];  
+		$PROCESS_BY = $_SESSION["AD_PERSONCODE"];
+		$PROCESS_DATE = date("Y-m-d H:i:s");
+
+		$sql = "INSERT INTO REPAIRWAITDETAIL (RPRQ_CODE,RPWD_DETAIL,RPWD_CREATEBY,RPWD_CREATEDATE) VALUES (?,?,?,?)";
+		$params = array($RPRQ_CODE,$RPWD_DETAIL,$PROCESS_BY,$PROCESS_DATE);
+		$stmt = sqlsrv_query( $conn, $sql, $params);	
+
+		if( $stmt === false ) {
+			die( print_r( sqlsrv_errors(), true));
+		}else{
+			print "บันทึกเรียบร้อย";	
+		}
+	};
 	######################################################################################################
 	if($proc=="delete" && !empty($id)){
 		

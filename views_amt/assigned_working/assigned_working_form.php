@@ -77,11 +77,27 @@
       Swal.fire({
         title: 'คุณแน่ใจหรือไม่...ที่จะหยุดพักงานซ่อมนี้',
         icon: 'warning',
+        input: "text",
+        inputAttributes: {
+          autocapitalize: "off"
+        },
         showCancelButton: true,
         confirmButtonColor: '#C82333',
         confirmButtonText: 'ใช่! บันทึกหยุดพักงาน',
-        cancelButtonText: 'ยกเลิก'
+        cancelButtonText: 'ยกเลิก',
+        showLoaderOnConfirm: true,
+        inputValidator: function (value) {
+            return new Promise(function (resolve, reject) {
+                if (value !== '') {
+                    resolve();
+                } else {
+                    resolve('โปรดระบุสาเหตุที่ขอหยุดพักงาน!');
+                }
+                return value;
+            });
+        }, 
       }).then((result) => {
+        var pausejobrepair = result.value;
         if (result.isConfirmed) {
           var url = "<?=$path?>views_amt/assigned_working/assigned_working_proc.php";
           $.ajax({
@@ -89,6 +105,7 @@
             url:url,
             // data: $("#form_project").serialize(),
             data: {
+              DETAILPAUSE: pausejobrepair, 
               target: target, 
               RPATTM_GROUP: groub, 
               RPRQ_CODE: rprqcode, 

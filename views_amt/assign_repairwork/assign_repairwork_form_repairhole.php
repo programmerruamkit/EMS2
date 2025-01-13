@@ -282,23 +282,41 @@
                           </div>   
                         </td>
                       </tr>
-                    </table>   
+                    </table>
+                    <?php
+                      $sql_plan_hole_other = "SELECT DISTINCT A.RPRQ_ID,A.RPRQ_REGISHEAD,B.RPC_AREA,B.RPC_AREAID,B.RPC_AREA_OTHER,C.RPH_AREA,A.RPRQ_REQUESTCARDATE,A.RPRQ_USECARDATE,D.OTGR_NAME
+                        FROM dbo.REPAIRREQUEST AS A
+                        LEFT JOIN dbo.REPAIRCAUSE AS B ON B.RPRQ_CODE = A.RPRQ_CODE
+                        LEFT JOIN dbo.REPAIR_HOLE AS C ON C.RPH_ID = B.RPC_AREAID
+                        LEFT JOIN dbo.OUTER_GARAGE AS D ON D.OTGR_NAME = B.RPC_AREA_OTHER
+                        WHERE A.RPRQ_STATUS = 'Y' AND A.RPRQ_STATUSREQUEST = 'รอจ่ายงาน'
+                        AND A.RPRQ_ID = '$rpcid'";
+                      $params_plan_hole_other = array();
+                      $query_plan_hole_other = sqlsrv_query($conn, $sql_plan_hole_other, $params_plan_hole_other);
+                      $result_plan_hole_other = sqlsrv_fetch_array($query_plan_hole_other, SQLSRV_FETCH_ASSOC); 
+                        $RPC_AREA_OTHER=$result_plan_hole_other['RPC_AREA_OTHER'];
+                        $RS_OTGR_NAME=$result_plan_hole_other['OTGR_NAME'];
+                    ?>
                     <table width="100%" cellpadding="0" id="request_piece_detail" class="display" style="margin-top:10px; margin-bottom:10px">     
                       <tr class="bg-white">          
+                        <td height="40" width="10%" >
+                          <div class="input-control text" style="margin-right:3px"> 
+                            <select class="char"  style="width: 100%;" name="select_outhergarage" id="select_outhergarage" onchange="save_data_hole('','<?=$rprq_code;?>','<?=$proc;?>','<?=$nature;?>','repairhole',this.value)">
+                              <option value=''>--- เลือกอู่นอก ---</option>
+                              <?php                          
+                                  $sql_select_outhergarage = "SELECT * FROM OUTER_GARAGE WHERE OTGR_STATUS='Y'";
+                                  $query_select_outhergarage = sqlsrv_query($conn, $sql_select_outhergarage);
+                                  while ($result_select_outhergarage = sqlsrv_fetch_array($query_select_outhergarage, SQLSRV_FETCH_ASSOC)) {
+                                      $OTGR_NAME=$result_select_outhergarage['OTGR_NAME'];
+                              ?>
+                              <option value="<?=$OTGR_NAME?>" <?php if(isset($RPC_AREA_OTHER)){ if($RPC_AREA_OTHER==$OTGR_NAME){echo 'selected';} } ?> ><?= $OTGR_NAME ?></option>
+                              <?php } ?>
+                            </select>
+                          </div>
+                        </td>  
                         <td height="40" width="30%" >
                           <div class="input-control text" style="margin-right:3px">   
-                            <?php
-                              $sql_plan_hole_other = "SELECT DISTINCT A.RPRQ_ID,A.RPRQ_REGISHEAD,B.RPC_AREA,B.RPC_AREAID,B.RPC_AREA_OTHER,C.RPH_AREA,A.RPRQ_REQUESTCARDATE,A.RPRQ_USECARDATE
-                                FROM dbo.REPAIRREQUEST AS A
-                                LEFT JOIN dbo.REPAIRCAUSE AS B ON B.RPRQ_CODE = A.RPRQ_CODE
-                                LEFT JOIN dbo.REPAIR_HOLE AS C ON C.RPH_ID = B.RPC_AREAID
-                                WHERE A.RPRQ_STATUS = 'Y' AND A.RPRQ_STATUSREQUEST = 'รอจ่ายงาน'
-                                AND A.RPRQ_ID = '$rpcid'";
-                              $params_plan_hole_other = array();
-                              $query_plan_hole_other = sqlsrv_query($conn, $sql_plan_hole_other, $params_plan_hole_other);
-                              $result_plan_hole_other = sqlsrv_fetch_array($query_plan_hole_other, SQLSRV_FETCH_ASSOC); 
-                            ?>
-                            <input type="text" name="RPC_AREA_OTHER" id="RPC_AREA_OTHER" class="clear_data char" value="<?=$result_plan_hole_other['RPC_AREA_OTHER'];?>" placeholder="อื่น ๆ เช่น กลางลาน หรือ พื้นที่ลูกค้า" autocomplete="off" onchange="save_data_hole('','<?=$rprq_code;?>','<?=$proc;?>','<?=$nature;?>','repairhole',this.value)">
+                            <input type="text" name="RPC_AREA_OTHER" id="RPC_AREA_OTHER" class="clear_data char" value="<?php if(isset($RPC_AREA_OTHER)){if($RPC_AREA_OTHER==$RS_OTGR_NAME){echo "";}else{echo $RPC_AREA_OTHER;}} ?>" placeholder="อื่น ๆ เช่น กลางลาน หรือ พื้นที่ลูกค้า" autocomplete="off" onchange="save_data_hole('','<?=$rprq_code;?>','<?=$proc;?>','<?=$nature;?>','repairhole',this.value)">
                           </div>
                         </td>
                       </tr>

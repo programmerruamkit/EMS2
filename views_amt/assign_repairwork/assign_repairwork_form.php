@@ -32,7 +32,7 @@
       $('.datepic').datetimepicker({
           lang:'th',
           format:'d/m/Y H:i',
-        closeOnDateSelect: true
+          // closeOnDateSelect: true
       });
   </script>
   <script type="text/javascript">    

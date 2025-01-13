@@ -167,42 +167,84 @@
             }
         })
     }  
-    function save_pausejob(target,groub,rprqcode,subject) {
-        Swal.fire({
-        title: '<font color="black">คุณแน่ใจหรือไม่...ที่จะหยุดพักงานซ่อมนี้</font>',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#C82333',
-        confirmButtonText: 'ใช่! บันทึกหยุดพักงาน',
-        cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var url = "../../service/assigned_working_proc.php";
-                $.ajax({
-                type: "POST",
-                url:url,
-                // data: $("#form_project").serialize(),
-                data: {
-                    target: target, 
-                    RPATTM_GROUP: groub, 
-                    RPRQ_CODE: rprqcode, 
-                    RPC_SUBJECT: subject
-                },
-                success:function(data){
-                    // console.log(data)
-                    // alert(data);                              
-                    Swal.fire({
-                    icon: 'success',
-                    title: '<font color="black">ขณะนี้ หยุดพักงานชั่วคราว เรียบร้อย</font>',
-                    showConfirmButton: false,
-                    timer: 2000
-                    }).then((result) => {	 
-                        location.assign('./?id='+rprqcode+'&proc=add') 
-                    })	
+    // function save_pausejob(target,groub,rprqcode,subject) {
+    //     Swal.fire({
+    //     title: '<font color="black">คุณแน่ใจหรือไม่...ที่จะหยุดพักงานซ่อมนี้</font>',
+    //     icon: 'warning',
+    //     showCancelButton: true,
+    //     confirmButtonColor: '#C82333',
+    //     confirmButtonText: 'ใช่! บันทึกหยุดพักงาน',
+    //     cancelButtonText: 'ยกเลิก'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             var url = "../../service/assigned_working_proc.php";
+    //             $.ajax({
+    //             type: "POST",
+    //             url:url,
+    //             // data: $("#form_project").serialize(),
+    //             data: {
+    //                 target: target, 
+    //                 RPATTM_GROUP: groub, 
+    //                 RPRQ_CODE: rprqcode, 
+    //                 RPC_SUBJECT: subject
+    //             },
+    //             success:function(data){
+    //                 // console.log(data)
+    //                 // alert(data);                              
+    //                 Swal.fire({
+    //                 icon: 'success',
+    //                 title: '<font color="black">ขณะนี้ หยุดพักงานชั่วคราว เรียบร้อย</font>',
+    //                 showConfirmButton: false,
+    //                 timer: 2000
+    //                 }).then((result) => {	 
+    //                     location.assign('./?id='+rprqcode+'&proc=add') 
+    //                 })	
+    //             }
+    //             });
+    //         }
+    //     })
+    // } 
+    function save_pausejob() {
+        if($('#pausejobrepair').val() == '' ){
+            Swal.fire({
+                icon: 'warning',
+                title: '<font color="black">กรุณาระบุรายละเอียด</font>',
+                showConfirmButton: false,
+                timer: 1500,
+                onAfterClose: () => {
+                    setTimeout(() => $("#pausejobrepair").focus(), 0);
                 }
-                });
+            })
+            return false;
+        }
+        var pausejobrepair = $("#pausejobrepair").val();
+        var target_pj = $("#target_pj").val();
+        var groub_pj = $("#groub_pj").val();
+        var rprqcode_pj = $("#RPRQ_CODE_pj").val();
+        var subject_pj = $("#SUBJECT_pj").val();
+        var url = "../../service/assigned_working_proc.php";
+        $.ajax({
+            type: "POST",
+            url:url,
+            // data: $("#form_project").serialize(),
+            data: {
+                DETAILPAUSE: pausejobrepair, 
+                target: target_pj, 
+                RPATTM_GROUP: groub_pj, 
+                RPRQ_CODE: rprqcode_pj, 
+                RPC_SUBJECT: subject_pj
+            },
+            success:function(data){                        
+                Swal.fire({
+                icon: 'success',
+                title: '<font color="black">ขณะนี้ หยุดพักงานชั่วคราว เรียบร้อย</font>',
+                showConfirmButton: false,
+                timer: 2000
+                }).then((result) => {	 
+                    location.assign('./?id='+rprqcode_pj+'&proc=add') 
+                })	
             }
-        })
+        });
     } 
     function save_continuejob(target,groub,rprqcode,subject) {
         // if(!confirm("ยืนยันการแก้ไข")) return false;      
@@ -349,6 +391,13 @@
         document.getElementById('proc').value = a4;
         document.getElementById('target').value = a5;   
     }
+    function sendid_pausejob(title,a1,a2,a3,a4){
+        document.getElementById('title_pj').innerHTML = title;
+        document.getElementById('target_pj').value = a1;  
+        document.getElementById('groub_pj').value = a2; 
+        document.getElementById('RPRQ_CODE_pj').value = a3;
+        document.getElementById('SUBJECT_pj').value = a4;
+    } 
     function sendid_checklist(url,proc,id){
         var url = url+"?proc="+proc;
         var id = id;    

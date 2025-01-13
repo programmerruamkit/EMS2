@@ -67,6 +67,22 @@
 				}
 			})
 		}
+		function save_repairdetail(rprq,detail) {   
+			var query = "?dateStart=waitassign";
+			var url = "<?=$path?>views_amt/assign_repairwork/assign_repairwork_proc.php";
+			$.ajax({
+				type: "POST",
+				url:url,
+				data: {
+					target: "repairdetail",
+					RPRQ_CODE: rprq, 
+					RPWD_DETAIL: detail
+				},
+				success:function(data){
+					loadViewdetail('<?=$path?>views_amt/assign_repairwork/assign_repairwork.php'+query);
+				}
+			});
+		} 
 	</script>
 	<script type="text/javascript">
 		$(document).ready(function(e) {
@@ -79,6 +95,16 @@
 			});
 		});
 	</script>
+	<style>
+		.danger{
+			color:black;
+			background-color:#FFCCCC!important;
+		}
+		::placeholder {
+			color: gray;
+			opacity: 1; /* Firefox */
+		}
+	</style>
 </head>
 <body>
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="INVENDATA no-border">
@@ -222,11 +248,17 @@
 								<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>								
 								<?php
 									if(($_GET['dateStart']=="waitassign")||($_GET['dateStart']=="waitrepair")||($_GET['dateStart']=="working")){
-										echo "<th rowspan='2' align='center' width='15%'>วันที่นำรถเข้าซ่อม";
+										echo '<th rowspan="2" align="center" width="12%">วันที่นำรถเข้าซ่อม';
 									}
 								?>
 								<th rowspan="2" align="center" width="3%">สถานะ</th>
-								<th rowspan="2" align="center" width="3%">พิมพ์</th>
+								<?php
+									if($_GET['dateStart']=="waitassign"){
+										echo '<th rowspan="2" align="center" width="15%">ระบุสาเหตุที่ยังรอจ่ายงาน';
+									}else{
+										echo '<th rowspan="2" align="center" width="3%">พิมพ์</th>';
+									}
+								?>
 								<th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
 								<th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
 								<th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
@@ -254,15 +286,25 @@
 								$no=0;
 								while($result_assign_D1 = sqlsrv_fetch_array($query_assign_D1, SQLSRV_FETCH_ASSOC)){	
 									$no++;
+									
+									if($_GET['dateStart']=="waitassign"){
+										$RPRQ_CODE=$result_assign_D1['RPRQ_CODE'];
+										$stmt_waitdetail = "SELECT * FROM REPAIRWAITDETAIL WHERE RPRQ_CODE = ? ORDER BY RPWD_CREATEDATE DESC";
+										$params_waitdetail = array($RPRQ_CODE);	
+										$query_waitdetail = sqlsrv_query( $conn, $stmt_waitdetail, $params_waitdetail);	
+										$result_waitdetail = sqlsrv_fetch_array($query_waitdetail, SQLSRV_FETCH_ASSOC);
+										$RPWD_DETAIL=$result_waitdetail["RPWD_DETAIL"];
+										
+									}
 							?>
 							<tr id="<?php print $result_assign_D1['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
 								<td align="center"><?php print $result_assign_D1['RPRQ_ID']; ?></td>   			
 								<?php
 									if(($_GET['dateStart']=="waitassign")||($_GET['dateStart']=="waitrepair")||($_GET['dateStart']=="working")){
 										if(isset($result_assign_D1['RPC_INCARDATE'])){
-											echo '<td align="center">'.$result_assign_D1["RPC_INCARDATE"].' เวลา '.$result_assign_D1["RPC_INCARTIME"].' น.</td>';
+											echo '<td align="center">'.$result_assign_D1["RPC_INCARDATE"].' '.$result_assign_D1["RPC_INCARTIME"].'</td>';
 										}else{
-											echo '<td align="center">'.$result_assign_D1["RPRQ_REQUESTCARDATE"].' เวลา '.$result_assign_D1["RPRQ_REQUESTCARTIME"].' น.</td>';
+											echo '<td align="center">'.$result_assign_D1["RPRQ_REQUESTCARDATE"].' '.$result_assign_D1["RPRQ_REQUESTCARTIME"].'</td>';
 										}
 									}
 								?>              
@@ -292,7 +334,15 @@
 									?>
 								</td>   		                
 								<td align="center">
-									<button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_assign('<?php print $result_assign_D1['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
+									<?php 
+										if($_GET['dateStart']=="waitassign"){ ?>
+											<div class="input-control text" style="margin-right:3px">
+												<input type="text" name="detail" id="detail" class="clear_data danger" value="<?php echo $RPWD_DETAIL; ?>" placeholder="สาเหตุที่รอจ่ายงาน" autocomplete="off" onchange="save_repairdetail('<?php print $result_assign_D1['RPRQ_CODE']; ?>',this.value)">
+											</div>
+										<?php }else{ ?>
+											<button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_assign('<?php print $result_assign_D1['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
+										<?php }
+									?>
 								</td>
 								<td align="center"><?php print $result_assign_D1['RPRQ_REGISHEAD']; ?></td>
 								<td align="center"><?php print $result_assign_D1['RPRQ_CARNAMEHEAD']; ?></td>

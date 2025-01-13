@@ -99,20 +99,20 @@
                             ชื่อผู้ใช้ : <?=$rsp["RA_USERNAME"];?>
                         </div>
                         <div class="col-4">
-                            รหัสผ่านเดิม : <?=$rsp["RA_PASSWORD"];?>
+                            รหัสผ่าน : <?=$rsp["RA_PASSWORD"];?>
                         </div>
                         <div class="col-2">&nbsp;</div>
                     </div>             
-                    <div class="row mb-0">
+                    <div class="row mb-0" style="display:none">
                         <div class="col-2">&nbsp;</div>
                         <div class="col-4">&nbsp;</div>
                         <div class="col-4">
-                            รหัสผ่านใหม่ : <input type="text" size="20" name="newpass" id="newpass" value="<?=$RA_PASSWORD;?>" style="width: 200px;height: 40px;border-radius: 10px;">
+                            รหัสผ่านใหม่ : <input type="number" size="20" name="newpass" id="newpass" value="<?=$RA_PASSWORD;?>" style="width: 200px;height: 40px;border-radius: 10px;">
                         </div>
                         <div class="col-2">&nbsp;</div>
                     </div>   
                     <br>      
-                    <div class="row mb-0">
+                    <div class="row mb-0" style="display:none">
                         <div class="col-4">&nbsp;</div>
                         <div class="col-4">
                             <center>

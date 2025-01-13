@@ -53,7 +53,7 @@
         // document.getElementById('VEHICLEREGISNUMBER').focus();
         return false;
       }	
-      if($('#ACTIVESTATUS').val() == 0 ){
+      if($('#ACTIVESTATUS').val() == '' ){
         Swal.fire({
             icon: 'warning',
             title: 'กรุณาเลือกสถานะใช้งาน',
@@ -318,7 +318,7 @@
                                 <option value disabled selected>-------โปรดเลือก-------</option>
                                 <option value="1" <?php if($result_edit_customer['ACTIVESTATUS']== "1"){echo "selected";} ?>>เปิดใช้งาน
                                 </option>
-                                <option value="0" <?php if($result_edit_customer['ACTIVESTATUS']== "0"){echo "selected";} ?>>ปิดใช้งาน
+                                <option value="N" <?php if($result_edit_customer['ACTIVESTATUS']== "N"){echo "selected";} ?>>ปิดใช้งาน
                                 </option>
                               </select>
                             </div>

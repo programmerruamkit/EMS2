@@ -635,7 +635,7 @@ if ($JOBTYPE == 'PM') {
         $boxname_s3='สำนวน พรมพา ';
         $boxname_s4='อาทิตย์ แสงสว่าง';
         $boxname1='เติมพงศ์ กลิ่นนุช';
-        $boxname2='อำนาจ อาจสู้ศึก ';
+        $boxname2='ศิวะ เเป้นทอง ';
         $boxposition='RTD';
     }
     // CheckifSet  
@@ -1241,8 +1241,8 @@ if ($JOBTYPE == 'PM') {
                 $boxname='อาทิตย์ แสงสว่าง';
             }
             $boxname1='เติมพงศ์ กลิ่นนุช';
-            $boxname2='อำนาจ อาจสู้ศึก ';
-            $boxposition='RTD';
+            $boxname2='ศิวะ เเป้นทอง ';
+            $boxposition='RTD'; 
         }
     // CheckifSet                            
     $tb_section_bm_8 = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size:10;margin-top:30px;">

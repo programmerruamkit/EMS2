@@ -304,9 +304,10 @@
                                 <?php if(isset($result_repairtime['RPATTM_PROCESS'])){ ?>
                                     <?php if(($result_repairtime['RPATTM_GROUP']=='START')||($result_repairtime['RPATTM_GROUP']=='CONTINUE')){ ?>    
                                         <?php if(isset($result_repairman['RPME_CODE'])){ ?>   
-                                            <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-red-dark" onclick="save_pausejob('save_pausejob','PAUSE','<?php print $RPRQ_CODE;?>','<?php print $result_repaircause['RPC_SUBJECT'];?>')">
+                                            <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-red-dark" data-menu="repairpausejob" onclick="sendid_pausejob('เพิ่มรายละเอียด','save_pausejob','PAUSE','<?=$RPRQ_CODE;?>','<?=$SUBJECT;?>')">
+                                            <!-- <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-red-dark" onclick="save_pausejob('save_pausejob','PAUSE','<?php print $RPRQ_CODE;?>','<?php print $result_repaircause['RPC_SUBJECT'];?>')"> -->
                                                 <i class="fa fa-pause <?=$css_open_icenter;?>"></i><font size="2" class="showfont">พักชั่วคราว</font>                                
-                                            </a>                      
+                                            </a>                    
                                         <?php }else{ ?>   
                                             <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-gray-dark" style="opacity: 0.2;">
                                                 <i class="fa fa-pause"></i><font size="2" class="showfont">พักชั่วคราว</font>                                
@@ -482,6 +483,38 @@
         </form>
         <br>
     </div>  
+    <!-- MODAL หยุดพักงาน --> 
+    <div id="repairpausejob" class="menu menu-box-modal-forworking rounded-m" data-menu-height="100%" data-menu-width="500" data-backdrop="static">
+        <h1 class="text-center mt-4"><i class="fa fa-3x fa-info-circle scale-box color-yellow-dark shadow-xl rounded-circle"></i></h1>
+        <h3 class="text-center mt-3 font-700">คุณแน่ใจหรือไม่...ที่จะหยุดพักงานซ่อมนี้</h3>
+        <form action="#" method="post" enctype="multipart/form-data" name="form_project_pausejob" id="form_project_pausejob">
+            <div class="content mb-2 mt-2">
+                <div class="row mb-0">
+                    <div class="col-12">
+                        <label class="color-highlight" id="title_pj"></label>
+                        <div class="input-style has-borders no-icon mb-4">
+                            <textarea name="pausejobrepair" id="pausejobrepair" placeholder=""></textarea>
+                        </div>
+                    </div>
+                </div>
+                <center>
+                    <div class="row mb-0 me-3 ms-3">
+                        <div class="col-6">
+                            <a href="#" class="btn btn-full btn-m bg-green-dark border-green-dark font-600 rounded-s" onclick="save_pausejob()">ใช่! บันทึกหยุดพักงาน</a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="btn close-menu btn-full btn-m bg-red-dark border-red-dark font-600 rounded-s">ยกเลิก</a>
+                        </div>
+                    </div>
+                </center>
+            </div>
+            <input type="hidden" name="target_pj" id="target_pj">
+            <input type="hidden" name="groub_pj" id="groub_pj">
+            <input type="hidden" name="RPRQ_CODE_pj" id="RPRQ_CODE_pj">
+            <input type="hidden" name="SUBJECT_pj" id="SUBJECT_pj">
+        </form>
+        <br>
+    </div> 
 </div>
 <?php	
 	require($path."include/script.php"); 

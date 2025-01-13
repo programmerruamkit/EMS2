@@ -188,7 +188,7 @@
         <tbody>
 			<?php
 				if($CTM_GROUP=="cusout"){
-					$sql_vehicleinfo = "SELECT * FROM CUSTOMER_CAR WHERE AFFCOMPANY = '$GET_CTM_COMCODE' AND ACTIVESTATUS = '1'";
+					$sql_vehicleinfo = "SELECT * FROM CUSTOMER_CAR WHERE AFFCOMPANY = '$GET_CTM_COMCODE' AND ACTIVESTATUS != '0'";
 				}else{
 					$sql_vehicleinfo = "SELECT * FROM vwVEHICLEINFO WHERE AFFCOMPANY LIKE '%$GET_CTM_COMCODE%' AND NOT VEHICLEGROUPDESC = 'Car Pool' AND ACTIVESTATUS = '1'";
 				}

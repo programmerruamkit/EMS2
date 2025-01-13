@@ -67,6 +67,16 @@
 		$params = array($RPRQ_CODE,$RPC_SUBJECT,$RPATTM_PROCESS,$RPATTM_GROUP,$RPATTM_TOTAL,$RPATTM_PROCESSBY,$RPATTM_PROCESSDATE);		
 		$stmt = sqlsrv_query( $conn, $sql, $params);
 
+		$DETAILPAUSE = $_POST["DETAILPAUSE"];		
+		$RPATDT_GROUP = "PAUSE";
+		$RPATDT_TOTAL = '';
+		$RPATDT_PROCESSBY = $_SESSION["AD_PERSONCODE"];
+		$RPATDT_PROCESSDATE = date("Y-m-d H:i:s");
+			
+		$sql2 = "INSERT INTO REPAIRACTUAL_DETAIL (RPRQ_CODE,RPC_SUBJECT,RPATDT_DETAIL,RPATDT_GROUP,RPATDT_TOTAL,RPATDT_PROCESSBY,RPATDT_PROCESSDATE) VALUES (?,?,?,?,?,?,?)";
+		$params2 = array($RPRQ_CODE,$RPC_SUBJECT,$DETAILPAUSE,$RPATDT_GROUP,$RPATDT_TOTAL,$RPATDT_PROCESSBY,$RPATDT_PROCESSDATE);
+		$stmt2 = sqlsrv_query( $conn, $sql2, $params2);
+
 		if( $stmt === false ) {
 			die( print_r( sqlsrv_errors(), true));
 		}else{
