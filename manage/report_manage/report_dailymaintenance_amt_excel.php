@@ -117,8 +117,9 @@ header("Pragma:no-cache");
                             b.RPC_INCARDATE +' '+ b.RPC_INCARTIME TIMEPLANSTART,
                             b.RPC_OUTCARDATE,
                             b.RPC_OUTCARTIME,
-                            b.RPC_OUTCARDATE +' '+ b.RPC_OUTCARTIME TIMEPLANEND,                            
-                            DATEDIFF(MINUTE, b.RPC_INCARTIME, b.RPC_OUTCARTIME) AS 'PLANMINUTE',                            
+                            b.RPC_OUTCARDATE +' '+ b.RPC_OUTCARTIME TIMEPLANEND,                           
+                            -- DATEDIFF(MINUTE, b.RPC_INCARTIME, b.RPC_OUTCARTIME) AS 'PLANMINUTE',   
+                            DATEDIFF(MINUTE,CASE WHEN ISDATE(b.RPC_INCARTIME) = 1 THEN CONVERT(DATETIME, b.RPC_INCARTIME) ELSE NULL END,CASE WHEN ISDATE(b.RPC_OUTCARTIME) = 1 THEN CONVERT(DATETIME, b.RPC_OUTCARTIME) ELSE NULL END) AS 'PLANMINUTE',                        
                             CONVERT(VARCHAR(10),CONVERT(date, b.RPC_INCARDATE, 105),23),
                             b.RPC_SUBJECT SUBJ,
                             CASE
@@ -147,7 +148,7 @@ header("Pragma:no-cache");
                     $wsa="AND a.RPRQ_STATUS = 'Y' AND a.RPRQ_AREA = '$SESSION_AREA' ";
 					$wd1="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' ";
 					$wd2="AND CONVERT(datetime,a.RPRQ_CREATEDATE_REQUEST,103) BETWEEN '$dscon' AND '$decon' ";
-					$wrg="AND a.RPRQ_REGISHEAD LIKE '%$rgsub%' ";
+					$wrg="AND (a.RPRQ_REGISHEAD LIKE '%$rgsub%' OR a.RPRQ_REGISTAIL LIKE '%$rgsub%') ";      
 					$wwt="AND a.RPRQ_WORKTYPE LIKE '%$gp%' ";
 					$wtc="AND a.RPRQ_TYPECUSTOMER LIKE '%$tc%' ";
 					$wst1="AND a.RPRQ_STATUSREQUEST NOT IN('รอส่งแผน','รอตรวจสอบ','รอจ่ายงาน','ไม่อนุมัติ') ";

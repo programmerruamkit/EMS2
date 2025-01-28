@@ -266,7 +266,7 @@
 					$wsa="AND a.RPRQ_STATUS = 'Y' AND a.RPRQ_AREA = '$SESSION_AREA' ";
 					$wd1="AND CONVERT(datetime,b.RPC_INCARDATE,103) BETWEEN '$dscon' AND '$decon' ";
 					$wd2="AND CONVERT(datetime,a.RPRQ_CREATEDATE_REQUEST,103) BETWEEN '$dscon' AND '$decon' ";
-					$wrg="AND a.RPRQ_REGISHEAD LIKE '%$rgsub%' ";
+					$wrg="AND (a.RPRQ_REGISHEAD LIKE '%$rgsub%' OR a.RPRQ_REGISTAIL LIKE '%$rgsub%') ";      
 					$wwt="AND a.RPRQ_WORKTYPE LIKE '%$gp%' ";
 					$wtc="AND a.RPRQ_TYPECUSTOMER LIKE '%$tc%' ";
 					$wst1="AND a.RPRQ_STATUSREQUEST NOT IN('รอส่งแผน','รอตรวจสอบ','รอจ่ายงาน','ไม่อนุมัติ') ";
