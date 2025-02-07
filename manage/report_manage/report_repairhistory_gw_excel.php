@@ -139,7 +139,7 @@ header("Pragma:no-cache");
 					if($rgsub!=''){
 						$rsrg="REGNO LIKE '%$rgsub%' AND ";
 					}else{$rsrg="";} 
-					if($dscon!='' && $decon!=''){
+					if($dscon!='-- 00:00' && $decon!='-- 00:00'){
 						$rsse="OPENDATECON BETWEEN '$dscon' AND '$decon' AND ";
 						// $rsse="OPENDATECON BETWEEN '$dscon' AND '$decon' AND ";
 					}else{$rsse="";}
