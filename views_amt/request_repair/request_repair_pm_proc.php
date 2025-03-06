@@ -372,6 +372,12 @@
 					//     echo "status : ".$result_['status']; echo "message : ". $result_['message'];
 					// } 
 				curl_close($chOne);   
+				// แจ้งเตือนเทเลแกรม--------------------------------------------------------------------------------
+					$channelId = '-4748971185';
+					$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
+					$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+					$response = file_get_contents($urltelegram);
+				// แจ้งเตือนเทเลแกรม--------------------------------------------------------------------------------
 			}
 		// แจ้งเตือนไลน์--------------------------------------------------------------------------------	
 
