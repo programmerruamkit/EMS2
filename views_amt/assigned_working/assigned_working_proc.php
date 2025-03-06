@@ -210,14 +210,14 @@
 				curl_setopt( $chOne, CURLOPT_RETURNTRANSFER, 1); 
 				$result = curl_exec( $chOne ); 					
 				curl_close($chOne);   
-				// แจ้งเตือนเทเลแกรม--------------------------------------------------------------------------------
-					$channelId = '-4748971185';
-					$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
-					$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
-					$response = file_get_contents($urltelegram);
-				// แจ้งเตือนเทเลแกรม--------------------------------------------------------------------------------
 			}
 		// แจ้งเตือนไลน์--------------------------------------------------------------------------------
+		// แจ้งเตือนเทเลแกรม-OPEN-------------------------------------------------------------------------------
+			$channelId = '-4748971185';
+			$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
+			$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+			$response = file_get_contents($urltelegram);
+		// แจ้งเตือนเทเลแกรม-CLOSE-------------------------------------------------------------------------------
 		
 		$RPRQ_SPAREPART = $_POST["RPRQ_SPAREPART"];
 		$SPAREPART_PROCESSDATE = date("d/m/Y");
@@ -469,14 +469,14 @@
 					curl_setopt( $chOne, CURLOPT_RETURNTRANSFER, 1); 
 					$result = curl_exec( $chOne ); 					
 					curl_close($chOne);   
-					// แจ้งเตือนเทเลแกรม--------------------------------------------------------------------------------
-						$channelId = '-4748971185';
-						$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
-						$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
-						$response = file_get_contents($urltelegram);
-					// แจ้งเตือนเทเลแกรม--------------------------------------------------------------------------------
 				}
 			// แจ้งเตือนไลน์--------------------------------------------------------------------------------
+			// แจ้งเตือนเทเลแกรม-OPEN-------------------------------------------------------------------------------
+				$channelId = '-4748971185';
+				$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
+				$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+				$response = file_get_contents($urltelegram);
+			// แจ้งเตือนเทเลแกรม-CLOSE-------------------------------------------------------------------------------
 
 			echo json_encode(array("statusCode"=>200)); 
 		}else{
