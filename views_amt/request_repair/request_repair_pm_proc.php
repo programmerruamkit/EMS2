@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
 
@@ -33,16 +33,18 @@
 		
 		$VHCTMG_LINEOFWORK = $result_vehicleinfo['VHCCT_PM'];		
 		$VHCCT_ID = $result_vehicleinfo["VHCCT_ID"];
-                
+		$VHCCT_AREA = $result_vehicleinfo["VHCCT_AREA"];
+		
 		$VEHICLEREGISNUMBER=$result_vehicleinfo['VEHICLEREGISNUMBER'];
 		$THAINAME=$result_vehicleinfo['THAINAME'];
 		$AFFCOMPANY = $_POST["AFFCOMPANY"];		
 		if($AFFCOMPANY=="RKS"||$AFFCOMPANY=="RKR"||$AFFCOMPANY=="RKL"){     
 			$field="VEHICLEREGISNUMBER = '$VEHICLEREGISNUMBER'";
 		}else if($AFFCOMPANY=="RRC"||$AFFCOMPANY=="RCC"||$AFFCOMPANY=="RATC"){
-			$explodes = explode('(', $THAINAME);
-			$THAINAME = $explodes[0];
-			$field="THAINAME = '$THAINAME'";
+			// $explodes = explode('(', $THAINAME);
+			// $THAINAME = $explodes[0];
+			// $field="THAINAME = '$THAINAME'";
+			$field="VEHICLEREGISNUMBER = '$VEHICLEREGISNUMBER'";
 		}else{
 			$field="VEHICLEREGISNUMBER = '$VEHICLEREGISNUMBER'";
 		}
@@ -78,8 +80,22 @@
 		}else if(($MAXMILEAGENUMBER >= '2000001') && ($MAXMILEAGENUMBER <= '3000000')){
 			$fildsfindMLPM="MLPM_MILEAGE_2M3M";
 		}
+		$MAXCUT = SUBSTR($MAXMILEAGENUMBER,-4);
+		if($MAXCUT > 2000){
+			$MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER;
+		}else{
+			if($_GET['ctmcomcode']=="AMT"||$_GET['ctmcomcode']=="RKS"||$_GET['ctmcomcode']=="RKR"||$_GET['ctmcomcode']=="RKL"){     
+				$MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER-1000;
+			}else if($_GET['ctmcomcode']=="GW"||$_GET['ctmcomcode']=="RRC"||$_GET['ctmcomcode']=="RCC"||$_GET['ctmcomcode']=="RATC"){
+				$MAXMILEAGENUMBER2000=$MAXMILEAGENUMBER-1000;
+			}
+		}
 
-		$sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfindMLPM > '".$result_mileage['MAXMILEAGENUMBER']."' AND MLPM_AREA = '$SESSION_AREA' ORDER BY $fildsfindMLPM ASC";
+		if($CTM_GROUP=="cusout"){
+			$sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfindMLPM = '".$MAXMILEAGENUMBER."' ORDER BY $fildsfindMLPM ASC";
+		}else if($CTM_GROUP=="cusin"){
+			$sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfindMLPM > '".$MAXMILEAGENUMBER2000."' AND MLPM_AREA = '$VHCCT_AREA' ORDER BY $fildsfindMLPM ASC";
+		}		
 		$params_rankpm = array();
 		$query_rankpm = sqlsrv_query($conn, $sql_rankpm, $params_rankpm);
 		$result_rankpm = sqlsrv_fetch_array($query_rankpm, SQLSRV_FETCH_ASSOC);                             
@@ -375,10 +391,30 @@
 			}
 		// แจ้งเตือนไลน์--------------------------------------------------------------------------------	
 		// แจ้งเตือนเทเลแกรม-OPEN-------------------------------------------------------------------------------
-			$channelId = '-4748971185';
-			$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
-			$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
-			$response = file_get_contents($urltelegram);
+			$stmt_telegram = "SELECT * FROM SETTING WHERE ST_TYPE = '33' AND ST_STATUS = 'Y' AND ST_AREA = '$SESSION_AREA'";
+			$query_telegram = sqlsrv_query( $conn, $stmt_telegram);	
+			$no=0;
+			while($result_telegram = sqlsrv_fetch_array($query_telegram)){	
+				$no++;
+				$ST_DETAIL_TELEGRAM=$result_telegram["ST_DETAIL"];
+				$channelId=$ST_DETAIL_TELEGRAM;  
+				$NOTI_LINE1=" 🔴 แจ้งซ่อม PM ($RPRQ_MILEAGEFINISH)"."\n";
+				$NOTI_LINE2="ID : ".$LAST_RPRQ_ID.""."\n";
+				$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD."\n";
+				$NOTI_LINE4="ชื่อรถ(หัว) : ".$RPRQ_CARNAMEHEAD."\n";
+				$NOTI_LINE5="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL."\n";
+				$NOTI_LINE6="ชื่อรถ(หาง) : ".$RPRQ_CARNAMETAIL."\n";
+				// $NOTI_LINE7="ปัญหา : $RPC_DETAIL"."\n";
+				$NOTI_LINE8="วันที่/เวลา แจ้งซ่อม : ".$datetimeRequest_in.""."\n";
+				$NOTI_LINE9="วันที่/เวลา ต้องการใช้รถ : ".$datetimeRequest_out.""."\n";
+				$NOTI_LINE10="ผู้แจ้ง : ".$RPRQ_REQUESTBY."";  
+				// $MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8;	
+				$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8.$NOTI_LINE9.$NOTI_LINE10;	
+				// $channelId = '-4748971185';
+				$botApiToken  = '7514279565:AAG8L_IfiV1SD_4lF98WjtV5E4nLRqec_PY'; 
+				$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+				$response = file_get_contents($urltelegram); 
+			}
 		// แจ้งเตือนเทเลแกรม-CLOSE-------------------------------------------------------------------------------
 
 		// if( ($stmt || $stmt1 || $stmt2 || $stmt3 || $stmt4 || $stmt5) === false ) {

@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
 
@@ -58,9 +58,46 @@
 	if($proc=="add"){
 		// $RPRQ_CODE = $_POST["RPRQ_CODE"];
 		$RPRQ_WORKTYPE = $_POST["RPRQ_WORKTYPE"];
-		$RPRQ_REGISHEAD = $_POST["VEHICLEREGISNUMBER1"];
+
+		if($_POST["VEHICLEREGISNUMBER1"] != ""){
+			if ($_POST["TYPECUSTOMERS"] == "cusin"){
+				$sql_car = "SELECT * FROM vwVEHICLEINFO WHERE VEHICLEREGISNUMBER = '".$_POST["VEHICLEREGISNUMBER1"]."'";
+			}else if ($_POST["TYPECUSTOMERS"] == "cusout"){
+				$sql_car = "SELECT * FROM vwVEHICLEINFO_OUT WHERE VEHICLEREGISNUMBER = '".$_POST["VEHICLEREGISNUMBER1"]."'";
+			}
+		}else if($_POST["THAINAME1"] != ""){
+			if ($_POST["TYPECUSTOMERS"] == "cusin"){
+				$sql_car = "SELECT * FROM vwVEHICLEINFO WHERE THAINAME = '".$_POST["THAINAME1"]."'";
+			}else if ($_POST["TYPECUSTOMERS"] == "cusout"){
+				$sql_car = "SELECT * FROM vwVEHICLEINFO_OUT WHERE THAINAME = '".$_POST["THAINAME1"]."'";
+			}
+		}
+		$params_car = array();
+		$query_car = sqlsrv_query($conn, $sql_car, $params_car);
+		$result_car = sqlsrv_fetch_array($query_car, SQLSRV_FETCH_ASSOC);
+		
+		if($result_car["VEHICLEREGISNUMBER"] != ""){
+			$RPRQ_REGISHEAD = $result_car["VEHICLEREGISNUMBER"];
+		}else{
+			$RPRQ_REGISHEAD = $_POST["VEHICLEREGISNUMBER1"];
+		}
+		if($result_car["THAINAME"] != ""){
+			$RPRQ_CARNAMEHEAD = $result_car["THAINAME"];
+		}else{
+			$RPRQ_CARNAMEHEAD = $_POST["THAINAME1"];
+		}
+		if($result_car["VEHICLETYPEDESC"] != ""){
+			$RPRQ_CARTYPE = $result_car["VEHICLETYPEDESC"];
+		}else{
+			$RPRQ_CARTYPE = $_POST["RPRQ_CARTYPE"];
+		}
+		if($result_car["AFFCOMPANY"] != ""){
+			$RPRQ_LINEOFWORK = $result_car["AFFCOMPANY"];
+		}else{
+			$RPRQ_LINEOFWORK = $_POST["AFFCOMPANY"];
+		}
+
 		$RPRQ_REGISTAIL = $_POST["VEHICLEREGISNUMBER2"];
-		$RPRQ_CARNAMEHEAD = $_POST["THAINAME1"];
 		$RPRQ_CARNAMETAIL = $_POST["THAINAME2"];		
 		$RPRQ_CARTYPE = $_POST["RPRQ_CARTYPE"];	
 		$RPRQ_LINEOFWORK = $_POST["AFFCOMPANY"];
@@ -88,7 +125,8 @@
 		$RPRQ_PRODUCTINCAR = $_POST["GOTC"];
 		$RPRQ_NATUREREPAIR = $_POST["NTORNNW"];
 		$RPRQ_TYPECUSTOMER = $_POST["TYPECUSTOMERS"];
-		$RPRQ_COMPANYCASH = $_POST["AFFCOMPANY"];
+		// $RPRQ_COMPANYCASH = $_POST["AFFCOMPANY"];
+		$RPRQ_COMPANYCASH = $result_car["AFFCOMPANY"];
 		$RPRQ_REQUESTBY = $_POST["EMP_NAME_RQRP"];
 		$RPRQ_REQUESTBY_SQ = $_POST["RPRQ_CREATENAME"];
 		$RPRQ_CREATEDATE_REQUEST = $_POST["RPRQ_CREATEDATE_REQUEST"];
@@ -229,10 +267,29 @@
 					}
 				// แจ้งเตือนไลน์--------------------------------------------------------------------------------
 				// แจ้งเตือนเทเลแกรม-OPEN-------------------------------------------------------------------------------
-					$channelId = '-4748971185';
-					$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
-					$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
-					$response = file_get_contents($urltelegram);
+					$stmt_telegram = "SELECT * FROM SETTING WHERE ST_TYPE = '33' AND ST_STATUS = 'Y' AND ST_AREA = '$SESSION_AREA'";
+					$query_telegram = sqlsrv_query( $conn, $stmt_telegram);	
+					$no=0;
+					while($result_telegram = sqlsrv_fetch_array($query_telegram)){	
+						$no++;
+						$ST_DETAIL_TELEGRAM=$result_telegram["ST_DETAIL"];
+						$channelId=$ST_DETAIL_TELEGRAM;  
+						$NOTI_LINE1=" 🔴 แจ้งซ่อม BM ($RPC_SUBJECT_NAME)"."\n";
+						$NOTI_LINE2="ID : ".$LAST_RPRQ_ID.", ลำดับ : ".$RPRQ_NUMBER.""."\n";
+						$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD."\n";
+						$NOTI_LINE4="ชื่อรถ(หัว) : ".$RPRQ_CARNAMEHEAD."\n";
+						$NOTI_LINE5="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL."\n";
+						$NOTI_LINE6="ชื่อรถ(หาง) : ".$RPRQ_CARNAMETAIL."\n";
+						$NOTI_LINE7="ปัญหา : $RPC_DETAIL"."\n";
+						$NOTI_LINE8="วันที่/เวลา แจ้งซ่อม : ".$datetimeRequest_in.""."\n";
+						$NOTI_LINE9="วันที่/เวลา ต้องการใช้รถ : ".$datetimeRequest_out.""."\n";
+						$NOTI_LINE10="ผู้แจ้ง : ".$RPRQ_REQUESTBY."";   
+						$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8.$NOTI_LINE9.$NOTI_LINE10;
+						// $channelId = '-4748971185';
+						$botApiToken  = '7514279565:AAG8L_IfiV1SD_4lF98WjtV5E4nLRqec_PY'; 
+						$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+						$response = file_get_contents($urltelegram); 
+					}
 				// แจ้งเตือนเทเลแกรม-CLOSE-------------------------------------------------------------------------------
 			}
 		}	
@@ -664,7 +721,7 @@
 		if( $stmt === false ) {
 			die( print_r( sqlsrv_errors(), true));
 		}else{
-			print "ส่งแผนเรียบร้อยแล้ว"; 	
+			print "ส่งแผนเรียบร้อยแล้ว";	
 		}	
 
 		if($CASE=='not'){

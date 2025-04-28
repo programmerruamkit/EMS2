@@ -1,5 +1,5 @@
 <?php include('db.php');
-    session_start();
+    session_name("EMS"); session_start();
     error_reporting(0); //E_ALL แสดง error ทั้งหมด | ใส่ 0 ปิดแสดง error ทั้งหมด
     date_default_timezone_set('Asia/Bangkok');
         $serverName = $HOST;

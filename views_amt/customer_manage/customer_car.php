@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');	
 	$GET_CTM_COMCODE=$_GET['ctm_comcode'];

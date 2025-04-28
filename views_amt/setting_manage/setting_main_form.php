@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
 	$SESSION_AREA = $_SESSION["AD_AREA"];
@@ -81,12 +81,12 @@
                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <?php if($proc=="edit"){ ?>
-                        <td width="24" valign="middle" class=""><img src="../images/Process-Info-icon32.png" width="32" height="32"></td>
+                        <td width="24" valign="middle" class=""><img src="https://img2.pic.in.th/pic/Process-Info-icon32.png" width="32" height="32"></td>
                         <td valign="bottom" class="">
                           <h4>&nbsp;&nbsp;แก้ไขรายการ</h4>
                         </td>
                       <?php }else{ ?>
-                        <td width="24" valign="middle" class=""><img src="../images/plus-icon32.png" width="32" height="32"></td>
+                        <td width="24" valign="middle" class=""><img src="https://img2.pic.in.th/pic/plus-icon32.png" width="32" height="32"></td>
                         <td valign="bottom" class="">
                           <h4>&nbsp;&nbsp;เพิ่มรายการใหม่</h4>
                         </td>
@@ -109,12 +109,16 @@
                               <select class="time" onFocus="$(this).select();" style="width: 100%;" name="ST_TYPE"
                                 id="ST_TYPE" required>
                                 <option value disabled selected>-------โปรดเลือก-------</option>
-                                <option value="27" <?php if($result_edit_setting['ST_TYPE']== "27"){echo "selected";} ?>>LineNotify แจ้งซ่อม</option>
+                                <!-- <option value="27" <?php if($result_edit_setting['ST_TYPE']== "27"){echo "selected";} ?>>LineNotify แจ้งซ่อม</option>
                                 <option value="28" <?php if($result_edit_setting['ST_TYPE']== "28"){echo "selected";} ?>>LineNotify ตรวจสอบแจ้งซ่อม</option>
                                 <option value="29" <?php if($result_edit_setting['ST_TYPE']== "29"){echo "selected";} ?>>LineNotify จ่ายงาน</option>
                                 <option value="30" <?php if($result_edit_setting['ST_TYPE']== "30"){echo "selected";} ?>>LineNotify ปิดงาน</option>
                                 <option value="31" <?php if($result_edit_setting['ST_TYPE']== "31"){echo "selected";} ?>>LineNotify เตือนล่วงหน้า</option>
-                                <option value="32" <?php if($result_edit_setting['ST_TYPE']== "32"){echo "selected";} ?>>LineNotify เข้าซ่อมล่าช้า</option>
+                                <option value="32" <?php if($result_edit_setting['ST_TYPE']== "32"){echo "selected";} ?>>LineNotify เข้าซ่อมล่าช้า</option> -->
+                                <option value="33" <?php if($result_edit_setting['ST_TYPE']== "33"){echo "selected";} ?>>Telegram แจ้งซ่อม</option>
+                                <option value="34" <?php if($result_edit_setting['ST_TYPE']== "34"){echo "selected";} ?>>Telegram ตรวจสอบแจ้งซ่อม</option>
+                                <option value="35" <?php if($result_edit_setting['ST_TYPE']== "35"){echo "selected";} ?>>Telegram จ่ายงาน</option>
+                                <option value="36" <?php if($result_edit_setting['ST_TYPE']== "36"){echo "selected";} ?>>Telegram ปิดงาน</option>
                               </select>
                             </div>
                           </td>

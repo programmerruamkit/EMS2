@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
     $path = "../../";    
 	require($path."include/connect.php");
 
@@ -71,7 +71,7 @@
 		$RPRQ_CREATEDATE_REQUEST = date("d/m/Y");
 		$RPRQ_AREA = $_POST["RPRQ_AREA"];
 		$RPRQ_STATUS = 'Y';
-		$RPRQ_STATUSREQUEST = 'รอส่งแผน'; 
+		$RPRQ_STATUSREQUEST = 'รอส่งแผน';
 		$RPRQ_CREATEBY = $_SESSION["AD_PERSONCODE"];
 		$RPRQ_CREATEDATE = date("Y-m-d H:i:s");
 		$RPCIM_PROCESSBY = $_SESSION["AD_PERSONCODE"];
@@ -157,7 +157,7 @@
 					$result_lastjob = sqlsrv_fetch_array($query_lastjob, SQLSRV_FETCH_ASSOC);
 					$LAST_RPRQ_ID=$result_lastjob["RPRQ_ID"];	
 					
-					$stmt_linenoti = "SELECT * FROM SETTING WHERE ST_TYPE = '27' AND ST_STATUS = 'Y' AND ST_AREA = '$AREA'";
+					$stmt_linenoti = "SELECT * FROM SETTING WHERE ST_TYPE = '27' AND ST_STATUS = 'Y' AND ST_AREA = '$SESSION_AREA'";
 					$query_linenoti = sqlsrv_query( $conn, $stmt_linenoti);	
 					$no=0;
 					while($result_linenoti = sqlsrv_fetch_array($query_linenoti)){	
@@ -166,13 +166,15 @@
 						$TK_RQRP="$ST_DETAIL";  
 						$NOTI_LINE1=" 🔴 แจ้งซ่อม BM ($RPC_SUBJECT_NAME)"."\n";
 						$NOTI_LINE2="ID : ".$LAST_RPRQ_ID.", ลำดับ : ".$RPRQ_NUMBER.""."\n";
-						$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD.""."\n";
-						$NOTI_LINE4="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL.""."\n";
-						$NOTI_LINE5="ปัญหา : $RPC_DETAIL"."\n";
-						$NOTI_LINE6="วันที่/เวลา แจ้งซ่อม : ".$RPRQ_REQUESTCARDATE." ".$RPRQ_REQUESTCARTIME.""."\n";
-						$NOTI_LINE7="วันที่/เวลา ต้องการใช้รถ : ".$RPRQ_USECARDATE." ".$RPRQ_USECARTIME.""."\n";
-						$NOTI_LINE8="ผู้แจ้ง : ".$RPRQ_REQUESTBY."";   
-						$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8;	
+						$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD."\n";
+						$NOTI_LINE4="ชื่อรถ(หัว) : ".$RPRQ_CARNAMEHEAD."\n";
+						$NOTI_LINE5="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL."\n";
+						$NOTI_LINE6="ชื่อรถ(หาง) : ".$RPRQ_CARNAMETAIL."\n";
+						$NOTI_LINE7="ปัญหา : $RPC_DETAIL"."\n";
+						$NOTI_LINE8="วันที่/เวลา แจ้งซ่อม : ".$datetimeRequest_in.""."\n";
+						$NOTI_LINE9="วันที่/เวลา ต้องการใช้รถ : ".$datetimeRequest_out.""."\n";
+						$NOTI_LINE10="ผู้แจ้ง : ".$RPRQ_REQUESTBY."";   
+						$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8.$NOTI_LINE9.$NOTI_LINE10;
 						$chOne = curl_init(); 
 						curl_setopt( $chOne, CURLOPT_URL, "https://notify-api.line.me/api/notify"); 
 						curl_setopt( $chOne, CURLOPT_SSL_VERIFYHOST, 0); 
@@ -194,10 +196,29 @@
 					}
 				// แจ้งเตือนไลน์--------------------------------------------------------------------------------
 				// แจ้งเตือนเทเลแกรม-OPEN-------------------------------------------------------------------------------
-					$channelId = '-4748971185';
-					$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
-					$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
-					$response = file_get_contents($urltelegram);
+					$stmt_telegram = "SELECT * FROM SETTING WHERE ST_TYPE = '33' AND ST_STATUS = 'Y' AND ST_AREA = '$SESSION_AREA'";
+					$query_telegram = sqlsrv_query( $conn, $stmt_telegram);	
+					$no=0;
+					while($result_telegram = sqlsrv_fetch_array($query_telegram)){	
+						$no++;
+						$ST_DETAIL_TELEGRAM=$result_telegram["ST_DETAIL"];
+						$channelId=$ST_DETAIL_TELEGRAM;  
+						$NOTI_LINE1=" 🔴 แจ้งซ่อม BM ($RPC_SUBJECT_NAME)"."\n";
+						$NOTI_LINE2="ID : ".$LAST_RPRQ_ID.", ลำดับ : ".$RPRQ_NUMBER.""."\n";
+						$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD."\n";
+						$NOTI_LINE4="ชื่อรถ(หัว) : ".$RPRQ_CARNAMEHEAD."\n";
+						$NOTI_LINE5="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL."\n";
+						$NOTI_LINE6="ชื่อรถ(หาง) : ".$RPRQ_CARNAMETAIL."\n";
+						$NOTI_LINE7="ปัญหา : $RPC_DETAIL"."\n";
+						$NOTI_LINE8="วันที่/เวลา แจ้งซ่อม : ".$datetimeRequest_in.""."\n";
+						$NOTI_LINE9="วันที่/เวลา ต้องการใช้รถ : ".$datetimeRequest_out.""."\n";
+						$NOTI_LINE10="ผู้แจ้ง : ".$RPRQ_REQUESTBY."";   
+						$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8.$NOTI_LINE9.$NOTI_LINE10;
+						// $channelId = '-4748971185';
+						$botApiToken  = '7514279565:AAG8L_IfiV1SD_4lF98WjtV5E4nLRqec_PY'; 
+						$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+						$response = file_get_contents($urltelegram); 
+					}
 				// แจ้งเตือนเทเลแกรม-CLOSE-------------------------------------------------------------------------------
 			}
 		}

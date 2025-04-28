@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
 
@@ -575,10 +575,56 @@
 				}
 			// แจ้งเตือนไลน์--------------------------------------------------------------------------------
 			// แจ้งเตือนเทเลแกรม-OPEN-------------------------------------------------------------------------------
-				$channelId = '-4748971185';
-				$botApiToken  = '7789413047:AAEXveIx2Ba2J86Wdoobub-VQs4RYIwQ0Yw'; 
-				$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
-				$response = file_get_contents($urltelegram);
+				$stmt_telegram = "SELECT * FROM SETTING WHERE ST_TYPE = '35' AND ST_STATUS = 'Y' AND ST_AREA = '$SESSION_AREA'";
+				$query_telegram = sqlsrv_query( $conn, $stmt_telegram);	
+				$no=0;
+				while($result_telegram = sqlsrv_fetch_array($query_telegram)){	
+					$no++;
+					$ST_DETAIL_TELEGRAM=$result_telegram["ST_DETAIL"];
+					$channelId=$ST_DETAIL_TELEGRAM;  
+
+					if($LAST_RPRQ_WORKTYPE=='BM'){						
+						$NOTI_LINE1=" 🟡 แจ้งการจ่ายงาน BM ($RPC_SUBJECT_CON)"."\n";
+						$NOTI_LINE2="ID : ".$LAST_RPRQ_ID.", ลำดับ : ".$RPRQ_NUMBER.""."\n";							
+						$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD."\n";
+						$NOTI_LINE4="ชื่อรถ(หัว) : ".$RPRQ_CARNAMEHEAD."\n";
+						$NOTI_LINE5="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL."\n";
+						$NOTI_LINE6="ชื่อรถ(หาง) : ".$RPRQ_CARNAMETAIL."\n";
+						$NOTI_LINE7="ปัญหา : $RPC_DETAIL"."\n";
+						$NOTI_LINE8="$RPC_SUBJECT_CON : $RPC_INCARDATE $RPC_INCARTIME $RPC_AREA"."\n";                
+						$NOTI_LINE9="ช่างผู้รับผิดชอบ : ".$RPME_NAME.""."\n";
+						$NOTI_LINE10="--------------------------------"."\n";               
+						$NOTI_LINE11="ผู้จ่ายงาน : ".$ASSIGN_NAME."";   
+						$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8.$NOTI_LINE9.$NOTI_LINE10.$NOTI_LINE11;
+
+					}else if($LAST_RPRQ_WORKTYPE=='PM'){
+						$NOTI_LINE1=" 🟡 แจ้งการจ่ายงาน PM ($RPRQ_RANKPMTYPE)"."\n";		
+						$NOTI_LINE2="ID : ".$LAST_RPRQ_ID.", ถึงระยะเลขไมล์ : ".$RPRQ_MILEAGEFINISH.""."\n";					
+						$NOTI_LINE3="ทะเบียน(หัว) : ".$RPRQ_REGISHEAD."\n";
+						$NOTI_LINE4="ชื่อรถ(หัว) : ".$RPRQ_CARNAMEHEAD."\n";
+						$NOTI_LINE5="ทะเบียน(หาง) : ".$RPRQ_REGISTAIL."\n";
+						$NOTI_LINE6="ชื่อรถ(หาง) : ".$RPRQ_CARNAMETAIL."\n";
+						$NOTI_LINE7="--------------------------------"."\n";							
+						$NOTI_LINE8="$RPC_SUBJECT_CON_EG : $RPC_INCARDATE_EG $RPC_INCARTIME_EG $RPC_AREA_EG"."\n";    
+						$NOTI_LINE9="ช่างผู้รับผิดชอบ : ".$RPME_NAME_EG.""."\n";
+						$NOTI_LINE10="--------------------------------"."\n";
+						$NOTI_LINE11="$RPC_SUBJECT_CON_BD : $RPC_INCARDATE_BD $RPC_INCARTIME_BD $RPC_AREA_BD"."\n";   
+						$NOTI_LINE12="ช่างผู้รับผิดชอบ : ".$RPME_NAME_BD.""."\n";
+						$NOTI_LINE13="--------------------------------"."\n";
+						$NOTI_LINE14="$RPC_SUBJECT_CON_TU : $RPC_INCARDATE_TU $RPC_INCARTIME_TU $RPC_AREA_TU"."\n";   
+						$NOTI_LINE15="ช่างผู้รับผิดชอบ : ".$RPME_NAME_TU.""."\n";
+						$NOTI_LINE16="--------------------------------"."\n";
+						$NOTI_LINE17="$RPC_SUBJECT_CON_EL : $RPC_INCARDATE_EL $RPC_INCARTIME_EL $RPC_AREA_EL"."\n";   
+						$NOTI_LINE18="ช่างผู้รับผิดชอบ : ".$RPME_NAME_EL.""."\n";
+						$NOTI_LINE19="--------------------------------"."\n";               
+						$NOTI_LINE20="ผู้จ่ายงาน : ".$ASSIGN_NAME."";  
+						$MESSAGE_NOTI_LINE=$NOTI_LINE1.$NOTI_LINE2.$NOTI_LINE3.$NOTI_LINE4.$NOTI_LINE5.$NOTI_LINE6.$NOTI_LINE7.$NOTI_LINE8.$NOTI_LINE9.$NOTI_LINE10.$NOTI_LINE11.$NOTI_LINE12.$NOTI_LINE13.$NOTI_LINE14.$NOTI_LINE15.$NOTI_LINE16.$NOTI_LINE17.$NOTI_LINE18.$NOTI_LINE19.$NOTI_LINE20;
+					}
+					// $channelId = '-4748971185';
+					$botApiToken  = '7514279565:AAG8L_IfiV1SD_4lF98WjtV5E4nLRqec_PY'; 
+					$urltelegram = "https://api.telegram.org/bot$botApiToken/sendMessage?chat_id=$channelId&text=".urlencode($MESSAGE_NOTI_LINE);
+					$response = file_get_contents($urltelegram); 
+				}
 			// แจ้งเตือนเทเลแกรม-CLOSE-------------------------------------------------------------------------------
 		}
 	};

@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
 	$SESSION_AREA = $_SESSION["AD_AREA"];
@@ -152,6 +152,8 @@
 						$ST_TYPE_NAME='LineNotify เตือนล่วงหน้า - ';
 					}else if($ST_TYPE=='32'){
 						$ST_TYPE_NAME='LineNotify เข้าซ่อมล่าช้า - ';
+					}else if($ST_TYPE=='33'||$ST_TYPE=='34'||$ST_TYPE=='35'||$ST_TYPE=='36'){
+						$ST_TYPE_NAME='Telegram - ';
 					}else{
 						$ST_TYPE_NAME='';
 					}

@@ -2,7 +2,7 @@
 	// echo"<pre>";
 	// print_r($_POST);
 	// echo"</pre>";
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
 

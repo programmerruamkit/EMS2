@@ -1,5 +1,5 @@
 <?php
-	session_start ();
+	session_name("EMS"); session_start();
     unset($_SESSION["reload"]);
     $path = "../../";    
 	require($path."include/connect.php");

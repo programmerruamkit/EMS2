@@ -1,5 +1,5 @@
 ﻿<?php 
-session_start(); //ประกาศใช้ session
+session_name("EMS"); session_start(); //ประกาศใช้ session
 session_destroy(); //เคลียร์ค่า session
 $path='../';
 // echo "\$_SERVER[\"HTTP_USER_AGENT\"] = ".$_SERVER["HTTP_USER_AGENT"]."<br>";

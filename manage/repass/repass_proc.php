@@ -1,5 +1,5 @@
 <?php
-	session_start();  	
+	session_name("EMS"); session_start();  	
 	include('../../include/connect.php');
 
 	// echo"<pre>";

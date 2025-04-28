@@ -1,5 +1,5 @@
 <?php
-	session_start ();
+	session_name("EMS"); session_start();
     $SS_ROLE=$_SESSION["AD_ROLE_NAME"];
     // $AD_POSITIONNAME = $_SESSION['AD_POSITIONNAME'];
     $word = "ช่าง";

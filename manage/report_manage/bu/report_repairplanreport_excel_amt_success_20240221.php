@@ -2,7 +2,7 @@
 
 <?php
 
-session_start();
+session_name("EMS"); session_start();
 $path = "../";   	
 require($path.'../include/connect.php');
 $SESSION_AREA = $_SESSION["AD_AREA"];

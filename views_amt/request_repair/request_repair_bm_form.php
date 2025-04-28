@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   	
 	require($path.'../include/connect.php');
   
@@ -249,6 +249,7 @@
           url: '../autocomplete/autocomplete_vehicle_request.php',
           data: {
               txt_flg: "select_maxmileage", 
+              typecus: typecus,
               vehiclenumber: document.getElementById('VEHICLEREGISNUMBER1').value
           },
           success: function (rs) {
@@ -294,6 +295,7 @@
           url: '../autocomplete/autocomplete_vehicle_request.php',
           data: {
               txt_flg: "select_maxmileage", 
+              typecus: typecus,
               thainame: document.getElementById('THAINAME1').value
           },
           success: function (rs) {

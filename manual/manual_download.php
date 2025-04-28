@@ -1,5 +1,5 @@
 ﻿<?php
-	session_start ();
+	session_name("EMS"); session_start();
 	$path='../';
 	require($path."include/head.php");		
 	require($path."include/script.php"); 
@@ -127,6 +127,26 @@
                     <span>
                       <img title="pdf" src="<?=$path?>images/pdf-icon-150x150.png" width="35" height="35">
                     </span><span>&emsp;(อัพเดทล่าสุด 24/08/2567)</span>
+                  </a>
+                </td>
+              </tr>
+              <tr height="50px" align="center">
+                <!-- <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td> -->
+                <td align="right">คู่มือ Telegram สำหรับ E-Maintenance</td>
+                <td align="center">
+                  <a href="./document/คู่มือ Telegram สำหรับ E-Maintenance.pdf" target="_blank">
+                    <span>
+                      <img title="pdf" src="<?=$path?>images/pdf-icon-150x150.png" width="35" height="35">
+                    </span><span>&emsp;(อัพเดทล่าสุด 19/03/2568)</span>
+                  </a>
+                </td>
+                <td align="center">
+                  <a href="./document/คู่มือ Telegram สำหรับ E-Maintenance.pdf" target="_blank">
+                    <span>
+                      <img title="pdf" src="<?=$path?>images/pdf-icon-150x150.png" width="35" height="35">
+                    </span><span>&emsp;(อัพเดทล่าสุด 19/03/2568)</span>
                   </a>
                 </td>
               </tr>

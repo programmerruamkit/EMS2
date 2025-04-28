@@ -1,5 +1,5 @@
 <?php
-	session_start ();
+	session_name("EMS"); session_start();
 	$path='../';
 	require($path."include/connect.php");
 	$item_code = $_POST['item_code'];

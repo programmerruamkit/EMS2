@@ -1,4 +1,5 @@
 <?php 
+session_name("EMS"); session_start();
 $path='../';
 require($path."include/connect.php");
 require($path."include/authen.php"); 

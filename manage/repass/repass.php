@@ -1,5 +1,5 @@
 <?php
-	session_start();
+	session_name("EMS"); session_start();
 	$path = "../";   
 	include($path.'../include/connect.php'); 	
 ?>
