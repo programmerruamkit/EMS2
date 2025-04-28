@@ -12,25 +12,70 @@
    	$connectionInfo = array("Database"=>$DATABASE, "UID"=>$USERNAME, "PWD"=>$PASSWORD, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
     $conn = sqlsrv_connect($HOST, $connectionInfo);    
     if( $conn === false ) {
-        die( print_r( sqlsrv_errors(), true));
+        echo '<div style="
+                text-align: center; 
+                font-family: Arial, sans-serif; 
+                margin-top: 50px; 
+                padding: 30px;
+                background-color: #f8d7da; 
+                color: #721c24; 
+                border: 2px solid #f5c6cb; 
+                border-radius: 10px; 
+                max-width: 800px; 
+                margin: auto;
+            ">';
+        echo '    <h1 style="color: #d8000c;">⚠️ ขออภัยในความไม่สะดวก</h1>';
+        echo '    <h2>ระบบ <span style="color: #0056b3;">E-Maintenance</span> ไม่สามารถเชื่อมต่อฐานข้อมูลหลักของระบบได้</h2>';
+        echo '    <p style="font-size: 18px; color: #721c24;">';
+        echo '        ขณะนี้ระบบกำลังอยู่ระหว่างการปรับปรุง <br>';
+        echo '        ทีมงาน <b>RIT</b> กำลังดำเนินการแก้ไข และจะกลับมาให้บริการโดยเร็วที่สุด';
+        echo '    </p>';
+        // echo '    <p style="font-size: 16px; color: #721c24;">หากมีข้อสงสัย กรุณาติดต่อฝ่ายสนับสนุนที่ <b>xxx-xxx-xxxx</b> หรืออีเมล <b>support@example.com</b></p>';
+        echo '</div>';
+        exit();
+        // die( print_r( sqlsrv_errors(), true));
     }else{        
         // echo "Database Connected1.";
     }
 
     // FOR EMS_OLD
-    $connectionInfo_old = array("Database"=>$DATABASE_OLD, "UID"=>$USERNAME_OLD, "PWD"=>$PASSWORD_OLD, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
-    $conn_old = sqlsrv_connect($HOST_OLD, $connectionInfo_old);    
-    if( $conn_old === false ) {
-        die( print_r( sqlsrv_errors(), true));
-    }else{        
-        // echo "Database Connected2.";
-    }
+    // $connectionInfo_old = array("Database"=>$DATABASE_OLD, "UID"=>$USERNAME_OLD, "PWD"=>$PASSWORD_OLD, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
+    // $conn_old = sqlsrv_connect($HOST_OLD, $connectionInfo_old);    
+    // if( $conn_old === false ) {
+    //     die( print_r( sqlsrv_errors(), true));
+    // }else{        
+    //     // echo "Database Connected2.";
+    // }
     
     // FOR EMS_TMS
     $connectionInfo_tms = array("Database"=>$DATABASE_TMS, "UID"=>$USERNAME_TMS, "PWD"=>$PASSWORD_TMS, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
     $conn_tms = sqlsrv_connect($HOST_TMS, $connectionInfo_tms);    
     if( $conn_tms === false ) {
-        die( print_r( sqlsrv_errors(), true));
+        echo '<div style="
+                text-align: center; 
+                font-family: Arial, sans-serif; 
+                margin-top: 50px; 
+                padding: 30px;
+                background-color: #f8d7da; 
+                color: #721c24; 
+                border: 2px solid #f5c6cb; 
+                border-radius: 10px; 
+                max-width: 800px; 
+                margin: auto;
+            ">';
+        echo '    <h1 style="color: #d8000c;">⚠️ ขออภัยในความไม่สะดวก</h1>';
+        echo '    <h2>ระบบ <span style="color: #0056b3;">E-Maintenance</span> ไม่สามารถเชื่อมต่อฐานข้อมูลระบบ <span style="color: #0056b3;">TMS</span> ได้</h2>';
+        echo '    <p style="font-size: 18px; color: #721c24;">';
+        echo '        ระบบ E-Maintenance จำเป็นต้องใช้ข้อมูลจากฐานข้อมูลของระบบ TMS<br>';
+        echo '        หากฐานข้อมูลของระบบ TMS มีปัญหา อาจส่งผลให้ระบบ E-Maintenance ไม่สามารถใช้งานได้ชั่วคราว';
+        echo '    </p>';
+        echo '    <p style="font-size: 18px; color: #721c24;">ทีมงานกำลังดำเนินการแก้ไขปัญหาโดยเร็วที่สุด ขออภัยในความไม่สะดวก</p>';
+        echo '    <p style="font-size: 16px; color: #721c24;">';
+        // echo '        หากมีข้อสงสัย กรุณาติดต่อฝ่ายสนับสนุนที่ <b>xxx-xxx-xxxx</b> หรืออีเมล <b>support@example.com</b>';
+        echo '    </p>';
+        echo '</div>';
+        exit();
+        // die( print_r( sqlsrv_errors(), true));
     }else{        
         // echo "Database Connected2.";
     }
@@ -63,8 +108,8 @@
     return $conn;
     sqlsrv_close($conn);
     
-    return $conn_old;
-    sqlsrv_close($conn_old);
+    // return $conn_old;
+    // sqlsrv_close($conn_old);
     
     return $conn_tms;
     sqlsrv_close($conn_tms);
