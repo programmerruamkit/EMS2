@@ -23,9 +23,10 @@
         <table  border="1"  style="width: 100%;">
             <thead>
                 <tr>
-                    <th colspan="16" style="text-align: center;background-color: #dedede">รายงานรายละเอียดงานซ่อม <?=$SESSION_AREA?> (ประจำวันที่ <?= $txt_datestart ?> - <?= $txt_dateend ?>)</th>
+                    <th colspan="18" style="text-align: center;background-color: #dedede">รายงานรายละเอียดงานซ่อม <?=$SESSION_AREA?> (ประจำวันที่ <?= $txt_datestart ?> - <?= $txt_dateend ?>)</th>
                 </tr>
                 <tr>   
+                    <th rowspan="2" style="text-align:center;background-color: #dedede">เลขที่ใบแจ้งซ่อม</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ช่องซ่อม</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ทะเบียน(หัว)</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ลูกค้า</th>
@@ -37,6 +38,7 @@
                     <th colspan="2" style="text-align:center;background-color: #dedede">PLAN</th>
                     <th colspan="2" style="text-align:center;background-color: #dedede">ACTUAL</th>
                     <th colspan="3" style="text-align:center;background-color: #dedede">ส่วนต่าง</th>
+                    <th rowspan="2" style="text-align:center;background-color: #dedede">หมายเหตุ</th>
 
                 </tr>
                 <tr>
@@ -91,7 +93,8 @@
                                 ELSE c.RPC_SUBJECT
                             END SUBJECT,
                             c.RPC_DETAIL DETAIL,
-                            c.RPC_INCARDATE CARINPUTDATE
+                            c.RPC_INCARDATE CARINPUTDATE,
+                            a.RPRQ_IS_ADDITIONAL_WORK IS_ADDITIONAL_WORK
                         FROM
                             REPAIRREQUEST a
                             INNER JOIN REPAIRCAUSE c ON c.RPRQ_CODE = a.RPRQ_CODE
@@ -192,7 +195,8 @@
                                 $estimaters='';
                             }    
                         ?>                            
-                        <tr>                                
+                        <tr>            
+                            <td style="text-align: center">'<?= str_pad($result_seRepairplan['REPAIRPLANID'], 6, '0', STR_PAD_LEFT) ?></td>         
                             <td style="text-align: left"><?=$result_seRepairplan['REPAIRAREA']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['VEHICLEREGISNUMBER1']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['COMPANYPAYMENT']?></td>
@@ -210,6 +214,9 @@
                             <td style="text-align: center"><?=number_format(($PLANHOUR*$result_seCountMechanic['COUNTMEC'])-($result_seCountMechanic['COUNTMEC']*6.33),2)?></td>
                             <td style="text-align: center"><?=number_format(($ACTUALHOUR*$result_seCountMechanic['COUNTMEC'])-($PLANHOUR*$result_seCountMechanic['COUNTMEC']),2)?></td>
                             <td style="text-align: center"><?=number_format(($ACTUALHOUR*$result_seCountMechanic['COUNTMEC'])-($result_seCountMechanic['COUNTMEC']*6.33),2)?></td>
+                            <td style="text-align: center; <?= $result_seRepairplan['IS_ADDITIONAL_WORK'] ? 'background-color: #FFFF66;' : '' ?>">
+                                <?= $result_seRepairplan['IS_ADDITIONAL_WORK'] ? '('.$result_seRepairplan['IS_ADDITIONAL_WORK'].')' : '' ?>
+                            </td>
                         </tr>
                         <?php
                         $SUMMECHANIC        = $SUMMECHANIC + $result_seCountMechanic['COUNTMEC'];
@@ -237,6 +244,8 @@
                     <td style="text-align: center"><b><?= number_format($SUMCAPPLAN,2); ?></td>
                     <td style="text-align: center"><b><?= number_format($SUMPLANACT,2); ?></td>
                     <td style="text-align: center"><b><?= number_format($SUMCAPACT,2); ?></td>
+                    <td style="text-align: center"><b></b></td>
+                    <td style="text-align: center"><b></b></td>
                 </tr>
             </tbody>
         </table>

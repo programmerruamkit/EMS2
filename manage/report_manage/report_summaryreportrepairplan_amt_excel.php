@@ -26,10 +26,10 @@ header("Pragma:no-cache");
         <table  border="1"  style="width: 100%;">
             <thead>
                 <tr>
-                    <th colspan="21" style="text-align: center;background-color: #dedede">รายงานข้อมูลสรุปแผนงาน <?=$SESSION_AREA?> (ประจำวันที่ <?= $txt_datestart_amt ?> - <?= $txt_dateend_amt ?>)</th>
+                    <th colspan="23" style="text-align: center;background-color: #dedede">รายงานข้อมูลสรุปแผนงาน <?=$SESSION_AREA?> (ประจำวันที่ <?= $txt_datestart_amt ?> - <?= $txt_dateend_amt ?>)</th>
                 </tr>
                 <tr>   
-                    <!-- <th rowspan="2" style="text-align:center;background-color: #dedede">แผน</th> -->
+                    <th rowspan="2" style="text-align:center;background-color: #dedede">เลขที่ใบแจ้งซ่อม</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ช่องซ่อม</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ทะเบียน(หัว)</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ลูกค้า</th>
@@ -44,6 +44,7 @@ header("Pragma:no-cache");
                     <th rowspan="2" style="text-align:center;background-color: #dedede">Dif.</th>
                     <th rowspan="2" style="text-align:center;background-color: #dedede">ACTUAL HRS<br>Per MEC.</th>
                     <th colspan="4" style="text-align:center;background-color: #dedede">รวมประมาณรายได้</th>
+                    <th rowspan="2" style="text-align:center;background-color: #dedede">หมายเหตุ</th>
 
                 </tr>
                 <tr>
@@ -105,7 +106,8 @@ header("Pragma:no-cache");
                                 ELSE c.RPC_SUBJECT
                             END SUBJECT,
                             c.RPC_DETAIL DETAIL,
-                            c.RPC_INCARDATE CARINPUTDATE
+                            c.RPC_INCARDATE CARINPUTDATE,
+                            a.RPRQ_IS_ADDITIONAL_WORK IS_ADDITIONAL_WORK
                         FROM
                             REPAIRREQUEST a
                             INNER JOIN REPAIRCAUSE c ON c.RPRQ_CODE = a.RPRQ_CODE
@@ -275,7 +277,7 @@ header("Pragma:no-cache");
                             $rsdrivecard = $RPMD_CARLICENCE;
                         ?>                            
                         <tr>                                
-                            <!-- <td style="text-align: left"><?=$result_seRepairplan['REPAIRPLANID']?></td> -->
+                            <td style="text-align: center">'<?= str_pad($result_seRepairplan['REPAIRPLANID'], 6, '0', STR_PAD_LEFT) ?></td>  
                             <td style="text-align: left"><?=$result_seRepairplan['REPAIRAREA']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['VEHICLEREGISNUMBER1']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['COMPANYPAYMENT']?></td>
@@ -299,6 +301,9 @@ header("Pragma:no-cache");
                             <td style="text-align: center"><?=$sparepartcost?></td>
                             <td style="text-align: center"><?=$wage?></td>
                             <td style="text-align: center"><?=number_format($estimaters,2)?></td>
+                            <td style="text-align: center; <?= $result_seRepairplan['IS_ADDITIONAL_WORK'] ? 'background-color: #FFFF66;' : '' ?>">
+                                <?= $result_seRepairplan['IS_ADDITIONAL_WORK'] ? '('.$result_seRepairplan['IS_ADDITIONAL_WORK'].')' : '' ?>
+                            </td>
                         </tr>
                         <?php
                         $SUMMECHANIC        = $SUMMECHANIC + $result_seCountMechanic['COUNTMEC'];
@@ -316,7 +321,7 @@ header("Pragma:no-cache");
                     }
                     ?>
                 <tr>
-                    <th colspan="6" style="text-align: right;background-color: #dedede">TOTAL</th>
+                    <th colspan="7" style="text-align: right;background-color: #dedede">TOTAL</th>
                     <td style="text-align: center"><b><?= $SUMMECHANIC?></b></td>
                     <td style="text-align: center"></td>
                     <td style="text-align: center"></td>
@@ -332,6 +337,8 @@ header("Pragma:no-cache");
                     <td style="text-align: center"><b><?= number_format($SUMsparepartcost,0) ?></b></td>
                     <td style="text-align: center"><b><?= number_format($SUMwage,0) ?></b></td>
                     <td style="text-align: center"><b><?= number_format($SUMestimaters,0) ?></b></td>
+                    <td style="text-align: center"></td>
+                    <td style="text-align: center"></td>
                 </tr>
             </tbody>
         </table>

@@ -101,7 +101,7 @@
             </tr>
         </tbody>
       </table> 
-      <hr>
+      <!-- <hr>
       <br>  
       <h3>รายงาน สรุปประมาณการรายได้</h3>  
       <table>
@@ -130,7 +130,7 @@
                 <td>&nbsp;</td>
             </tr>
         </tbody>
-      </table> 
+      </table>  -->
     </td>
     <td class="RIGHT"></td>
   </tr>

@@ -55,6 +55,7 @@ header("Pragma:no-cache");
                 </tr>
                 <tr>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ลำดับ</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เลขที่ใบแจ้งซ่อม</td>
 					<th colspan="2" style="text-align:center;background-color: #dedede" width="10%">ข้อมูลรถ(หัว)</th>
 					<th colspan="2" style="text-align:center;background-color: #dedede" width="10%">ข้อมูลรถ(หาง)</th>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">สายงาน/ลูกค้า</td>
@@ -140,7 +141,8 @@ header("Pragma:no-cache");
                             a.RPRQ_REMARK,
                             (SELECT TOP 1 CONVERT(VARCHAR, CONVERT(DATETIME, RPATTM_PROCESS, 101), 103)+' '+SUBSTRING(RPATTM_PROCESS, 12, 5) FROM REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT AND RPATTM_GROUP='START') AS REPAIRSTART,
                             (SELECT TOP 1 CONVERT(VARCHAR, CONVERT(DATETIME, RPATTM_PROCESS, 101), 103)+' '+SUBSTRING(RPATTM_PROCESS, 12, 5) FROM REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT AND RPATTM_GROUP='SUCCESS') AS REPAIREND,
-                            (SELECT DISTINCT SUM(CAST(REPLACE(RPATTM_TOTAL,',','') as int)) FROM dbo.REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT) AS RPATTM_TOTAL
+                            (SELECT DISTINCT SUM(CAST(REPLACE(RPATTM_TOTAL,',','') as int)) FROM dbo.REPAIRACTUAL_TIME WHERE RPRQ_CODE=a.RPRQ_CODE AND RPC_SUBJECT=b.RPC_SUBJECT) AS RPATTM_TOTAL,
+                            a.RPRQ_IS_ADDITIONAL_WORK IS_ADDITIONAL_WORK
                         FROM
                             REPAIRREQUEST a
                             INNER JOIN REPAIRCAUSE b ON b.RPRQ_CODE = a.RPRQ_CODE
@@ -222,9 +224,8 @@ header("Pragma:no-cache");
                                 $APPROVE_NAME=$result_emp_approve["nameT"];
                         ?>                            
                         <tr>
-                            
-                            <!-- <td style="text-align: left"><?=$result_seRepairplan['REPAIRPLANID']?></td> -->
                             <td style="text-align: center"><?=$i?></td>
+                            <td style="text-align: center">'<?= str_pad($result_seRepairplan['REPAIRPLANID'], 6, '0', STR_PAD_LEFT) ?></td>  
                             <td style="text-align: center"><?=$result_seRepairplan['VEHICLEREGISNUMBER1']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['THAINAME1']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['VEHICLEREGISNUMBER2']?></td>
@@ -251,7 +252,9 @@ header("Pragma:no-cache");
                             <td style="text-align: center"><?=$result_seRepairplan['RPRQ_REQUESTBY_SQ']?></td>
                             <td style="text-align: center"><?=$APPROVE_NAME?></td>
                             <td style="text-align: center"><?=$TECHICIAN?></td>
-                            <td style="text-align: center"><?=$result_seRepairplan['RPRQ_REMARK']?></td>
+                            <td style="text-align: center; <?= $result_seRepairplan['IS_ADDITIONAL_WORK'] ? 'background-color: #FFFF66;' : '' ?>">
+                                <?=$result_seRepairplan['RPRQ_REMARK']?> <?= $result_seRepairplan['IS_ADDITIONAL_WORK'] ? '('.$result_seRepairplan['IS_ADDITIONAL_WORK'].')' : '' ?>
+                            </td>
                         </tr>
                         <?php                        
                             $sumjobtypetenko = $sumjobtypetenko + $JOBBM;
@@ -267,7 +270,7 @@ header("Pragma:no-cache");
                     ?>
                 
                 <tr>
-                    <td colspan="9">&nbsp;</td>
+                    <td colspan="10">&nbsp;</td>
                     <td style="text-align: center"><?= $sumjobtypetenko ?></td>
                     <td style="text-align: center"><?= $sumjobtypeplanning ?></td>
                     <td style="text-align: center"><?= $sumstatus1 ?></td>
