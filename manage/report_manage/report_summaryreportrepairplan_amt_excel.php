@@ -90,10 +90,31 @@ header("Pragma:no-cache");
                             c.RPC_OUTCARDATE +' '+ c.RPC_OUTCARTIME TIMEPLANEND,    
                             -- DATEDIFF(MINUTE, c.RPC_INCARTIME, c.RPC_OUTCARTIME) AS 'PLANMINUTE',  
                             DATEDIFF(MINUTE,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME) AS 'PLANMINUTE', 
-                            DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)/(60*60*24) AS Day,
-                            DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)/(60*60)%24 AS Hour,
-                            DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)/(60)%60 AS Minute,
-                            DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)%60 AS Second,                         
+                            -- DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)/(60*60*24) AS Day,
+                            -- DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)/(60*60)%24 AS Hour,
+                            -- DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)/(60)%60 AS Minute,
+                            -- DATEDIFF(SECOND,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23)+' '+ c.RPC_INCARTIME,CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23)+' '+ c.RPC_OUTCARTIME)%60 AS Second,
+                            
+                            DATEDIFF_BIG(SECOND,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23) + ' ' + c.RPC_INCARTIME,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23) + ' ' + c.RPC_OUTCARTIME
+                            ) / (60*60*24) AS Day,
+
+                            DATEDIFF_BIG(SECOND,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23) + ' ' + c.RPC_INCARTIME,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23) + ' ' + c.RPC_OUTCARTIME
+                            ) / (60*60) % 24 AS Hour,
+
+                            DATEDIFF_BIG(SECOND,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23) + ' ' + c.RPC_INCARTIME,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23) + ' ' + c.RPC_OUTCARTIME
+                            ) / 60 % 60 AS Minute,
+
+                            DATEDIFF_BIG(SECOND,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23) + ' ' + c.RPC_INCARTIME,
+                                CONVERT(VARCHAR(10),CONVERT(date, c.RPC_OUTCARDATE, 105),23) + ' ' + c.RPC_OUTCARTIME
+                            ) % 60 AS Second,
+
                             CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23),                        
                             CONVERT(VARCHAR(10),CONVERT(date, c.RPC_INCARDATE, 105),23),
                             c.RPC_SUBJECT SUBJ,
