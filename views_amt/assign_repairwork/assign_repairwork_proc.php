@@ -269,14 +269,16 @@
 			$result_repairman = sqlsrv_fetch_array($query_repairman, SQLSRV_FETCH_ASSOC); 
 			$RPME_NAME = $result_repairman["nameT"];  	
 			
-			$sql_repairdetail = "SELECT RPC_DETAIL FROM vwASSIGN WHERE RPRQ_CODE = '$RPRQ_CODE'";
+			$sql_repairdetail = "SELECT RPC_DETAIL,RPC_AREA,RPC_INCARDATE FROM vwASSIGN WHERE RPRQ_CODE = '$RPRQ_CODE'";
 			$params_repairdetail = array();
 			$query_repairdetail = sqlsrv_query($conn, $sql_repairdetail, $params_repairdetail);
 			$result_repairdetail = sqlsrv_fetch_array($query_repairdetail, SQLSRV_FETCH_ASSOC); 
-			$RPME_DETAIL = $result_repairdetail["RPC_DETAIL"];  	
+			$RPME_DETAIL = $result_repairdetail["RPC_DETAIL"];  
+			$RPC_AREA = $result_repairdetail["RPC_AREA"];
+			$RPC_INCARDATE = $result_repairdetail["RPC_INCARDATE"];
 			
-			$sql1 = "INSERT INTO REPAIRMANEMP (RPRQ_CODE,RPC_SUBJECT,RPME_CODE,RPME_NAME,RPME_DETAIL,RPME_STATUS,RPME_CREATEBY,RPME_CREATEDATE) VALUES (?,?,?,?,?,?,?,?)";
-			$params1 = array($RPRQ_CODE,$RPC_SUBJECT,$RPME_CODE,$RPME_NAME,$RPME_DETAIL,$RPME_STATUS,$PROCESS_BY,$PROCESS_DATE);
+			$sql1 = "INSERT INTO REPAIRMANEMP (RPRQ_CODE,RPC_SUBJECT,RPME_CODE,RPME_NAME,RPME_DETAIL,RPME_STATUS,RPME_CREATEBY,RPME_CREATEDATE,RPC_AREA,RPC_INCARDATE) VALUES (?,?,?,?,?,?,?,?,?,?)";
+			$params1 = array($RPRQ_CODE,$RPC_SUBJECT,$RPME_CODE,$RPME_NAME,$RPME_DETAIL,$RPME_STATUS,$PROCESS_BY,$PROCESS_DATE,$RPC_AREA,$RPC_INCARDATE);
 			$stmt1 = sqlsrv_query( $conn, $sql1, $params1);	
 
 			if( $stmt1 === false ) {
@@ -678,4 +680,24 @@
 			print "ลบข้อมูลเรียบร้อยแล้ว";	
 		}		
 	};	
+	######################################################################################################
+	if ($_POST['target'] === 'save_additional_work') {
+		$rprq_code = $_POST['rprq_code'];
+		if($_POST['is_additional_work']=='true') {
+			$is_additional_work = 'งานเพิ่มจากแผน';
+		} else {
+			$is_additional_work = null;
+		}
+	
+		$stmt = "UPDATE REPAIRREQUEST SET RPRQ_IS_ADDITIONAL_WORK = ? WHERE RPRQ_CODE = ?";
+		$params = array($is_additional_work, $rprq_code);
+		$query = sqlsrv_query($conn, $stmt, $params);
+	
+		if ($query) {
+			echo json_encode(['status' => 'success']);
+		} else {
+			echo json_encode(['status' => 'error', 'message' => sqlsrv_errors()]);
+		}
+		exit;
+	}
 ?>

@@ -225,6 +225,20 @@
             }
         });
     }
+    function saveAdditionalWork(isChecked) {
+      var rprqCode = '<?= $RPRQ_CODE; ?>';
+      var url = "<?=$path?>views_amt/assign_repairwork/assign_repairwork_proc.php";
+  
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: {
+          target: "save_additional_work",
+          is_additional_work: isChecked,
+          rprq_code: rprqCode
+        }
+      });
+    }
   </script>
 </head>
 
@@ -393,6 +407,13 @@
                         <?php } ?>
                       </td>
                     </tr> -->
+                    <tr>
+                      <td align="right" bgcolor="#f9f9f9"><strong>งานเพิ่มเติม:</strong></td>
+                      <td align="left" colspan="7">
+                        <input type="checkbox" name="is_additional_work" id="is_additional_work" value="1" <?php if ($result_rprq['RPRQ_IS_ADDITIONAL_WORK'] == 'งานเพิ่มจากแผน') {echo 'checked';} else {echo '';}?>  onchange="saveAdditionalWork(this.checked)">
+                        งานเพิ่มจากแผน
+                      </td>
+                    </tr>
                   </table>
                 </td>
                 <td class="RIGHT"></td>
@@ -406,7 +427,7 @@
           </div>
         </td>        
       </tr>
-    </table>  
+    </table>
 
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
       <tr>
