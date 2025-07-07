@@ -7,8 +7,13 @@
 	require($path.'../include/connect.php');
 	
 	$PROCESS_BY = $_SESSION["AD_PERSONCODE"];
-	$PROCESS_DATE = date("Y-m-d H:i:s");		
-	
+	$PROCESS_DATE = date("Y-m-d H:i:s");	
+
+	$count_temp = "SELECT COUNT(*) AS CNT FROM RKTC_TEMP";
+$query_count_temp = sqlsrv_query($conn, $count_temp);
+$result_count_temp = sqlsrv_fetch_array($query_count_temp, SQLSRV_FETCH_ASSOC);
+$CNT_INSERTED = $result_count_temp['CNT'];
+
 	$temp = "SELECT * FROM RKTC_TEMP";
 	$querytemp = sqlsrv_query( $conn, $temp);
 	while($resulttemp = sqlsrv_fetch_array($querytemp)){	
@@ -34,12 +39,12 @@
 		$temp19 = $resulttemp['WORKINGHOURS'];
 		$temp20 = $resulttemp['COLLECTIONHOURS'];
 			
-		$fromdb = "SELECT JOBNO,SPAREPARTSDETAIL,SPAREPARTSSELLER FROM RKTC WHERE JOBNO = '$temp9' AND SPAREPARTSDETAIL = '$temp11' AND SPAREPARTSSELLER = '$temp15'";
-		$queryfromdb = sqlsrv_query($conn, $fromdb);
-		$resultfromdb = sqlsrv_fetch_array($queryfromdb, SQLSRV_FETCH_ASSOC);
-			$fromdb9 = $resultfromdb['JOBNO']; 
-			$fromdb11 = $resultfromdb['SPAREPARTSDETAIL'];
-			$fromdb15 = $resultfromdb['SPAREPARTSSELLER'];
+		// $fromdb = "SELECT JOBNO,SPAREPARTSDETAIL,SPAREPARTSSELLER FROM RKTC WHERE JOBNO = '$temp9' AND SPAREPARTSDETAIL = '$temp11' AND SPAREPARTSSELLER = '$temp15'";
+		// $queryfromdb = sqlsrv_query($conn, $fromdb);
+		// $resultfromdb = sqlsrv_fetch_array($queryfromdb, SQLSRV_FETCH_ASSOC);
+		// 	$fromdb9 = $resultfromdb['JOBNO']; 
+		// 	$fromdb11 = $resultfromdb['SPAREPARTSDETAIL'];
+		// 	$fromdb15 = $resultfromdb['SPAREPARTSSELLER'];
 
 		// if(isset($fromdb9)){                 
 		// 	$sql = "UPDATE RKTC SET NICKNM = ?,CUSCOD = ?,OPENDATE = ?,CLOSEDATE = ?,TAXINVOICEDATE = ?,REGNO = ?,CHASSIS = ?,MILEAGE = ?,TYPNAME = ?,NET = ?,COST = ?,SELLING = ?,SPAREPARTSSELLER = ?,SUMMARY = ?,WAGES = ?,MECHANIC = ?,WORKINGHOURS = ?,COLLECTIONHOURS = ?,MODIFIEDBY = ?,MODIFIEDDATE = ?
@@ -76,4 +81,7 @@
 
 		// echo $CNTINS;
 		// echo $CNTUP;
-		echo $CNTUP;
+		// echo $CNTUP;
+		
+	// หลัง insert เสร็จ
+	echo $CNT_INSERTED;

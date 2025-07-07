@@ -116,9 +116,9 @@
 			<td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;มอบหมายงานซ่อม</h3></td>
 			<td width="617" align="right" valign="bottom" class="" nowrap>
 				<div class="toolbar">
-					<!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
-					<!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-					<!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+					
+					
+					
 				</div>
 			</td>
 		</tr>
@@ -175,7 +175,7 @@
                     <td width="15%" align="center">
                         <div class="row input-control">           
 							<input type="text" name="dateStart" id="dateStart" class="datepic time" placeholder="วันที่เริ่มต้นสัปดาห์" autocomplete="off" value="<?=$getday;?>" onchange="search_request()">         
-                            <!-- <input type="text" name="dateStart" id="dateStart" class="time" placeholder="วันที่เริ่มต้นสัปดาห์" style="date" value="<?=$getday;?>" onchange="search_request()" autocomplete="off"/> -->
+                            
                         </div>
                     </td>                
                     <!-- <td width="1%" align="center">&nbsp;</td>            
@@ -242,7 +242,7 @@
 					<?php } ?>
 				</ul>  
 				<div id="tabs-1">
-					<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1"><!-- default hover pointer display hover pointer -->
+					<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1">
 						<thead>
 							<tr height="30">
 								<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>								
@@ -271,7 +271,7 @@
 								<th align="center"width="5%">ทะเบียน</th>
 								<th align="center"width="10%">ชื่อรถ</th> 
 								<th align="center"width="50%">จ่ายงาน</th>    
-								<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->
+								
 								<th align="center"width="50%">ลบ</th>    
 							</tr>
 						</thead>
@@ -378,7 +378,7 @@
 				</div>
 				<?php if(($_GET['dateStart']!="waitassign")&&($_GET['dateStart']!="waitrepair")&&($_GET['dateStart']!="working")){ ?>
 					<div id="tabs-2">
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable2"><!-- default hover pointer display hover pointer -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable2">
 							<thead>
 								<tr height="30">
 									<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>
@@ -396,7 +396,7 @@
 									<th align="center"width="5%">ทะเบียน</th>
 									<th align="center"width="10%">ชื่อรถ</th> 
 									<th align="center"width="50%">จ่ายงาน</th>   
-									<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->    
+									    
 									<th align="center"width="50%">ลบ</th>    
 								</tr>
 							</thead>
@@ -465,7 +465,7 @@
 						</table> 
 					</div>
 					<div id="tabs-3">
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable3"><!-- default hover pointer display hover pointer -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable3">
 							<thead>
 								<tr height="30">
 									<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>
@@ -483,7 +483,7 @@
 									<th align="center"width="5%">ทะเบียน</th>
 									<th align="center"width="10%">ชื่อรถ</th> 
 									<th align="center"width="50%">จ่ายงาน</th>   
-									<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->    
+									    
 									<th align="center"width="50%">ลบ</th>    
 								</tr>
 							</thead>
@@ -552,7 +552,7 @@
 						</table> 
 					</div>
 					<div id="tabs-4">
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable4"><!-- default hover pointer display hover pointer -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable4">
 							<thead>
 								<tr height="30">
 									<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>
@@ -570,7 +570,7 @@
 									<th align="center"width="5%">ทะเบียน</th>
 									<th align="center"width="10%">ชื่อรถ</th> 
 									<th align="center"width="50%">จ่ายงาน</th>   
-									<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->    
+									    
 									<th align="center"width="50%">ลบ</th>    
 								</tr>
 							</thead>
@@ -639,7 +639,7 @@
 						</table> 
 					</div>
 					<div id="tabs-5">
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable5"><!-- default hover pointer display hover pointer -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable5">
 							<thead>
 								<tr height="30">
 									<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>
@@ -657,7 +657,7 @@
 									<th align="center"width="5%">ทะเบียน</th>
 									<th align="center"width="10%">ชื่อรถ</th> 
 									<th align="center"width="50%">จ่ายงาน</th>   
-									<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->    
+									    
 									<th align="center"width="50%">ลบ</th>    
 								</tr>
 							</thead>
@@ -726,7 +726,7 @@
 						</table> 
 					</div>
 					<div id="tabs-6">
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable6"><!-- default hover pointer display hover pointer -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable6">
 							<thead>
 								<tr height="30">
 									<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>
@@ -744,7 +744,7 @@
 									<th align="center"width="5%">ทะเบียน</th>
 									<th align="center"width="10%">ชื่อรถ</th> 
 									<th align="center"width="50%">จ่ายงาน</th>   
-									<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->    
+									    
 									<th align="center"width="50%">ลบ</th>    
 								</tr>
 							</thead>
@@ -813,7 +813,7 @@
 						</table> 
 					</div>
 					<div id="tabs-7">
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable7"><!-- default hover pointer display hover pointer -->
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable7">
 							<thead>
 								<tr height="30">
 									<th rowspan="2" align="center" width="5%">เลขที่ใบขอซ่อม</th>
@@ -831,7 +831,7 @@
 									<th align="center"width="5%">ทะเบียน</th>
 									<th align="center"width="10%">ชื่อรถ</th> 
 									<th align="center"width="50%">จ่ายงาน</th>   
-									<!-- <th align="center"width="5%">ยกเลิกซ่อม</th> -->    
+									    
 									<th align="center"width="50%">ลบ</th>    
 								</tr>
 							</thead>

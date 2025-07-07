@@ -30,10 +30,10 @@ $(document).ready(function(e) {
                 <td width="25" valign="middle" class=""><img src="../images/car_repair.png" width="48" height="48"></td>
                 <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลใบขอซ่อมที่ไม่ได้รับอนุมัติซ่อม</h3></td>
                 <td width="617" align="right" valign="bottom" class="" nowrap>
-                        <!-- <button class="bg-color-blue big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม BM</font></button> -->
-                        <!-- <button class="bg-color-orange big" title="New" onClick="loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm.php');"><font color="white" size="4">New แจ้งซ่อม PM</font></button> -->
-                        <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                        <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                        
+                        
+                        
+                        
                 </td>
             </tr>
         </table>
@@ -51,10 +51,10 @@ $(document).ready(function(e) {
   <tr class="CENTER">
     <td class="LEFT"></td>    
     <td class="CENTER" align="center">  
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1"><!-- default hover pointer display hover pointer -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1">
             <thead>
                 <tr height="30">
-                    <!-- <th rowspan="2" align="center" width="6%">ประเภทงาน</th> -->
+                    
                     <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลใบขอซ่อม - เดิม</th>
                     <th rowspan="2" align="center" width="10%">สาเหตุไม่อนุมัติ</th>
                     <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลใบขอซ่อม - ใหม่</th>
@@ -107,7 +107,7 @@ $(document).ready(function(e) {
                         $no++;
                 ?>
                 <tr style="cursor:pointer" height="25px" align="center">   
-                    <!-- <td align="center"><b>< ?php print $result_rprq_nap['WK']; ?></b></td>   -->
+                    
                     <td align="center"><b><?php print $result_rprq_nap['ID1']; ?></b></td>  
                     <td align="center">
                         <?php 

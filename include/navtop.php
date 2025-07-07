@@ -1,4 +1,4 @@
-<!--JS Window8-->
+
 <script type="text/javascript" src="<?=$path;?>js/modern/dropdown.js"></script>
 <?php
   $AD_ROLE_NAME=$_SESSION['AD_ROLE_NAME'];
@@ -46,7 +46,7 @@
                 $AD_ROLE_NAME = $result_login["RU_NAME"];
                 $AD_AREA = $result_login["AREA"];	                    
           ?>
-            <a href="javascript:void(0);" onclick="role_session('<?=$_SESSION['AD_ROLEACCOUNT_USERNAME'];?>','<?=$_SESSION['AD_ROLEACCOUNT_PASSWORD'];?>',<?=$AD_ROLE_ID;?>,<?=$AD_RA_ID;?>)">
+            <a href="javascript:void(0);" onclick="role_session('<?=$_SESSION['AD_ROLEACCOUNT_USERNAME'];?>','<?=$_SESSION['AD_ROLEACCOUNT_PASSWORD'];?>',<?=$AD_ROLE_ID;?>,<?=$AD_RA_ID;?>,'<?=$AD_ROLE_NAME?>')">
               <li>
                 <font color="black" size="2px"><b><i class="gg-user"></i>&nbsp;&nbsp;&nbsp;<?=$AD_ROLE_NAME?> - <?=$AD_AREA?></b></font>
               </li>
@@ -88,11 +88,17 @@
 <div class="topnav bg-color-grayDark" id="myTopnav">
 <div id="container">
   <div id="left">
-      <a href="<?=$path;?>manage/dashboard.php?menu_id=dashboard" style=" <?=($_GET["menu_id"]=='dashboard')?'color:#0CF;':'' /*text-decoration:underline;*/?>">Dashboard</a>
-      <span class="divider"></span>
       <?php 
         $SS_AREA=$_SESSION["AD_AREA"];
         $SS_ROLENAME=$_SESSION["AD_ROLE_NAME"];
+      ?>
+      <?php if($SS_ROLENAME=="PROJECT"){ ?>
+        <a href="<?=$path;?>manage/dashboard_project.php?menu_id=dashboard" style=" <?=($_GET["menu_id"]=='dashboard')?'color:#0CF;':'' /*text-decoration:underline;*/?>">หน้าหลัก</a>
+      <?php } else { ?>
+        <a href="<?=$path;?>manage/dashboard.php?menu_id=dashboard" style=" <?=($_GET["menu_id"]=='dashboard')?'color:#0CF;':'' /*text-decoration:underline;*/?>">Dashboard</a>
+      <?php } ?>
+      <span class="divider"></span>
+      <?php 
         $sql_sidemenu = "SELECT * FROM vwMENU  WHERE MN_LEVEL = '1' AND MN_STATUS = 'Y' AND RM_STATUS = 'Y' AND AREA = '$SS_AREA' AND RU_NAME = '$SS_ROLENAME' ORDER BY MN_SORT ASC";
         $query_sidemenu = sqlsrv_query($conn, $sql_sidemenu);
         while($result_sidemenu = sqlsrv_fetch_array($query_sidemenu, SQLSRV_FETCH_ASSOC)){ 

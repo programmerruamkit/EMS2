@@ -98,8 +98,8 @@
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
                 <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button>
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
             </div>
         </td>
         </tr>
@@ -115,11 +115,11 @@
 			<tr height="30">
 				<th width="10%">ลำดับ.</th>
 				<th width="30%">ชื่อรายการ</th>
-				<!-- <th width="15%">รายการย่อยภายใน</th> -->
-				<!-- <th width="15%">พื้นที่</th> -->
+				
+				
 				<th width="30%">รายละเอียด / TOKEN</th>
 				<th width="10%">เวลา</th>
-				<!-- <th width="10%">พื้นที่</th> -->
+				
 				<th width="10%">สถานะ</th>
 				<th width="10%">จัดการ</th>
 			</tr>
@@ -164,12 +164,12 @@
 				<td align="left" >&nbsp;<?php print $ST_TYPE_NAME.$ST_NAME; ?></td>
 				<td align="left" >&nbsp;<?php print $ST_DETAIL; ?></td>
 				<td align="center" >&nbsp;<?php print $ST_TIME; ?></td>
-				<!-- <td align="center" >&nbsp;<?php print $ST_AREA; ?></td> -->
+				
 				<td align="center" >&nbsp;<?php if($ST_STATUS=="Y"){print "<img src='../images/check_true.gif' width='16' height='16'>";}else{print "<img src='../images/check_del.gif' width='16' height='16'>";}?></td>
 				<td align="center" >
 					<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/setting_manage/setting_main_form.php','edit','<?php print $ST_CODE; ?>','1=1','600','400','แก้ไขรายการ');"><i class='icon-pencil icon-large'></i></button>
-					<!-- &nbsp;&nbsp; -->
-					<!-- <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="Del" onclick="swaldelete_setting_main('<?php print $ST_CODE; ?>','<?php print $no;?>')"><i class="icon-cancel icon-large"></i></button> -->
+					
+					
 				</td>
             </tr>
             <?php }; ?>

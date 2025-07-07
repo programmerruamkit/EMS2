@@ -118,7 +118,7 @@
                               ?>
                               <select class="time" onFocus="$(this).select();" style="width: 100%;" name="NTRP_ID" id="NTRP_ID" required>
                                 <option value disabled selected>-------เลือกลักษณะงานซ่อม-------</option>
-                                <!-- sqlsrv_fetch_assoc -->
+                                
                                 <?php while($result_selnature = sqlsrv_fetch_array($query_selnature)): ?>
                                 <option value="<?=$result_selnature['NTRP_ID']?>" <?php if($result_edit_typerepairwork['NTRP_ID']==$result_selnature['NTRP_ID']){echo "selected";} ?>><?=$result_selnature['NTRP_AREA']?> - <?=$result_selnature['NTRP_NAME']?></option>
                                 <?php endwhile; ?>

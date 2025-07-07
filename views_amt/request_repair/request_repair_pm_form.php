@@ -160,9 +160,9 @@
         <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลใบขอซ่อมรถ PM</h3></td>
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                <!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
+                
             </div>
         </td>
         </tr>
@@ -185,7 +185,7 @@
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="CTM_COMCODE" id="CTM_COMCODE" required>
                                 <option value disabled selected>-------เลือกบริษัท-------</option>
                                 <option value="ALL" <?php if($_GET['ctmcomcode']=="ALL"){echo "selected";} ?>>เลือกทั้งหมด</option>
-                                <!-- sqlsrv_fetch_assoc -->
+                                
                                 <?php while($result_selcus = sqlsrv_fetch_array($query_selcus)): 
                                     $CTM_COMCODE=$result_selcus['CTM_COMCODE'];
                                     $CTM_GROUP1=$result_selcus["CTM_GROUP"];
@@ -248,7 +248,7 @@
                     <tr height="30">
                         <th rowspan="2" align="center" width="5%">ลำดับ</th>
                         <th rowspan="2" align="center" width="5%">ส่งแผน/จัดการ</th>
-                        <!-- <th rowspan="2" align="center" width="5%">แก้ไขแผน</th> -->
+                        
                         <th colspan="2" align="center" width="13%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
                         <?php if($CTM_GROUP=="cusout"){ ?>
                             <th rowspan="2" align="center" width="13%" class="ui-state-default">เพิ่ม/แก้ไขรถลูกค้า - ชื่อลูกค้า</th>
@@ -268,8 +268,8 @@
                         <th align="center" width="5%">ทะเบียน</th>
                         <th align="center">ชื่อรถ</th>  
                         <?php if($CTM_GROUP!="cusout"){ ?>                  
-                            <!-- <th align="center" width="5%">ทะเบียน</th> -->
-                            <!-- <th align="center">ชื่อรถ</th> -->
+                            
+                            
                         <?php } ?>
                         <th align="center">ระยะเลขไมล์</th>
                         <th align="center">PM</th>
@@ -448,21 +448,21 @@
 
                     ?>
                     <tr height="25px" align="center" id="<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>" <?=$class_tr?>>
-                        <!-- onDblClick="javascript:ajaxPopup2('<?=$path?>views_amt/customer_manage/customer_car_detail.php','','id=<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>','1300','480','รายละเอียด')" -->
+                        
                         <td ><?php print "$no.";?></td>
                         <td >
                             <?php if(($RPRQ_STATUSREQUEST=='รอตรวจสอบ')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="javascript:void(0);" onclick="swaldelete_requestrepair('<?php print $RPRQ_CODE; ?>','<?php print $result_vehicleinfo['VEHICLEREGISNUMBER'];?>','<?php print $_GET['ctmcomcode'];?>')"><img src="https://img2.pic.in.th/pic/delete-icon24.png" width="24" height="24"></a>    
-                                <!-- <a href="javascript:void(0);" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_pm_sent.php','edit','<?php print $RPRQ_CODE; ?>&ctmgroup=<?php print $CTM_GROUP; ?>','1=1','1300','400','แก้ไขแผน PM');"><img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24"></a>     -->
+                                
                             <?php }else if(($RPRQ_STATUSREQUEST=='รอจ่ายงาน')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="javascript:void(0);" onclick="swaldelete_requestrepair('<?php print $RPRQ_CODE; ?>','<?php print $result_vehicleinfo['VEHICLEREGISNUMBER'];?>','<?php print $_GET['ctmcomcode'];?>')"><img src="https://img2.pic.in.th/pic/delete-icon24.png" width="24" height="24"></a>    
-                                <!-- <a href="javascript:void(0);" onclick="swaldelete_requestrepair('<?php print $RPRQ_CODE; ?>','<?php print $result_vehicleinfo['VEHICLEREGISNUMBER'];?>','<?php print $_GET['ctmcomcode'];?>')"><img src="https://img2.pic.in.th/pic/delete-icon24.png" width="24" height="24"></a>     -->
+                                
                             <?php }else if(($RPRQ_STATUSREQUEST=='รอคิวซ่อม')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="#"></a>
                             <?php }else if(($RPRQ_STATUSREQUEST=='กำลังซ่อม')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="#"></a>
-                            <!-- < ?php }else if($RPRQ_WORKTYPE=='BM'){ ?> -->
-                                <!-- <a href="#"></a> -->
+                            
+                                
                             <?php }else{ ?>
                                 <a href="javascript:void(0);" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_pm_sent.php','add','<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>&ctmgroup=<?php print $CTM_GROUP; ?>','1=1','800','400','เพิ่มแผน PM');"><img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24"></a>    
                             <?php } ?>                            
@@ -477,8 +477,8 @@
                             <td align="left"><font color="<?=$font?>">
                             <a href="javascript:void(0);" onclick="javascript:loadViewdetail('<?=$path?>views_amt/customer_manage/customer_car.php?ctm_comcode=<?php print $result_vehicleinfo['CTM_COMCODE']; ?>&from=pm',);"><img src="https://img2.pic.in.th/pic/add-icon16.png" width="16" height="16"></a> - 
                             <?=$result_vehicleinfo['CTM_NAMETH']; ?></font></td>
-                            <!-- <td ><font color="<?=$font?>"></font></td> -->
-                            <!-- <td ><font color="<?=$font?>"></font></td> -->
+                            
+                            
                         <?php } ?>  
                             <td align="right">
                                 <font color="<?=$font?>">

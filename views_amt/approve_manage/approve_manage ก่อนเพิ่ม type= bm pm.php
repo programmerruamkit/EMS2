@@ -157,7 +157,7 @@
     <td class="LEFT"></td>
     <td class="CENTER" align="center">
 		<form name="form_approve" id="form_approve">
-        <!-- <form name="form_approve" id="form_approve" method="post" action="<?=$path?>views_amt/approve_manage/approve_manage_proc.php" enctype="multipart/form-data">  -->
+        
 			<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default">
 				<thead>
 					<tr align="center">

@@ -31,7 +31,7 @@
   <tr class="CENTER">
     <td class="LEFT"></td>
     <td class="CENTER" align="center">
-		<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1"><!-- default hover pointer display hover pointer -->
+		<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1">
 			<thead>
 				<tr height="30">
 					<th rowspan="2" align="center" width="5%" class="ui-state-default">เลขที่ใบขอซ่อม</th>

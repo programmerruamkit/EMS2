@@ -22,7 +22,7 @@ require($path."include/script.php");
                     $AD_ROLE_ID = $result_login["RU_ID"];
                     $AD_ROLE_NAME = $result_login["RU_NAME"];	                    
             ?>
-            <a href="javascript:void(0);" onclick="role_session('<?=$_SESSION['AD_ROLEACCOUNT_USERNAME'];?>','<?=$_SESSION['AD_ROLEACCOUNT_PASSWORD'];?>',<?=$AD_ROLE_ID;?>,<?=$AD_RA_ID;?>)">
+            <a href="javascript:void(0);" onclick="role_session('<?=$_SESSION['AD_ROLEACCOUNT_USERNAME'];?>','<?=$_SESSION['AD_ROLEACCOUNT_PASSWORD'];?>',<?=$AD_ROLE_ID;?>,<?=$AD_RA_ID;?>,'<?=$AD_ROLE_NAME?>')">
                 <div class="box" style="cursor:pointer">
                     <div class="ribbon"><span>&nbsp;</span></div>
                     <h1><?=$AD_ROLE_NAME?></h1>
@@ -31,7 +31,7 @@ require($path."include/script.php");
             <?php $no++; } ?>
         </div>
     </div>
-    <!-- <br> -->
+    
     <b><font color="red" class="textdest" size="4px">&nbsp;&nbsp;&nbsp;&nbsp;หมายเหตุ: ให้คลิกเลือกสิทธิ์การใช้งาน เพื่อเข้าใช้งานตามสิทธิ์ที่เลือก เช่น Driver, Admin, Manager เป็นต้น</font></b>
     
     <style>
@@ -113,8 +113,8 @@ require($path."include/script.php");
             background: linear-gradient(#ffff56 0%, #ffff00 100%);
             box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
             position: absolute;
-            top: 17px; // change this, if no border
-            right: -29px; // change this, if no border
+            top: 17px; 
+            right: -29px;
         }
         .ribbon span::before {
             content: '';

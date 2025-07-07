@@ -729,7 +729,7 @@
                   <option value="22:00">
                   <option value="23:00">
                 </datalist>
-                <!-- https://www.tutorialspoint.com/How-to-use-time-input-type-in-HTML -->
+                
             
               <strong>&nbsp;&nbsp;วันที่ต้องการใช้รถ :</strong>
           		<input type="text" name="dateRequest_out" id="dateRequest_out" placeholder="วันที่" style="width:150px;" class="char" value="<?php echo $result_edit_repairrequest["RPRQ_USECARDATE"];?>" autocomplete="off" >
@@ -760,7 +760,7 @@
                   <option value="22:00">
                   <option value="23:00">
                 </datalist>
-                <!-- https://www.tutorialspoint.com/How-to-use-time-input-type-in-HTML -->
+                
             
               </div>
           </td>

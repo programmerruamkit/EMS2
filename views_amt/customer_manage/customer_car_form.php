@@ -251,7 +251,7 @@
                               <input type="text" name="" id="" onFocus="$(this).select();" value="<?=$result_edit_customer["VEHICLEBUYWHERE"];?>" class="readonly" readonly>
                             </div>
                           </td> -->
-                        <!-- </tr> -->
+                        
                         <!-- <tr align="center" height="25px">
                           <td height="35" align="right" class="ui-state-default"><strong>วันที่ซื้อ :</strong></td>
                           <td height="35" align="left" class="bg-white">
@@ -304,7 +304,7 @@
                             </div>
                           </td>
                         </tr> -->
-                        <!-- <tr align="center" height="25px"> -->
+                        
                           <td height="35" align="right" class="ui-state-default"><strong>หมายเหตุ :</strong></td>
                           <td height="35" align="left" class="bg-white">
                             <div class="input-control text">

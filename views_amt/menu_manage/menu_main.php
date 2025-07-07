@@ -99,8 +99,8 @@
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
                 <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button>
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
             </div>
         </td>
         </tr>
@@ -125,7 +125,9 @@
 		</thead>
         <tbody>
 			<?php
-				$sql_menu = "SELECT * FROM MENU WHERE MN_LEVEL='1' AND NOT MN_STATUS='D'";
+				$SESSION_AREA = $_SESSION["AD_AREA"];
+			
+				$sql_menu = "SELECT * FROM MENU WHERE MN_LEVEL='1' AND NOT MN_STATUS='D' AND MN_AREA = '$SESSION_AREA' ORDER BY MN_SORT, MN_NAME";
 				$query_menu = sqlsrv_query($conn, $sql_menu);
 				$no=0;
 				while($result_menu = sqlsrv_fetch_array($query_menu, SQLSRV_FETCH_ASSOC)){	

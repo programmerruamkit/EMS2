@@ -30,7 +30,7 @@
           <div style="width:100%;" align="center">
             <div class="panel panel-default" style="height:100%">
               <div align="left" class="panel-heading">
-                <!-- <h5><img src="../images/task.png" width="32" height="32"> ประวัติการบันทึกข้อมูล</h5> -->
+                
               </div>
               <font size="2">    
                 <?php                

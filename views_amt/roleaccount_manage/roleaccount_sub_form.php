@@ -108,7 +108,7 @@
                             ?>
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="RU_ID" id="RU_ID" required>
                               <option value disabled selected>-------เลือกสิทธิ์-------</option>
-                              <!-- sqlsrv_fetch_assoc -->
+                              
                               <?php while($result_selrole = sqlsrv_fetch_array($query_selrole)): ?>
                               <option value="<?=$result_selrole['RU_ID']?>" <?php if($result_account_edit['RU_ID']==$result_selrole['RU_ID']){echo "selected";} ?>><?=$result_selrole['RU_AREA']?> - <?=$result_selrole['RU_NAME']?></option>
                               <?php endwhile; ?>

@@ -186,9 +186,9 @@
         <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;จัดการข้อมูลเลขไมล์ Rank PM</h3></td>
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                <!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
+                
             </div>
         </td>
         </tr>
@@ -203,10 +203,10 @@
             <tbody>
                 <tr align="center">   
 					<td width="10%" align="right"><strong>เงื่อนไขการค้นหา :</strong></td> 
-                    <!-- <td align="center"></td> -->
-                <!-- </tr> -->
-                <!-- <tr height="40px" align="center">    -->
-					<!-- <td width="10%" align="right">&nbsp;</td> -->
+                    
+                
+                
+					
                     <td width="20%" align="center">
                         <div class="input-control select">       
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="MLPM_NAME" id="MLPM_NAME" required>
@@ -237,7 +237,7 @@
                             ?>
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="MLPM_REMARK" id="MLPM_REMARK" required>
                                 <option value disabled selected>-------เลือกกลุ่มสายงาน-------</option>
-                                <!-- sqlsrv_fetch_assoc -->
+                                
                                 <?php while($result_selline = sqlsrv_fetch_array($query_selline)): ?>
                                     <option value="<?=$result_selline['MLPM_REMARK']?>" <?php if($GETmlpmline==$result_selline['MLPM_REMARK']){echo "selected";} ?>><?=$result_selline['MLPM_REMARK']?></option>
                                 <?php endwhile; ?>

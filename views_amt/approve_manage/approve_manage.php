@@ -207,7 +207,7 @@
     <td class="LEFT"></td>
     <td class="CENTER" align="center">
 		<form name="form_approve" id="form_approve">
-        <!-- <form name="form_approve" id="form_approve" method="post" action="<?=$path?>views_amt/approve_manage/approve_manage_proc.php" enctype="multipart/form-data">  -->
+        
 			<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default">
 				<thead>
 					<tr align="center">
@@ -240,7 +240,7 @@
 									<input type="hidden" name="GETTYPE" id="GETTYPE" value="<?=$GETTYPE;?>">
 									<input type="hidden" name="RPRQID" id="RPRQID<?php echo $no;?>" value="<?=$result_rprq['RPRQ_ID'];?>">
 									<input type="hidden" name="RPRQ_CODE<?php echo $no;?>" id="RPRQ_CODE" value="<?=$result_rprq['RPRQ_CODE'];?>">
-									<!-- <input type="checkbox" name="RPRQ_ID<?php echo $no;?>" id="RPRQ_ID" value="<?=$result_rprq['RPRQ_ID'];?>" style="cursor:pointer" class="largerCheckbox" onclick="fncshowid('<?php echo $no;?>')">&nbsp; -->
+									
 									<input type="checkbox" name="RPRQ_ID<?php echo $no;?>" id="RPRQ_ID" value="<?=$result_rprq['RPRQ_ID'];?>" style="cursor:pointer" class="largerCheckbox" onclick="fncshowid('<?php echo $no;?>')">&nbsp;
 								</label>
 							</div>

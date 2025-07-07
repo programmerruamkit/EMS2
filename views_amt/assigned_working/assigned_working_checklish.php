@@ -111,7 +111,7 @@
               <tr class="CENTER">
                 <td class="LEFT"></td>
                 <td class="CENTER" align="center">
-                  <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" > <!-- id="datatable3" -->
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" > 
                     <thead>
                       <tr height="30">
                         <th width="5%">ลำดับ.</th>

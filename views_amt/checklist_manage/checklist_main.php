@@ -164,9 +164,9 @@
 				<td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;จัดการข้อมูลรายการตรวจสอบ</h3></td>
 				<td width="617" align="right" valign="bottom" class="" nowrap>
 					<div class="toolbar">
-						<!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
-						<!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-						<!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+						
+						
+						
 					</div>
 				</td>
 			</tr>
@@ -321,7 +321,7 @@
     <td class="LEFT">&nbsp;</td>
     <td class="CENTER">&nbsp;		
 		<center>
-			<!-- <input type="button" class="button_gray" value="อัพเดท" onclick="querychecklist()"> -->
+			
 			<input type="button" class="button_gray" value="อัพเดท" onClick="javascript:loadViewdetail('<?=$path?>views_amt/checklist_manage/checklist_main.php');">
 		</center>
 	</td>

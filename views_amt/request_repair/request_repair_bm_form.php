@@ -883,8 +883,8 @@
                       ?>
                       <option value="<?php echo $result_ntrp_sub["TYPE"];?>" <?php if($result_ntrp_sub["TYPE"] == $result_edit_repairrequest["RPRQ_TYPECUSTOMER"]){echo "selected";} ?>><?=$result_ntrp_sub['NTRP_NAME']?></option>
                       <?php }} ?>
-                      <!-- <option value="cusout" < ?php if($result_edit_repairrequest['RPRQ_TYPECUSTOMER']== "cusout"){echo "selected";} ?>>ลูกค้าภายนอก</option> -->
-                      <!-- <option value="cusin" < ?php if($result_edit_repairrequest['RPRQ_TYPECUSTOMER']== "cusin"){echo "selected";} ?>>ลูกค้าภายใน</option> -->
+                      
+                      
                     </select>
                   </div>
                 </td>
@@ -1539,7 +1539,7 @@
                   <input type="hidden" name="RPRQ_CODE" id="RPRQ_CODE" value="<?=$result_edit_repairrequest["RPRQ_CODE"];?>">
                   <button class="bg-color-green font-white" type="button" name="buttonname" id="buttonname" value="edit" onClick="save_data()">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp;
                 <?php }else{ ?>
-                  <!-- <input type="hidden" name="RPRQ_CODE" id="RPRQ_CODE" value="< ?=$rand; ?>"> -->
+                  
                   <input type="hidden" name="RPRQ_NAP_OLD_CODE" id="RPRQ_NAP_OLD_CODE" value="<?=$result_edit_repairrequest["RPRQ_CODE"];?>">
                   <button class="bg-color-green font-white" type="button" name="buttonnameadd" id="buttonnameadd" value="add">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp;
                 <?php } ?>

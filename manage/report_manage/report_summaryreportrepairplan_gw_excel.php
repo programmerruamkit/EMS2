@@ -308,11 +308,11 @@ header("Pragma:no-cache");
                             <td style="text-align: left;"><?= $rsdrivename ?> / <?= $rsdrivecard ?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['TIMEPLANSTART']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['TIMEPLANEND']?></td>
-                            <!-- <td style="text-align: center"><?=$PLANHOUR?></td> -->
+                            
                             <td style="text-align: center"><?=number_format($PLANHOUR,2)?></td>
                             <td style="text-align: center"><?=$ACTUALMIN?></td>
                             <td style="text-align: center"><?=$ACTUALMAX?></td>
-                            <!-- <td style="text-align: center"><?=$ACTUALHOUR?></td> -->
+                            
                             <td style="text-align: center"><?=number_format($ACTUALHOUR,2)?></td>
                             <td style="text-align: center"><?=number_format( $ACTUALHOUR,2)-number_format( $PLANHOUR,2)?></td>
                             <td style="text-align: center"><?=number_format($ACTUALHOUR/$result_seCountMechanic['COUNTMEC'],2)?></td>

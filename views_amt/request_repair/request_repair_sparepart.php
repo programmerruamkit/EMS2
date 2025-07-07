@@ -135,11 +135,11 @@ $(document).ready(function(e) {
                 <td width="25" valign="middle" class=""><img src="../images/car_repair.png" width="48" height="48"></td>
                 <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลบันทึกเปลี่ยนอะไหล่</h3></td>
                 <td width="617" align="right" valign="bottom" class="" nowrap>
-                    <!-- <button class="bg-color-blue big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม BM</font></button> -->
-                    <!-- <button class="bg-color-orange big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม PM</font></button> -->
+                    
+                    
                     <button class="bg-color-orange big" title="New" onClick="loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_sparepart_form.php');"><font color="white" size="4">New แจ้งเปลี่ยนอะไหล่</font></button>
-                    <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                    <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                    
+                    
                 </td>
             </tr>
         </table>

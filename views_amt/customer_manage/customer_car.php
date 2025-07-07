@@ -149,12 +149,12 @@
         <td width="90%" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;จัดการข้อมูลลูกค้า - รถ (<?=$CTM_NAMETH?>)</h3></td>
         <td width="5%" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                <!-- <button class="bg-color-greenLight" style="padding-top:8px;" title="Detail" id="button_detail"><i class='icon-search icon-large'></i></button> -->
+                
 				<?php if($CTM_GROUP=="cusout"){ ?>
 					<button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button>
 				<?php } ?>
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
             </div>
         </td>
         </tr>
@@ -177,8 +177,8 @@
 				<?php } ?>
 				<th width="15%">หมายเหตุ</th>
 				<th width="14%">กลุ่มรถ</th>
-				<!-- ย้ายไปจัดการที่กลุ่มรถแทน -->
-					<!-- <th width="10%">กม./วัน</th>	 -->
+				
+					
 				<th width="10%">สถานะใช้งาน</th>				
 				<?php if($CTM_GROUP=="cusout"){ ?>
 					<th width="10%">จัดการ</th>
@@ -231,14 +231,14 @@
 						<option value disabled selected>-------เลือกกลุ่มรถ-------</option>
 						<option value="0">-------ว่าง-------</option>
 						<option value disabled>สายงาน - โมเดลรถ - ประเภทรถ</option>
-						<!-- sqlsrv_fetch_assoc -->
+						
 						<?php while($result_selcartype = sqlsrv_fetch_array($query_selcartype)): $num++; ?>
 							<option value="<?=$result_selcartype['VHCCT_ID']?>" <?php if($result_selcartype['VHCCT_ID']==$VHCCT_ID){echo "selected";} ?>><?php print "$num.";?> <?=$result_selcartype['VHCCT_AREA']?> - <?=$result_selcartype['VHCCT_LINEOFWORK']?>
 								<?php if($result_selcartype['VHCCT_SERIES']!=''){ ?> - <?=$result_selcartype['VHCCT_SERIES']?> - <?=$result_selcartype['VHCCT_NAMETYPE']?> <?php } ?></option>
 						<?php endwhile; ?>
 					</select>
 				</td>
-				<!-- ย้ายไปจัดการที่กลุ่มรถแทน -->
+				
 					<!-- <td align="left">
 						<input type="text" name="VHCTMG_KILOFORDAY" id="VHCTMG_KILOFORDAY" value="<?=$VHCTMG_KILOFORDAY?>" onchange="save_kiloforday('<?= $result_vehicleinfo['VEHICLEREGISNUMBER'] ?>',this.value)">
 					</td> -->
@@ -267,7 +267,7 @@
     <td class="CENTER">&nbsp;		
 		<center>
 			<?php if($_GET["from"]=='pm'){ ?>
-				<input type="button" class="button_red2" value="ย้อนกลับ" onClick="javascript:loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm_form.php?ctmcomcode=cusout');"> <!-- < ?=$GET_CTM_COMCODE;?> -->
+				<input type="button" class="button_red2" value="ย้อนกลับ" onClick="javascript:loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm_form.php?ctmcomcode=cusout');"> 
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="button" class="button_gray" value="อัพเดท" onClick="javascript:loadViewdetail('<?=$path?>views_amt/customer_manage/customer_car.php?ctm_comcode=<?=$GET_CTM_COMCODE;?>&from=pm');">
 			<?php }else{ ?>

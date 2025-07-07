@@ -94,9 +94,9 @@
 				$checkrpm = 44;
 			}
 	?>
-	<table width="100%"  height="100%"  border="0" cellpadding="0" cellspacing="0" class="no-border"> <!--main_data -->
+	<table width="100%"  height="100%"  border="0" cellpadding="0" cellspacing="0" class="no-border"> 
 		<tr valign="top">
-			<td height="1"><?php include ($path."include/navtop.php");?></td><!-- height="18" -->
+			<td height="1"><?php include ($path."include/navtop.php");?></td>
 		</tr>
 		<tr valign="top">
 			<td>

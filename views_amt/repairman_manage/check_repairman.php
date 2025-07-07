@@ -81,9 +81,9 @@
         <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;จัดการข้อมูลช่างประจำวัน</h3></td>
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                <!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
+                
             </div>
         </td>
         </tr>
@@ -221,7 +221,7 @@
     <td class="LEFT">&nbsp;</td>
     <td class="CENTER">&nbsp;		
 		<center>
-			<!-- <font color="red">***โหลดข้อมูลทุก 10 วินาที หากต้องการโหลดทันที ให้กดปุ่ม อัพเดท</font><br><br> -->
+			
 			<font color="red">***โหลดข้อมูลให้เป็นปัจจุบัน กรุณากดปุ่ม อัพเดท</font><br><br>
 			<input type="button" class="button_gray" value="อัพเดท" onclick="javascript:loadViewdetail('<?=$path?>views_amt/repairman_manage/check_repairman.php');">
 		</center>

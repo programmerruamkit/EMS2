@@ -151,7 +151,7 @@
                                 ?>
                                 <select class="time" onFocus="$(this).select();" style="width: 100%;" name="VHCCT_PM" id="VHCCT_PM" required>
                                     <option value disabled selected>-------เลือกกลุ่ม PM-------</option>
-                                    <!-- sqlsrv_fetch_assoc -->
+                                    
                                     <?php while($result_selline = sqlsrv_fetch_array($query_selline)): ?>
                                         <option value="<?=$result_selline['MLPM_LINEOFWORK']?>" <?php if($result_edit_cartype['VHCCT_PM']==$result_selline['MLPM_LINEOFWORK']){echo "selected";} ?>><?=$result_selline['MLPM_REMARK']?></option>
                                     <?php endwhile; ?>

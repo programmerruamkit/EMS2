@@ -196,7 +196,7 @@
                                                   } 
                                                 }  
                                               ?> onclick="save_data_hole('<?=$RPH_LEFT;?>','<?=$rprq_code;?>','<?=$proc;?>','<?=$nature;?>','repairhole','')"><br>
-                                              <!-- <img src="../images/Truck-icon32.png" width="32" height="32"> -->
+                                              
                                             </center>
                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                           </div>
@@ -267,7 +267,7 @@
                                                   } 
                                                 }
                                               ?> onclick="save_data_hole('<?=$RPH_RIGHT;?>','<?=$rprq_code;?>','<?=$proc;?>','<?=$nature;?>','repairhole','')"><br>
-                                              <!-- <img src="../images/Truck-icon32.png" width="32" height="32"> -->
+                                              
                                             </center>
                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                           </div>
@@ -359,7 +359,7 @@
                     <input type="hidden" name="proc" id="proc" value="<?=$proc;?>">
                     <input type="hidden" name="RPC_SUBJECT" id="RPC_SUBJECT" value="<?=$nature;?>">
                     <input type="hidden" name="target" id="target" value="repairhole">
-                    <!-- <button class="bg-color-green font-white" type="button" name="buttonname" id="buttonname" value="<?=$proc;?>" onclick="save_data()">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp; -->
+                    
                     <button class="bg-color-red font-white" type="button" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/assign_repairwork/assign_repairwork_form.php','add','<?php print $rprq_code; ?>','1=1','1300','570','มอบหมายงานซ่อม');">ย้อนกลับ</button>
                   </form>
                 </td>

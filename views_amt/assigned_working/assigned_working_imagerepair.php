@@ -138,7 +138,7 @@
                       <th width="5%" align="center"><strong>ลำดับ</strong></th>
                       <th width="20%" align="center"><strong>กลุ่มรูปภาพ</strong></th>
                       <th width="75%" align="center"><strong>รูปภาพ</strong></th>
-                      <!-- <th width="20%" align="left"><strong>ผู้บันทึก</strong></th> -->
+                      
                     </tr>
                   </thead>   
                     <tr height="25">

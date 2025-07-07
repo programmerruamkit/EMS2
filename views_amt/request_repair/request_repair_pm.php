@@ -141,11 +141,11 @@ $(document).ready(function(e) {
                 <td width="25" valign="middle" class=""><img src="../images/car_repair.png" width="48" height="48"></td>
                 <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลใบขอซ่อมรถ PM</h3></td>
                 <td width="617" align="right" valign="bottom" class="" nowrap>
-                    <!-- <button class="bg-color-blue big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม BM</font></button> -->
-                    <!-- <button class="bg-color-orange big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม PM</font></button> -->
+                    
+                    
                     <button class="bg-color-orange big" title="New" onClick="loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm_form.php');"><font color="white" size="4">New แจ้งซ่อม PM</font></button>
-                    <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                    <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                    
+                    
                 </td>
             </tr>
         </table>
@@ -208,7 +208,7 @@ $(document).ready(function(e) {
                         <li><a href="#tabs-7"><span style="font-size:13px">เสาร์ (<?=$result_getdate_d1d7["D7"]?>)</span></a></li>
                     </ul>  
                     <div id="tabs-1">
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1"><!-- default hover pointer display hover pointer -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1">
                             <thead>
                                 <tr height="30">
                                     <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
@@ -287,7 +287,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_monday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_monday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -295,7 +295,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>     -->
+                        
                     </div>  
                     <div id="tabs-2">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable2">
@@ -377,7 +377,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_tuesday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_tuesday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -385,7 +385,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>          -->
+                        
                     </div>   
                     <div id="tabs-3">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable3">
@@ -467,7 +467,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_wednesday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_wednesday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -475,7 +475,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>        -->
+                        
                     </div> 
                     <div id="tabs-4">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable4">
@@ -557,7 +557,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_thursday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_thursday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -565,7 +565,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>         -->
+                        
                     </div> 
                     <div id="tabs-5">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable5">
@@ -647,7 +647,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_friday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_friday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -655,7 +655,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>         -->
+                        
                     </div> 
                     <div id="tabs-6">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable6">
@@ -737,7 +737,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_saturday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_saturday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -745,7 +745,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>        -->
+                        
                     </div> 
                     <div id="tabs-7">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable7">
@@ -827,7 +827,7 @@ $(document).ready(function(e) {
                                                     echo '<strong>ID ใหม่ '.$result_nap_sonday['ID2'].'</strong>';
                                                 }else{ 
                                             ?>
-                                                <!-- <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_sonday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button> -->
+                                                
                                             <?php } ?>
                                         <?php } ?>
                                     </td>
@@ -835,7 +835,7 @@ $(document).ready(function(e) {
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>       -->
+                        
                     </div>           
                 </div>
             </form>

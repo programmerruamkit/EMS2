@@ -769,7 +769,7 @@
   /* The Modal (background) */
 </style>
 
-<!-- modal -->
+
 <script>
   var modalimg = document.getElementById("request_image");
   var btnimg = document.getElementById("request_image_button");

@@ -169,9 +169,9 @@
                             </label>
                           </td>
                         </tr>
-                        <input type="hidden" name="RPM_NATUREREPAIR" id="RPM_NATUREREPAIR" value="">
-                        <!-- <tr align="center" height="25px">
-                          <td height="35" align="right" class="ui-state-default"><strong>เลือกลักษณะงานซ่อม :</strong></td>
+                        
+                        <tr align="center" height="25px">
+                          <td height="35" align="right" class="ui-state-default"><strong>เลือกหน่วยงานหลัก :</strong></td>
                           <td height="35" align="left" class="bg-white">
                             <div class="input-control text">
                               <select class="time" onFocus="$(this).select();" style="width: 100%;" name="RPM_NATUREREPAIR" id="RPM_NATUREREPAIR" required>
@@ -180,11 +180,11 @@
                                 <option value="TU" <?php if($result_edit_repairman['RPM_NATUREREPAIR']== "TU"){echo "selected";} ?>>ยาง ช่วงล่าง</option>
                                 <option value="BD" <?php if($result_edit_repairman['RPM_NATUREREPAIR']== "BD"){echo "selected";} ?>>โครงสร้าง</option>
                                 <option value="EG" <?php if($result_edit_repairman['RPM_NATUREREPAIR']== "EG"){echo "selected";} ?>>เครื่องยนต์</option>
-                                <option value="AC" <?php if($result_edit_repairman['RPM_NATUREREPAIR']== "AC"){echo "selected";} ?>>อุปกรณ์ประจำรถ</option>
+                                
                               </select>
                             </div>
                           </td>
-                        </tr> -->
+                        </tr>
                         <tr align="center" height="25px">
                           <td height="35" align="right" class="ui-state-default"><strong>ทักษะความสามารถ :</strong></td>
                           <td height="35" align="left" class="bg-white">  

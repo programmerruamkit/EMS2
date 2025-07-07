@@ -860,7 +860,7 @@ $('.some_class').datetimepicker();
                     <option value="22:00">
                     <option value="23:00">
                   </datalist>
-                  <!-- https://www.tutorialspoint.com/How-to-use-time-input-type-in-HTML -->            
+                              
               </div>
             </td>
             <td height="35" align="right" class="ui-state-default"><strong>วันที่ต้องการใช้รถ:</strong></td>
@@ -894,7 +894,7 @@ $('.some_class').datetimepicker();
                     <option value="22:00">
                     <option value="23:00">
                   </datalist>
-                  <!-- https://www.tutorialspoint.com/How-to-use-time-input-type-in-HTML -->            
+                              
              </div>
             </td>
           </tr>  

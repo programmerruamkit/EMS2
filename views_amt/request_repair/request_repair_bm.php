@@ -148,9 +148,9 @@
                 <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลใบขอซ่อมรถ BM</h3></td>
                 <td width="617" align="right" valign="bottom" class="" nowrap>
                         <button class="bg-color-blue big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม BM</font></button>
-                        <!-- <button class="bg-color-orange big" title="New" onClick="loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm.php');"><font color="white" size="4">New แจ้งซ่อม PM</font></button> -->
-                        <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                        <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                        
+                        
+                        
                 </td>
             </tr>
         </table>
@@ -255,7 +255,7 @@
                         <?php } ?> 
                     </ul> 
                     <div id="tabs-1">
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1"><!-- default hover pointer display hover pointer -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1">
                             <thead>
                                 <tr height="30">
                                     <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>	
@@ -382,7 +382,7 @@
                                 <?php }; ?>
                             </tbody>
                         </table>       
-                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>     -->
+                        
                     </div>  
                     <?php if($_GET['dateStart']!="sendplan"){ ?>
                         <div id="tabs-2">
@@ -493,7 +493,7 @@
                                     <?php }; ?>
                                 </tbody>
                             </table>       
-                            <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>          -->
+                            
                         </div>   
                         <div id="tabs-3">
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable3">
@@ -603,7 +603,7 @@
                                     <?php }; ?>
                                 </tbody>
                             </table>       
-                            <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>        -->
+                            
                         </div> 
                         <div id="tabs-4">
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable4">
@@ -713,7 +713,7 @@
                                     <?php }; ?>
                                 </tbody>
                             </table>       
-                            <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>         -->
+                            
                         </div> 
                         <div id="tabs-5">
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable5">
@@ -823,7 +823,7 @@
                                     <?php }; ?>
                                 </tbody>
                             </table>       
-                            <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>         -->
+                            
                         </div> 
                         <div id="tabs-6">
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable6">
@@ -933,7 +933,7 @@
                                     <?php }; ?>
                                 </tbody>
                             </table>       
-                            <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>        -->
+                            
                         </div> 
                         <div id="tabs-7">
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable7">
@@ -1043,7 +1043,7 @@
                                     <?php }; ?>
                                 </tbody>
                             </table>       
-                            <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b>       -->
+                            
                         </div>     
                     <?php } ?>       
                 </div>

@@ -181,9 +181,9 @@
 		}
 	?>
 	<div id="dialog_popup" align="center"></div>
-	<table width="100%"  height="100%"  border="0" cellpadding="0" cellspacing="0" class="no-border"> <!--main_data -->
+	<table width="100%"  height="100%"  border="0" cellpadding="0" cellspacing="0" class="no-border"> 
 		<tr valign="top">
-			<td height="1"><?php include ($path."include/navtop.php");?></td><!-- height="18" -->
+			<td height="1"><?php include ($path."include/navtop.php");?></td>
 		</tr>
 		<tr valign="top">
 			<td><input type="hidden" id="toggle_menu" value="ปิด">
@@ -673,7 +673,7 @@
 										<table>
 											<tr>
 												<th scope="row" width="5%">&nbsp;</th>
-												<!-- <td><font color="red" style="font-weight: bold;" size="4">BAD NEW: PMORS1 60-5587 MISSED TARGET Urgently use truck by Customer</font></td> -->
+												
 											</tr>			
 										</table>
 									</div>&nbsp;
@@ -832,7 +832,7 @@
 										<div class="spacetable"></div>
 										<table>
 											<tr>
-												<!-- <td class="tb-red" width="10%"><center><b>BM</b></center></td> -->
+												
 												<td class="tb-brown" width="10%"><center><b><font class="tb-font-black">BM</font></b></center></td>
 												<td>&nbsp;&nbsp;<b><font size="4px"><?=$COUNT_BM?></font></b></td>
 											</tr>			

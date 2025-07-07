@@ -9,7 +9,7 @@
 <script type="text/javascript">
 	$(document).ready(function(e) {	   
 		$("#button_new").click(function(){
-			ajaxPopup2("<?=$path?>views_amt/repairman_manage/repairman_main_form.php","add","1=1","650","350","เพิ่มช่าง");
+			ajaxPopup2("<?=$path?>views_amt/repairman_manage/repairman_main_form.php","add","1=1","650","400","เพิ่มช่าง");
 		});
 	
 		$("#button_edit").click(function(){
@@ -100,8 +100,8 @@
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
                 <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button>
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
             </div>
         </td>
         </tr>
@@ -119,7 +119,7 @@
 				<th width="10%">รหัสพนักงาน</th>
 				<th width="15%">ชื่อพนักงาน</th>
 				<th width="5%">พื้นที่</th>
-				<!-- <th width="10%">ลักษณะการซ่อม</th> -->
+				<th width="10%">หน่วยงานหลัก</th>
 				<th width="20%">ทักษะความสามารถ</th>
 				<th width="15%">ชม.มาตรฐานการซ่อม</th>
 				<th width="15%">จัดการ</th>
@@ -170,11 +170,11 @@
 				<td align="center" >&nbsp;<?php print $RPM_PERSONCODE; ?></td>
 				<td align="left" >&nbsp;<?php print $RPM_PERSONNAME; ?></td>
 				<td align="center" >&nbsp;<?php print $RPM_AREA; ?></td>
-				<!-- <td align="center" >&nbsp;<?php print $RPM_NATUREREPAIR; ?></td> -->
+				<td align="center" >&nbsp;<?php print $RPM_NATUREREPAIR; ?></td>
 				<td align="left" >&nbsp;<?php print $SKILL; ?></td>
 				<td align="center" >&nbsp;<?php print $RPM_HOURSSTANDARD; ?></td>
 				<td align="center" >
-					<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/repairman_manage/repairman_main_form.php','<?php if($RPM_CODE!=''){print 'edit';}else{print 'add2';} ?>','<?php if($RPM_CODE!=''){print $RPM_CODE;}else{print $RPM_ID;} ?>','1=1','<?php if($RPM_CODE!=''){print '1300';}else{print '650';} ?>','350','แก้ไขช่างซ่อม');"><i class='icon-pencil icon-large'></i></button>
+					<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/repairman_manage/repairman_main_form.php','<?php if($RPM_CODE!=''){print 'edit';}else{print 'add2';} ?>','<?php if($RPM_CODE!=''){print $RPM_CODE;}else{print $RPM_ID;} ?>','1=1','<?php if($RPM_CODE!=''){print '1300';}else{print '650';} ?>','400','แก้ไขช่างซ่อม');"><i class='icon-pencil icon-large'></i></button>
 					&nbsp;&nbsp;
 					<button type="button" class="mini bg-color-red" style="padding-top:12px;" title="Del" onclick="swaldelete_repairman_main('<?php print $RPM_CODE; ?>','<?php print $no;?>')"><i class="icon-cancel icon-large"></i></button>
 				</td>

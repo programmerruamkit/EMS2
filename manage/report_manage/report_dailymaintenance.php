@@ -118,9 +118,9 @@
         <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;รายงานซ่อมบำรุงประจำวัน</h3></td>
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                <!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
-                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
-                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
+                
+                
+                
             </div>
         </td>
         </tr>
@@ -134,7 +134,7 @@
         <table>
             <tbody>
 				<tr align="center">
-					<!-- <td width="10%" align="right"><strong>เงื่อนไขการค้นหา :</strong></td> -->
+					
 					<td width="10%" align="left">
 						<div class="row input-control">วันที่เริ่มต้น
 							<input type="text" name="dateStart" id="dateStart" class="datepic time" placeholder="วันที่เริ่มต้น" autocomplete="off" value="<?=$getselectdaystart;?>" onchange="date1todate2()">
@@ -216,10 +216,10 @@
 					<th rowspan="2" align="center" width="10%" class="ui-state-default">ลักษณะงานซ่อม</th>
 					<th colspan="2" align="center" width="16%" class="ui-state-default">วันที่/เวลา</th>
 					<th rowspan="2" align="center" width="20%" class="ui-state-default">รายละเอียดการซ่อม</th>
-					<!-- <th rowspan="2" align="center" width="" class="ui-state-default">ค่าใช้จ่าย</th> -->
-					<!-- <th rowspan="2" align="center" width="" class="ui-state-default">พขร. แจ้งซ่อม</th> -->
+					
+					
 					<th rowspan="2" align="center" width="10%" class="ui-state-default">ช่างผู้รับผิดชอบ</th>
-					<!-- <th colspan="2" align="center" width="10%" class="ui-state-default">รูปถาพการแจ้งซ่อม</th> -->
+					
 				</tr>
 				<tr height="30">
 					<th align="center"width="5%">ทะเบียน</th>
@@ -228,8 +228,8 @@
 					<th align="center"width="7%">ชื่อรถ</th>
 					<th align="center"width="8%">เริ่มซ่อม</th>
 					<th align="center"width="8%">เสร็จ</th>
-					<!-- <th align="center"width="5%">ก่อน</th> -->
-					<!-- <th align="center"width="5%">หลัง</th> -->
+					
+					
 				</tr>
 			</thead>
 			<tbody>
@@ -327,7 +327,7 @@
 
 				<tr height="25px">
 					<td align="center"><?php print "$no";?></td>
-					<!-- <td align="center"><?php print "$RPRQ_ID";?></td> -->
+					
 					<td align="center"><?php print "$RPRQ_STATUSREQUEST";?></td>
 					<td align="center"><?php print "$RPRQ_REGISHEAD";?></td>
 					<td align="center"><?php print "$RPRQ_CARNAMEHEAD";?></td>
@@ -337,8 +337,8 @@
 					<td align="center"><?php print "$REPAIRSTART";?></td>
 					<td align="center"><?php print "$REPAIREND";?></td>
 					<td align="left"><?php print "$RPC_DETAIL";?></td>
-					<!-- <td align="center"></td> -->
-					<!-- <td align="left"><?php print "$RPRQ_REQUESTBY";?></td> -->
+					
+					
 					<td align="left"><?=$TECHICIAN?></td>
 					<!-- <td align="center">
 						<?php          
@@ -351,7 +351,7 @@
 							</a>
 						<?php } ?>
 					</td> -->
-					<!-- <td align="center"></td> -->
+					
 				</tr>
 				<?php }; ?>
 			</tbody>

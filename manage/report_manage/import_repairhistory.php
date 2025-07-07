@@ -79,6 +79,13 @@
 				// $("#form_search").submit(function(e){
 					var form = $('#form_search')[0];
 					// e.preventDefault();
+					Swal.fire({
+						title: 'กำลังตรวจสอบไฟล์...',
+						allowOutsideClick: false,
+						didOpen: () => {
+							Swal.showLoading();
+						}
+					});
 					$.ajax({
 						url:'<?=$path?>manage/report_manage/import_repairhistory_upload2temp.php',
 						type:'POST',
@@ -87,22 +94,40 @@
 						cache: false,             
 						processData:false,
 						dataType:'json',
-						beforeSend:function(){
-							$.blockUI();
-						},
+						// beforeSend:function(){
+						// 	$.blockUI();
+						// },
 						success:function(data){
 							//console.log(data);			
 							// alert(data);
 							if(data>1){
 								$('#form_search')[0].reset();    			
 								document.getElementById("lbl_cnt").innerHTML = 'ข้อมูลจากไฟล์ Excel : '+data+' รายการ';
+								Swal.fire({
+									icon: 'success',
+									title: 'ตรวจสอบไฟล์เรียบร้อย',
+									showConfirmButton: false,
+									timer: 1500
+								});
 							}else{							
 								$('#form_search')[0].reset();    			
 								document.getElementById("lbl_cnt").innerHTML = 'ข้อมูลจากไฟล์ Excel : 0 รายการ';
+								Swal.fire({
+									icon: 'warning',
+									title: 'ไม่พบข้อมูลในไฟล์',
+									showConfirmButton: false,
+									timer: 1500
+								});
 							}
 						},
 						error:function(err){
-							alert('Error:'+err.responseText);
+							// alert('Error:'+err.responseText);
+							Swal.close();
+							Swal.fire({
+								icon: 'error',
+								title: 'เกิดข้อผิดพลาด',
+								text: err.responseText || 'ไม่สามารถตรวจสอบไฟล์ได้'
+							});
 							closeUI();
 							// console.log(err);
 						}
@@ -115,11 +140,20 @@
 		function save_data_db() {
 			var buttonname = $('#buttonname').val();
 			var url = "<?=$path?>manage/report_manage/import_repairhistory_upload2db.php";
+			// แสดง loading
+			Swal.fire({
+				title: 'กำลังนำเข้าข้อมูล...',
+				allowOutsideClick: false,
+				didOpen: () => {
+					Swal.showLoading();
+				}
+			});
 			$.ajax({
 				type: "POST",
 				url: url,
 				data: $("#form_search").serialize(),
 				success: function (data) {
+					Swal.close(); // ปิด loading
 					// alert(data);
 					document.getElementById("lbl_cntsus").innerHTML = 'ข้อมูลที่บันทึกลงฐานข้อมูล : '+data+' รายการ';
 					Swal.fire({
@@ -132,6 +166,14 @@
 						// loadViewdetail('<?=$path?>manage/report_manage/import_repairhistory_upload.php');
 						closeUI();
 					})
+				},
+				error: function(err) {
+					Swal.close();
+					Swal.fire({
+						icon: 'error',
+						title: 'เกิดข้อผิดพลาด',
+						text: err.responseText || 'ไม่สามารถนำเข้าข้อมูลได้'
+					});
 				}
 			});
 		}

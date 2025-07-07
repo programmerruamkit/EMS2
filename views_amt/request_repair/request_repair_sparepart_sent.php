@@ -607,7 +607,7 @@
                 <input type="hidden" name="RPRQ_CODE" id="RPRQ_CODE" value="<?=$result_edit_repairrequest["RPRQ_CODE"];?>">
                 <button class="bg-color-green font-white" type="button" name="buttonname" id="buttonname" value="edit" onclick="save_data()">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp;
               <?php }else{ ?>
-                <!-- <input type="hidden" name="RPRQ_CODE" id="RPRQ_CODE" value="< ?=$rand; ?>"> -->
+                
                 <button class="bg-color-green font-white" type="button" name="buttonnameadd" id="buttonnameadd" value="add">บันทึกข้อมูล</button>&nbsp;&nbsp;&nbsp;
               <?php } ?>
               <button class="bg-color-red font-white" type="button" onclick="closeUI()">ปิดหน้าจอ</button>

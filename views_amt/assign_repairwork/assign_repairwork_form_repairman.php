@@ -128,15 +128,15 @@
                                     <div class="input-control text" style="width:100%;">   
                                       <div class="container-fluid">
                                         <form name="form_approve" id="form_approve">     
-                                          <!-- <div class="row"> -->
+                                          
                                             <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable9">
                                                 <thead>
                                                   <tr height="30">
                                                       <th width="5%">ลำดับ.</th>
                                                       <th width="20%">รหัสพนักงาน</th>
                                                       <th width="35%">ชื่อพนักงาน</th>
-                                                      <!-- <th width="15%">พื้นที่</th> -->
-                                                      <!-- <th width="15%">สถานะ</th> -->
+                                                      
+                                                      
                                                       <th width="15%">เลือก</th>
                                                   </tr>
                                                 </thead>
@@ -191,19 +191,19 @@
                                                       <td ><?php print "$no.";?></td>
                                                       <td align="center" >&nbsp;<?php print $RPM_PERSONCODE; ?></td>
                                                       <td align="left" >&nbsp;<?php print $RPM_PERSONNAME; ?></td>
-                                                      <!-- <td align="center" >&nbsp;<?php print $RPM_AREA; ?></td> -->
-                                                      <!-- <td align="center" >&nbsp;</td> -->
+                                                      
+                                                      
                                                       <td align="center" >
                                                         <label>
                                                           <img src="../images/add-icon16.png" width="16" height="16" style="cursor:pointer">
-                                                          <!-- <img src="../images/add-icon16.png" width="16" height="16" style="cursor:pointer" onclick="save_data('<?=$RPM_PERSONCODE;?>','<?=$rprq_code;?>','<?=$nature;?>','repairman','add')"> -->
+                                                          
                                                         </label>
                                                       </td>
                                                   </tr>
                                                   <?php }; ?>
                                                 </tbody>
                                             </table>                                           
-                                          <!-- </div> -->
+                                          
                                         </form>
                                       </div>
                                     </div>
@@ -240,8 +240,8 @@
                                                       <th width="5%">ลำดับ.</th>
                                                       <th width="20%">รหัสพนักงาน</th>
                                                       <th width="35%">ชื่อพนักงาน</th>
-                                                      <!-- <th width="15%">พื้นที่</th> -->
-                                                      <!-- <th width="15%">สถานะ</th> -->
+                                                      
+                                                      
                                                       <th width="15%">ลบ</th>
                                                   </tr>
                                                 </thead>
@@ -265,12 +265,12 @@
                                                       <td ><?php print "$no.";?></td>
                                                       <td align="center" >&nbsp;<?php print $RPME_CODE; ?></td>
                                                       <td align="left" >&nbsp;<?php print $RPME_NAME; ?></td>
-                                                      <!-- <td align="center" >&nbsp;<?php print $RPM_AREA; ?></td> -->
-                                                      <!-- <td align="center" >&nbsp;</td> -->
+                                                      
+                                                      
                                                       <td align="center" >
                                                         <label>
                                                           <img src="../images/delete-icon16.png" width="16" height="16" style="cursor:pointer">
-                                                          <!-- <img src="../images/delete-icon16.png" width="16" height="16" style="cursor:pointer" onclick="save_data('<?=$RPME_CODE;?>','<?=$rprq_code;?>','<?=$nature;?>','repairman','delete')"> -->
+                                                          
                                                         </label>
                                                       </td>
                                                   </tr>
