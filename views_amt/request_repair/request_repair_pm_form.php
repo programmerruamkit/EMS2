@@ -3,7 +3,11 @@
 	$path = "../";   	
 	require($path.'../include/connect.php');
 	$SESSION_AREA=$_SESSION["AD_AREA"];
-
+    if($SESSION_AREA=="AMT"){
+        $HREF="../manage/report_manage/report_detail_pm_amt_excel.php";
+    }else{
+        $HREF="../manage/report_manage/report_detail_pm_gw_excel.php";
+    }
     // $wh="";
     if($_GET['ctmcomcode']!=""){                        
         if(($_GET['ctmcomcode']!="ALL")&&($_GET['ctmcomcode']!="cusout")&&($_GET['ctmcomcode']!="AMT")&&($_GET['ctmcomcode']!="GW")){
@@ -70,10 +74,23 @@
                 var ctmcomcode = a1;
             }else{
                 var ctmcomcode = $("#CTM_COMCODE").val();
+                if(!ctmcomcode){
+                    ctmcomcode = $('input[type=checkbox][name=CTM_COMCODE]:checked').val();
+                }
             }
             var getctmcomcode = "?ctmcomcode="+ctmcomcode;
             loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm_form.php'+getctmcomcode);
         }
+        
+        function excel_detail_pm() {
+            var ctmcomcode = document.getElementById('CTM_COMCODE').value;
+            if(!ctmcomcode){
+                var ctmcomcode = $('input[type=checkbox][name=CTM_COMCODE]:checked').val();
+            }
+            var href = '<?=$HREF?>' + '?ctmcomcode='+ctmcomcode;
+            window.open(href, '_blank');
+        }
+
         $(document).ready(function(e) {	   
             $("#button_new").click(function(){
                 ajaxPopup2("<?=$path?>views_amt/request_repair/request_repair_pm_form.php","add","1=1","1350","670","เพิ่มใบแจ้งซ่อม");
@@ -160,9 +177,9 @@
         <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลใบขอซ่อมรถ PM</h3></td>
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                
-                
-                
+                <!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
+                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
+                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
             </div>
         </td>
         </tr>
@@ -185,7 +202,7 @@
                             <select class="time" onFocus="$(this).select();" style="width: 100%;" name="CTM_COMCODE" id="CTM_COMCODE" required>
                                 <option value disabled selected>-------เลือกบริษัท-------</option>
                                 <option value="ALL" <?php if($_GET['ctmcomcode']=="ALL"){echo "selected";} ?>>เลือกทั้งหมด</option>
-                                
+                                <!-- sqlsrv_fetch_assoc -->
                                 <?php while($result_selcus = sqlsrv_fetch_array($query_selcus)): 
                                     $CTM_COMCODE=$result_selcus['CTM_COMCODE'];
                                     $CTM_GROUP1=$result_selcus["CTM_GROUP"];
@@ -212,29 +229,34 @@
                     <td width="5%" align="center">
                         <font size="10">|</font>
                     </td>
-                    <td width="30%" align="center">
+                    <td width="25%" align="center">
                         <!-- < ?php if($CTM_GROUP=="cusout"){ ?>
                             <button class="bg-color-yellow" onclick="javascript:loadViewdetail('< ?=$path?>views_amt/customer_manage/customer_car.php?ctm_comcode=< ?php print $_GET['ctmcomcode']; ?>&from=pm',);"><font color="black"><i class="icon-plus"></i> เพิ่ม/แก้ไข ข้อมูลรถลูกค้านอก</font></button>
                         < ?php } ?> -->
                         <label onclick="selectcustomer('AMT')" style="cursor:pointer;">
-							<input type="checkbox" name="CTM_COMCODE" id="CTM_COMCODE" class="largerCheckbox1" <?php if($_GET['ctmcomcode']=='AMT'){echo 'checked';}?> >&ensp;<font size="5">AMT</font>
+							<input type="checkbox" name="CTM_COMCODE" id="CTM_COMCODE" class="largerCheckbox1" value="AMT" <?php if($_GET['ctmcomcode']=='AMT'){echo 'checked';}?> >&ensp;<font size="5">AMT</font>
                         </label>&emsp;&emsp;
                         <label onclick="selectcustomer('GW')" style="cursor:pointer;">
-							<input type="checkbox" name="CTM_COMCODE" id="CTM_COMCODE" class="largerCheckbox1" <?php if($_GET['ctmcomcode']=='GW'){echo 'checked';}?> >&ensp;<font size="5">GW</font>
+							<input type="checkbox" name="CTM_COMCODE" id="CTM_COMCODE" class="largerCheckbox1" value="GW" <?php if($_GET['ctmcomcode']=='GW'){echo 'checked';}?> >&ensp;<font size="5">GW</font>
                         </label>&emsp;&emsp;
                         <label onclick="selectcustomer('cusout')" style="cursor:pointer;">
-							<input type="checkbox" name="CTM_COMCODE" id="CTM_COMCODE" class="largerCheckbox1" <?php if($_GET['ctmcomcode']=='cusout'){echo 'checked';}?> >&ensp;<font size="5">ลูกค้านอก</font>
+							<input type="checkbox" name="CTM_COMCODE" id="CTM_COMCODE" class="largerCheckbox1" value="cusout" <?php if($_GET['ctmcomcode']=='cusout'){echo 'checked';}?> >&ensp;<font size="5">ลูกค้านอก</font>
                         </label>
                     </td>
                     <td width="5%" align="center">
                         <font size="10">|</font>
                     </td>
-                    <td align="center">
+                    <td width="30%" align="center">
                         <h4>
-                            <img src="https://img2.pic.in.th/pic/color_blue.png" width="20" height="20"> = อยู่ระหว่างการซ่อม PM
+                            <img src="https://img2.pic.in.th/pic/color_blue.png" width="20" height="20"> = อยู่ระหว่างซ่อม PM
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <img src="https://img2.pic.in.th/pic/color_gray.png" width="20" height="20"> = อยู่ระหว่างการซ่อม BM
+                            <img src="https://img2.pic.in.th/pic/color_gray.png" width="20" height="20"> = อยู่ระหว่างซ่อม BM
                         </h4>                        
+                    </td>
+                    <td align="center">
+						<div class="row input-control"><br>
+							<button  title="Excel" type="button" class="bg-color-green big" onclick="excel_detail_pm()"><font color="white" size="2"><i class="icon-file-excel icon-large"></i> Excel</font></button>
+						</div>                 
                     </td>
                 </tr>
                 <tr>
@@ -248,7 +270,7 @@
                     <tr height="30">
                         <th rowspan="2" align="center" width="5%">ลำดับ</th>
                         <th rowspan="2" align="center" width="5%">ส่งแผน/จัดการ</th>
-                        
+                        <!-- <th rowspan="2" align="center" width="5%">แก้ไขแผน</th> -->
                         <th colspan="2" align="center" width="13%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
                         <?php if($CTM_GROUP=="cusout"){ ?>
                             <th rowspan="2" align="center" width="13%" class="ui-state-default">เพิ่ม/แก้ไขรถลูกค้า - ชื่อลูกค้า</th>
@@ -268,8 +290,8 @@
                         <th align="center" width="5%">ทะเบียน</th>
                         <th align="center">ชื่อรถ</th>  
                         <?php if($CTM_GROUP!="cusout"){ ?>                  
-                            
-                            
+                            <!-- <th align="center" width="5%">ทะเบียน</th> -->
+                            <!-- <th align="center">ชื่อรถ</th> -->
                         <?php } ?>
                         <th align="center">ระยะเลขไมล์</th>
                         <th align="center">PM</th>
@@ -301,7 +323,7 @@
                                 $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
                                 $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
                             }else{
-                                $sql_mileage = "SELECT TOP 1 * FROM TEMP_MILEAGE WHERE $field ORDER BY CREATEDATE DESC ";
+                                $sql_mileage = "SELECT TOP 1 MAXMILEAGENUMBER,VEHICLEREGISNUMBER,THAINAME,CREATEDATE FROM TEMP_MILEAGE WHERE MAXMILEAGENUMBER > '0' AND $field ORDER BY CREATEDATE DESC";
                                 $params_mileage = array();
                                 $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
                                 $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
@@ -405,32 +427,24 @@
                                 $font='black';
                             }
                             
-                            if($result_rankpm['MLPM_NAME']=="PMoRS-1"){
-                                $fildsfindETM = "ETM_PM1";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-2"){
-                                $fildsfindETM = "ETM_PM2";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-3"){
-                                $fildsfindETM = "ETM_PM3";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-4"){
-                                $fildsfindETM = "ETM_PM4";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-5"){
-                                $fildsfindETM = "ETM_PM5";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-6"){
-                                $fildsfindETM = "ETM_PM6";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-7"){
-                                $fildsfindETM = "ETM_PM7";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-8"){
-                                $fildsfindETM = "ETM_PM8";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-9"){
-                                $fildsfindETM = "ETM_PM9";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-10"){
-                                $fildsfindETM = "ETM_PM10";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-11"){
-                                $fildsfindETM = "ETM_PM11";
-                            }else if($result_rankpm['MLPM_NAME']=="PMoRS-12"){
-                                $fildsfindETM = "ETM_PM12";
-                            }else{
-                                $fildsfindETM = "";
+                            $pmFields = array(
+                                'PMoRS-1'  => 'ETM_PM1',
+                                'PMoRS-2'  => 'ETM_PM2',
+                                'PMoRS-3'  => 'ETM_PM3',
+                                'PMoRS-4'  => 'ETM_PM4',
+                                'PMoRS-5'  => 'ETM_PM5',
+                                'PMoRS-6'  => 'ETM_PM6',
+                                'PMoRS-7'  => 'ETM_PM7',
+                                'PMoRS-8'  => 'ETM_PM8',
+                                'PMoRS-9'  => 'ETM_PM9',
+                                'PMoRS-10' => 'ETM_PM10',
+                                'PMoRS-11' => 'ETM_PM11',
+                                'PMoRS-12' => 'ETM_PM12'
+                            );
+                            if(isset($pmFields[$result_rankpm["MLPM_NAME"]])) {
+                                $fildsfindETM = $pmFields[$result_rankpm["MLPM_NAME"]];
+                            } else {
+                                $fildsfindETM = 'ETM_PM1'; // ค่าเริ่มต้น
                             }
                             $VHCCT_ID = $result_vehicleinfo["VHCCT_ID"];
                             $sql_selhour = "SELECT SUM(CAST($fildsfindETM AS DECIMAL(10,2))) AS SUMETM FROM ESTIMATE
@@ -448,21 +462,21 @@
 
                     ?>
                     <tr height="25px" align="center" id="<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>" <?=$class_tr?>>
-                        
+                        <!-- onDblClick="javascript:ajaxPopup2('<?=$path?>views_amt/customer_manage/customer_car_detail.php','','id=<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>','1300','480','รายละเอียด')" -->
                         <td ><?php print "$no.";?></td>
                         <td >
                             <?php if(($RPRQ_STATUSREQUEST=='รอตรวจสอบ')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="javascript:void(0);" onclick="swaldelete_requestrepair('<?php print $RPRQ_CODE; ?>','<?php print $result_vehicleinfo['VEHICLEREGISNUMBER'];?>','<?php print $_GET['ctmcomcode'];?>')"><img src="https://img2.pic.in.th/pic/delete-icon24.png" width="24" height="24"></a>    
-                                
+                                <!-- <a href="javascript:void(0);" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_pm_sent.php','edit','<?php print $RPRQ_CODE; ?>&ctmgroup=<?php print $CTM_GROUP; ?>','1=1','1300','400','แก้ไขแผน PM');"><img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24"></a>     -->
                             <?php }else if(($RPRQ_STATUSREQUEST=='รอจ่ายงาน')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="javascript:void(0);" onclick="swaldelete_requestrepair('<?php print $RPRQ_CODE; ?>','<?php print $result_vehicleinfo['VEHICLEREGISNUMBER'];?>','<?php print $_GET['ctmcomcode'];?>')"><img src="https://img2.pic.in.th/pic/delete-icon24.png" width="24" height="24"></a>    
-                                
+                                <!-- <a href="javascript:void(0);" onclick="swaldelete_requestrepair('<?php print $RPRQ_CODE; ?>','<?php print $result_vehicleinfo['VEHICLEREGISNUMBER'];?>','<?php print $_GET['ctmcomcode'];?>')"><img src="https://img2.pic.in.th/pic/delete-icon24.png" width="24" height="24"></a>     -->
                             <?php }else if(($RPRQ_STATUSREQUEST=='รอคิวซ่อม')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="#"></a>
                             <?php }else if(($RPRQ_STATUSREQUEST=='กำลังซ่อม')&&($RPRQ_WORKTYPE=='PM')){ ?>
                                 <a href="#"></a>
-                            
-                                
+                            <!-- < ?php }else if($RPRQ_WORKTYPE=='BM'){ ?> -->
+                                <!-- <a href="#"></a> -->
                             <?php }else{ ?>
                                 <a href="javascript:void(0);" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_pm_sent.php','add','<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>&ctmgroup=<?php print $CTM_GROUP; ?>','1=1','800','400','เพิ่มแผน PM');"><img src="https://img2.pic.in.th/pic/Process-Info-icon24.png" width="24" height="24"></a>    
                             <?php } ?>                            
@@ -477,8 +491,8 @@
                             <td align="left"><font color="<?=$font?>">
                             <a href="javascript:void(0);" onclick="javascript:loadViewdetail('<?=$path?>views_amt/customer_manage/customer_car.php?ctm_comcode=<?php print $result_vehicleinfo['CTM_COMCODE']; ?>&from=pm',);"><img src="https://img2.pic.in.th/pic/add-icon16.png" width="16" height="16"></a> - 
                             <?=$result_vehicleinfo['CTM_NAMETH']; ?></font></td>
-                            
-                            
+                            <!-- <td ><font color="<?=$font?>"></font></td> -->
+                            <!-- <td ><font color="<?=$font?>"></font></td> -->
                         <?php } ?>  
                             <td align="right">
                                 <font color="<?=$font?>">

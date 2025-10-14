@@ -3,6 +3,11 @@
 	$path = "../";   	
 	require($path.'../include/connect.php');
     
+    // echo "<pre>";
+    // print_r($_GET);
+    // print_r($CTM_GROUP);
+    // echo "</pre>";
+
     $SESSION_AREA = $_SESSION["AD_AREA"];
     
     $stmt_selsparename1 = "SELECT DISTINCT * FROM [dbo].[PROJECT_SPAREPART] a WHERE a.PJSPP_AREA = '$SESSION_AREA' AND a.PJSPP_NAME='".$_GET['pjsppname']."' ORDER BY a.PJSPP_ID ASC";
@@ -21,6 +26,21 @@
 ?>
 <html>
 <head>
+    <style>
+        .vehicle-checkbox {
+            width: 13px;
+            height: 13px;
+            cursor: pointer;
+            transform: scale(1.5);
+        }
+        
+        /* หรือสามารถใช้วิธีนี้เพื่อขนาดที่ใหญ่กว่า */
+        .vehicle-checkbox-large {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+    </style>
     <script>        
         function selectcustomer(){
             var pjsppname = $("#PJSPP_NAME").val();
@@ -50,13 +70,14 @@
             $("#button_new").click(function(){
                 ajaxPopup2("<?=$path?>views_project/request_repair/request_repair_sparepart_form.php","add","1=1","1350","670","เพิ่มใบแจ้งซ่อม");
             });
-        });        
-
+        });   
+        
         function sendMultiple() {
             var selectedVehicles = [];
             var selectedVehicleData = [];
-            var checkboxes = document.querySelectorAll('.vehicle-checkbox:checked');
-            
+            var table = $('#datatable').DataTable();
+            var checkboxes = table.$('input.vehicle-checkbox:checked'); // ดึงทุกหน้า
+
             if (checkboxes.length === 0) {
                 Swal.fire({
                     icon: 'warning',
@@ -66,14 +87,24 @@
                 });
                 return false;
             }
-            
-            checkboxes.forEach(function(checkbox) {
+            if (checkboxes.length > 20) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'เลือกได้ไม่เกิน 20 คัน',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return false;
+            }
+
+            checkboxes.each(function() {
+                var checkbox = this;
+                var row = $(checkbox).closest('tr')[0];
                 var vehicleId = checkbox.value;
-                var row = checkbox.closest('tr');
                 var vehicleRegis = row.cells[2].textContent.trim();
                 var vehicleName = row.cells[3].textContent.trim();
                 var vehicleType = row.cells[4].textContent.trim();
-                
+
                 selectedVehicles.push(vehicleId);
                 selectedVehicleData.push({
                     id: vehicleId,
@@ -82,7 +113,8 @@
                     type: vehicleType
                 });
             });
-            
+
+            // เปิด popup form
             showSendForm(selectedVehicleData);
         }
         
@@ -100,6 +132,25 @@
             
             ajaxPopup2(url + params, "add", "1=1", "900", "500", "บันทึกข้อมูลการเปลี่ยนอะไหล่");
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            var tbody = document.querySelector('#datatable tbody');
+            if (tbody) {
+                tbody.addEventListener('click', function(e) {
+                    var tr = e.target.closest('tr');
+                    if (!tr) return;
+                    if (e.target.type === 'checkbox') return;
+                    var checkbox = tr.querySelector('.vehicle-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                });
+            }
+        });
+        $('#datatable tbody').on('click', 'tr', function(e) {
+            if (e.target.type === 'checkbox') return;
+            var checkbox = $(this).find('.vehicle-checkbox')[0];
+            if (checkbox) checkbox.checked = !checkbox.checked;
+        });
     </script>
 </head>
 <body>
@@ -178,17 +229,22 @@
                     <thead>
                         <tr height="30">
                             <th rowspan="2" align="center" width="5%">ลำดับ</th>
-                            <th rowspan="2" align="center" width="10%">จัดการ</th>
+                            <th rowspan="2" align="center" width="5%">จัดการ</th>
                             <th colspan="3" align="center" width="25%" class="ui-state-default">ข้อมูลรถ</th>
-                            <th colspan="1" align="center" width="15%" class="ui-state-default">มาตราฐานกำหนดเปลี่ยน</th>
-                            <th rowspan="2" align="center" width="15%">วันที่เปลี่ยนล่าสุด</th>
-                            <th rowspan="2" align="center" width="15%">กำหนดเปลี่ยนครั้งถัดไป</th>
-                            <th rowspan="2" align="center" width="15%">ถึงกำหนด / <br>เกินระยะ(วัน)</th>
+                            <!-- <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th> -->
+                            <!-- <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th> -->
+                            <th colspan="1" align="center" width="10%" class="ui-state-default">มาตราฐานกำหนดเปลี่ยน</th>
+                            <th rowspan="2" align="center" width="10%">วันที่เปลี่ยนล่าสุด</th>
+                            <th rowspan="2" align="center" width="10%">กำหนดเปลี่ยนครั้งถัดไป</th>
+                            <th rowspan="2" align="center" width="10%">ถึงกำหนด / <br>เกินระยะ(วัน)</th>
+                            <th rowspan="2" align="center" width="15%">หมายเหตุ</th>
                         </tr>
                         <tr height="30">
                             <th align="center">ทะเบียน</th>
                             <th align="center">ชื่อรถ</th>  
                             <th align="center">ประเภท</th>  
+                            <!-- <th align="center">ทะเบียน</th> -->
+                            <!-- <th align="center">ชื่อรถ</th>   -->
                             <th align="center">ปี</th>  
                         </tr>
                     </thead>
@@ -219,39 +275,70 @@
                                     $VHCRG = "PJSPP".$PJSPP_CODENAME."_VHCRG"; 
                                     $VHCRGNM = "PJSPP".$PJSPP_CODENAME."_VHCRGNM"; 
                                     $CREATEDATE = "PJSPP".$PJSPP_CODENAME."_CREATEDATE"; 
+                                    $REMARK = "PJSPP".$PJSPP_CODENAME."_REMARK";
                                 } else {
-                                    $table = null; 
-                                    $CODENAME = null;
-                                    $VHCRG = null;
-                                    $VHCRGNM = null;
-                                    $CREATEDATE = null;
+                                    $table = null; // หรือจัดการ error ตามต้องการ
+                                    $CODENAME = null; // หรือจัดการ error ตามต้องการ
+                                    $VHCRG = null; // หรือจัดการ error ตามต้องการ
+                                    $VHCRGNM = null; // หรือจัดการ error ตามต้องการ
+                                    $CREATEDATE = null; // หรือจัดการ error ตามต้องการ
+                                    $REMARK = null; // หรือจัดการ error ตามต้องการ
                                 }
 
+                                // ดึงข้อมูลจากตาราง PROJECT_SPAREPART_CODENAME ตามรหัสที่เลือก
                                 $sql_sparepart = "SELECT TOP 1 * FROM [dbo].[$table] WHERE $CODENAME = '$PJSPP_CODENAME' AND ($VHCRG = '$VEHICLEREGISNUMBER' OR $VHCRGNM = '$THAINAME') ORDER BY $CREATEDATE DESC";
                                 $query_sparepart = sqlsrv_query($conn, $sql_sparepart);
                                 $result_sparepart = sqlsrv_fetch_array($query_sparepart, SQLSRV_FETCH_ASSOC);
 
+                                // คำนวณวันที่ถัดไป เมื่อครบปีตามที่ดึงมา $PJSPP_EXPIRE_YEAR เช่น 1 ปี, 2 ปี, 3 ปี
                                 $font = "black";
 
+                                // วันที่ปัจจุบัน
+                                // $lactchangedate = date("Y-m-d");    
+                                // แสดงผลข้อมูลอะไหล่ที่ดึงมา   
                                 if(isset($result_sparepart['PJSPP'.$PJSPP_CODENAME.'_LCD']) && $result_sparepart['PJSPP'.$PJSPP_CODENAME.'_LCD'] != null){
+                                    // ถ้ามีวันที่เปลี่ยนล่าสุด
                                     $lactchangedate = $result_sparepart['PJSPP'.$PJSPP_CODENAME.'_LCD'];  
+                                    // แปลงวันที่ไว้ใช้ในการแสดงผล                        
+                                    $lactchangedate_display = date("d/m/Y", strtotime($lactchangedate));
                                 } else {
+                                    // ถ้าไม่มีวันที่เปลี่ยนล่าสุด ให้ใช้วันที่ปัจจุบัน
                                     $lactchangedate = '';
+                                    // แปลงวันที่ไว้ใช้ในการแสดงผล                        
+                                    $lactchangedate_display = '';
                                 }
 
-                                $lactchangedate_display = date("d/m/Y", strtotime($lactchangedate));
-                                $expire_date_str = date("Y-m-d", strtotime("+$PJSPP_EXPIRE_YEAR year", strtotime($lactchangedate)));
-                                $PJSPP_EXPIRE_DATE = date("d/m/Y", strtotime($expire_date_str));
-                                $date1 = date_create(date("Y-m-d")); 
+                                if ($lactchangedate == '') {
+                                    // วันที่ครบกำหนด (เพิ่มปีจากวันที่ปัจจุบัน)
+                                    $expire_date_str = '';
+                                    // แปลงวันที่ไว้ใช้ในการแสดงผล
+                                    $PJSPP_EXPIRE_DATE = '';
+                                }else {
+                                    // วันที่ครบกำหนด (เพิ่มปีจากวันที่ปัจจุบัน)
+                                    $expire_date_str = date("Y-m-d", strtotime("+$PJSPP_EXPIRE_YEAR year", strtotime($lactchangedate)));
+                                    // แปลงวันที่ไว้ใช้ในการแสดงผล
+                                    $PJSPP_EXPIRE_DATE = date("d/m/Y", strtotime($expire_date_str));
+                                }
+
+                                // คำนวณจำนวนวันระหว่างวันนี้กับวันครบกำหนด
+                                $date1 = date_create(date("Y-m-d")); // วันที่ปัจจุบัน
+                                // $date1 = date_create($lactchangedate); // วันที่เปลี่ยน
                                 $date2 = date_create($expire_date_str);
                                 $diff = date_diff($date1, $date2);
-                                $day_diff = (int)$diff->format("%R%a");
-                                
-                                if ($day_diff < 0) {
-                                    $font = "red"; 
+                                $day_diff = (int)$diff->format("%R%a"); // ได้ค่าจำนวนวัน เป็น + หรือ - จำนวนเต็ม
+
+                                // กำหนดสีฟอนต์
+                                if ($day_diff < 0 || $day_diff == 0) {
+                                    // $class_tr='class="info"';
+                                    // $font = "red"; // ถ้าเกินกำหนดจะเป็นสีแดง
+                                    $day_diff_display = '';
                                 } else {
-                                    $font = "black";
-                                }                            
+                                    // $class_tr='class="second"';
+                                    // $font = "black"; // ถ้ายังไม่เกินกำหนดจะเป็นสีดำ
+                                    $day_diff_display = $day_diff; // แสดงจำนวนวันที่เหลือ
+                                }
+                                // แสดงหมายเหตุ
+                                $remarkdisplay = $result_sparepart['PJSPP'.$PJSPP_CODENAME.'_REMARK'];  
                         ?>
                         <tr height="25px" align="center" id="<?php print $result_vehicleinfo['VEHICLEINFOID']; ?>" <?=$class_tr?>>
                             <td ><?php print "$no.";?></td>
@@ -264,7 +351,8 @@
                             <td align="center"><font color="<?=$font?>"><?= $PJSPP_EXPIRE_YEAR ?></font></td>
                             <td align="center"><font color="<?=$font?>"><?= $lactchangedate_display ?></font></td>
                             <td align="center"><font color="<?=$font?>"><?= $PJSPP_EXPIRE_DATE ?></font></td>
-                            <td align="center"><font color="<?=$font?>"><?= $day_diff ?></font></td>
+                            <td align="center"><font color="<?=$font?>"><?= $day_diff_display ?></font></td>
+                            <td align="left"><font color="<?=$font?>"><?= $remarkdisplay ?></font></td>
                         </tr>
                         <?php }; ?>
                     </tbody>

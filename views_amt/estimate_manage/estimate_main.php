@@ -179,9 +179,9 @@
         <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;จัดการข้อมูลประมาณการ</h3></td>
         <td width="617" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                
-                
-                
+                <!-- <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button> -->
+                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
+                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
             </div>
         </td>
         </tr>
@@ -244,7 +244,7 @@
             </tbody>
         </table> 
 		<form id="form1" name="form1" method="post" action="#">
-			<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable">
+			<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display">
 				<thead>
 					<tr height="30">
 						<th rowspan="2" align="center" width="5%" class="ui-state-default">ลำดับ.</th>
@@ -280,7 +280,16 @@
 							$wh="null";
 						}
 						
-						$sql_estimate = "SELECT * FROM ESTIMATE WHERE ".$wh."";
+						$sql_estimate = "SELECT * FROM ESTIMATE WHERE ".$wh." ORDER BY 
+							CASE 
+								WHEN ETM_TYPE = 'โครงสร้าง' THEN 1 
+								WHEN ETM_TYPE = 'ระบบไฟ' THEN 1 
+								WHEN ETM_TYPE = 'ไฮดรอลิค' THEN 2 
+								WHEN ETM_TYPE = 'แอร์' THEN 2 
+								WHEN ETM_TYPE = 'ไดร์สตาร์ท' THEN 3 
+								WHEN ETM_TYPE = 'แบตเตอรี่' THEN 4 
+								WHEN ETM_TYPE = 'รวม' THEN 5 
+							END,ETM_NUM";
 						$query_estimate = sqlsrv_query($conn, $sql_estimate);
 						$no=0;
 						while($result_estimate = sqlsrv_fetch_array($query_estimate, SQLSRV_FETCH_ASSOC)){	
@@ -303,7 +312,7 @@
 							$VHCCT_ID=$result_estimate['VHCCT_ID'];
 							$ETM_GROUP=$result_estimate['ETM_GROUP'];
 							$ETM_TYPE=$result_estimate['ETM_TYPE'];
-							if(($ETM_NUM=='5')||($ETM_NUM=='3')||($ETM_TYPE=='รวม')){
+							if(($ETM_NUM=='5')||($ETM_NUM=='3')||($ETM_NUM=='7')||($ETM_TYPE=='รวม')){
 								$rol = 'readonly';
 								$cls = 'background-color:#d1d1d1;';
 							}else if(($ETM_NUM=='1')||($ETM_NUM=='4')){
@@ -318,7 +327,7 @@
 							}
 					?>
 					<tr height="25px" align="left">
-						<td style="text-align:center;" ><?php print "$no.$ETM_NUM";?></td>
+						<td style="text-align:center;" ><?php print "$ETM_NUM";?></td>
 						<td ><?php print "$ETM_NAME";?></td>
 						<td ><input type="text" name="ETM_PM1" id="ETM_PM1" autocomplete="off" value="<?php echo $ETM_PM1;?>" style="text-align:center;width:100%;<?=$cls?>" onchange="save_etm('<?=$ETM_CODE;?>',this.value,'1','<?=$ETM_NUM;?>','<?=$VHCCT_ID;?>','<?=$ETM_GROUP;?>','<?=$ETM_TYPE;?>')" <?=$rol?>></td>
 						<td ><input type="text" name="ETM_PM2" id="ETM_PM2" autocomplete="off" value="<?php echo $ETM_PM2;?>" style="text-align:center;width:100%;<?=$cls?>" onchange="save_etm('<?=$ETM_CODE;?>',this.value,'2','<?=$ETM_NUM;?>','<?=$VHCCT_ID;?>','<?=$ETM_GROUP;?>','<?=$ETM_TYPE;?>')" <?=$rol?>></td>

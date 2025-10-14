@@ -354,7 +354,7 @@
                                     <?php }else{ ?>
                                         <?php if(isset($result_repairman['RPME_CODE'])){ ?>   
                                             <?php if($result_rprq['RPRQ_WORKTYPE'] == 'BM'){ ?>
-                                                <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-green-dark" onclick="save_successjob_bm('save_successjob_bm','SUCCESS','<?php print $RPRQ_CODE;?>','<?php print $result_repaircause['RPC_SUBJECT'];?>','<?=$result_rprq['RPRQ_SPAREPART']?>')">
+                                                <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-green-dark" onclick="save_successjob_bm('<?=$SESSION_AREA;?>','save_successjob_bm','SUCCESS','<?php print $RPRQ_CODE;?>','<?php print $result_repaircause['RPC_SUBJECT'];?>','<?=$result_rprq['RPRQ_SPAREPART']?>')">
                                                     <i class="fa fa-check <?=$css_close_icenter;?>"></i><font size="2" class="showfont">เสร็จสิ้น</font>
                                                 </a>
                                             <?php }else{ ?>                               
@@ -368,7 +368,7 @@
                                                     }
                                                     // print $save_type;
                                                 ?>
-                                                <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-green-dark" onclick="save_successjob_pm('<?=$save_type?>','SUCCESS','<?php print $RPRQ_CODE;?>','<?php print $result_repaircause['RPC_SUBJECT'];?>')">
+                                                <a href="#" class="btn btn-m btn-full-width shadow-s rounded-s font-700 text-uppercase bg-green-dark" onclick="save_successjob_pm('<?=$SESSION_AREA;?>','<?=$save_type?>','SUCCESS','<?php print $RPRQ_CODE;?>','<?php print $result_repaircause['RPC_SUBJECT'];?>')">
                                                     <i class="fa fa-check <?=$css_close_icenter;?>"></i><font size="2" class="showfont">เสร็จสิ้น</font>
                                                 </a>
                                             <?php } ?>

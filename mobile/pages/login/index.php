@@ -1,9 +1,126 @@
 <?php
     $path = "../../";    
-	require($path."include/connect.php");
-	require($path."include/head.php");	
+    require($path."include/connect.php");
+    require($path."include/head.php");	
     session_destroy();
 ?>
+
+<!-- IT Policy Modal (modal ที่ 1) -->
+<div id="customPolicyModal" class="custom-modal-overlay">
+  <div class="custom-modal">
+    <div class="custom-modal-header">
+      <h3>IT Policy - นโยบายการใช้งานระบบ</h3>
+    </div>
+    <div class="custom-modal-body">
+      <iframe style="width:100%;height:350px;border-radius:8px;border:2px solid #6eb6de;box-shadow:0 2px 16px #0002;" src="https://online.anyflip.com/wcwkk/auwh/index.html" seamless="seamless" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true"></iframe>
+    </div>
+    <div class="custom-modal-footer">
+      <button id="acceptPolicyModalBtn" class="btn btn-primary">ฉันได้อ่านและยอมรับนโยบายแล้ว</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .custom-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(30,40,60,0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInModalBg 0.5s;
+  }
+  .custom-modal {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+    padding: 0;
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    max-height: 510px;
+    animation: popInModal 0.5s;
+    overflow: hidden;
+    border: 2px solid #6eb6de;
+  }
+  .custom-modal-header {
+    background: linear-gradient(90deg, #6eb6de 0%, #4a77d4 100%);
+    padding: 24px 0 12px 0;
+    text-align: center;
+    color: #fff;
+    border-bottom: 1px solid #6eb6de;
+    box-shadow: 0 2px 8px #0001;
+  }
+  .custom-modal-header h2 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px #0003;
+  }
+  .custom-modal-body {
+    padding: 24px 24px 0 24px;
+    background: rgba(255,255,255,0.03);
+    max-height: 100%;
+    overflow-y: auto; 
+  }
+  .custom-modal-footer {
+    padding: 24px;
+    text-align: center;
+    vertical-align: middle;
+    background: transparent;
+  }
+  #acceptPolicyModalBtn {
+    font-size: 20px;
+    padding: 0px 40px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #6eb6de 0%, #4a77d4 100%);
+    border: none;
+    text-align: center;
+    vertical-align: middle;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px #0002;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  #acceptPolicyModalBtn:hover {
+    background: linear-gradient(90deg, #4a77d4 0%, #6eb6de 100%);
+    box-shadow: 0 4px 16px #4a77d4aa;
+  }
+  @keyframes fadeInModalBg {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes popInModal {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @media (max-width: 700px) {
+    .custom-modal { max-width: 98vw; }
+    .custom-modal-body { padding: 12px 4px 0 4px; max-height: 100%;}
+    .custom-modal-header { padding: 16px 0 8px 0; }
+    .custom-modal-footer { padding: 12px; }
+  }
+</style>
+
+<script>
+  // Show IT Policy Modal on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.style.overflow = 'hidden';
+    document.getElementById('customPolicyModal').style.display = 'flex';
+    document.getElementById('acceptPolicyModalBtn').onclick = function() {
+      document.getElementById('customPolicyModal').style.display = 'none';
+      // Show update notification modal
+      document.getElementById('updateNotifyModal').style.display = 'flex';
+    };
+    document.getElementById('closeUpdateNotifyBtn').onclick = function() {
+      document.getElementById('updateNotifyModal').style.display = 'none';
+      document.body.style.overflow = '';
+    };
+  });
+</script>
 
 <div id="page">
     <div id="menu-colors" class="menu menu-box-bottom rounded-m" data-menu-load="<?=$path?>include/mnc.php" data-menu-height="480"></div>
@@ -61,13 +178,13 @@
     </div>
 </div>
 <?php	
-	require($path."include/script.php"); 
+    require($path."include/script.php"); 
 ?>
 <style>
-	.largerCheckbox {
-		width: 50px;
-		height: 50px;
-	}
+    .largerCheckbox {
+        width: 50px;
+        height: 50px;
+    }
 
     .toggle-1 {
         display: inline-block;
@@ -107,7 +224,7 @@
         height: 20px;
         padding: 0 10px;
 
-        content: "AMT";
+        content: "อมตะ";
         background: white;
         color: #f2395a;
         transition: all 0.3s ease;
@@ -121,8 +238,8 @@
 
     }
     .toggle-1__input:checked + .toggle-1__button::before {
-        content: 'GW';
+        content: 'เกตเวย์';
         left: 5px;
-        color:#8ECF45;
+        color:#336633;
     }
 </style>

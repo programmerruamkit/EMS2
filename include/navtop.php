@@ -92,7 +92,7 @@
         $SS_AREA=$_SESSION["AD_AREA"];
         $SS_ROLENAME=$_SESSION["AD_ROLE_NAME"];
       ?>
-      <?php if($SS_ROLENAME=="PROJECT"){ ?>
+      <?php if($SS_ROLENAME=="PROJECT TTT" || $SS_ROLENAME=="PROJECT" || $SS_ROLENAME=="TTT"){ ?>
         <a href="<?=$path;?>manage/dashboard_project.php?menu_id=dashboard" style=" <?=($_GET["menu_id"]=='dashboard')?'color:#0CF;':'' /*text-decoration:underline;*/?>">หน้าหลัก</a>
       <?php } else { ?>
         <a href="<?=$path;?>manage/dashboard.php?menu_id=dashboard" style=" <?=($_GET["menu_id"]=='dashboard')?'color:#0CF;':'' /*text-decoration:underline;*/?>">Dashboard</a>

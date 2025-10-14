@@ -13,44 +13,60 @@ $pjsppcodename = isset($_GET['pjsppcodename']) ? $_GET['pjsppcodename'] : '';
 <head>
     <script>
         function submitMultipleSend() {
-            var change_date = document.getElementById('change_date').value;
+            var vehicleData = [];
+            var hasError = false;
+            var errorMessage = '';
             
-            if (!change_date) {
+            // รวบรวมข้อมูลจากแต่ละแถว
+            <?php foreach($vehicle_data as $index => $vehicle): ?>
+                var changeDate<?php echo $index; ?> = document.getElementById('change_date_<?php echo $index; ?>').value;
+                var notes<?php echo $index; ?> = document.getElementById('notes_<?php echo $index; ?>').value;
+                
+                if (!changeDate<?php echo $index; ?>) {
+                    hasError = true;
+                    errorMessage += 'กรุณาเลือกวันที่สำหรับรถ <?php echo $vehicle["regis"]; ?>\n';
+                }
+                
+                vehicleData.push({
+                    id: '<?php echo $vehicle["id"]; ?>',
+                    regis: '<?php echo $vehicle["regis"]; ?>',
+                    name: '<?php echo $vehicle["name"]; ?>',
+                    change_date: changeDate<?php echo $index; ?>,
+                    notes: notes<?php echo $index; ?>
+                });
+            <?php endforeach; ?>
+            
+            if (hasError) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'กรุณาเลือกวันที่',
-                    showConfirmButton: false,
-                    timer: 1500
+                    title: 'กรุณาตรวจสอบข้อมูล',
+                    text: errorMessage,
+                    showConfirmButton: true,
+                    confirmButtonText: 'ตกลง'
                 });
                 return false;
             }
             
+            // แสดง loading
             Swal.fire({
                 title: 'กำลังบันทึกข้อมูล...',
                 text: 'กรุณารอสักครู่',
                 allowOutsideClick: false,
                 showConfirmButton: false,
-                timer: 1500,
                 didOpen: () => {
                     Swal.showLoading();
                 },
             });
             
-            var vehicleIds = [];
-            <?php foreach($vehicle_data as $vehicle): ?>
-                vehicleIds.push('<?php echo $vehicle["id"]; ?>');
-            <?php endforeach; ?>
-            
             $.ajax({
                 type: 'POST',
                 url: '<?=$path?>views_project/request_repair/request_repair_pm_multiple_proc.php',
                 data: {
-                    vehicle_ids: vehicleIds,
-                    change_date: change_date,
+                    vehicle_data: vehicleData,
                     pjsppname: '<?php echo $pjsppname; ?>',
                     pjsppcodename: '<?php echo $pjsppcodename; ?>',
                     ctmcomcode: '<?php echo $ctmcomcode; ?>',
-                    proc: 'add_multiple'
+                    proc: 'add_multiple_individual'
                 },
                 success: function(result) {
                     if (result.success) {
@@ -126,25 +142,11 @@ $pjsppcodename = isset($_GET['pjsppcodename']) ? $_GET['pjsppcodename'] : '';
             font-weight: bold;
         }
         .vehicle-list {
-            max-height: 200px;
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid #ccc;
             background-color: white;
             border-radius: 3px;
-        }
-        .form-row {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        .form-label {
-            width: 150px;
-            font-weight: bold;
-            text-align: right;
-            margin-right: 10px;
-        }
-        .form-input {
-            flex: 1;
         }
         .readonly-field {
             background-color: #f5f5f5;
@@ -152,47 +154,70 @@ $pjsppcodename = isset($_GET['pjsppcodename']) ? $_GET['pjsppcodename'] : '';
             padding: 8px;
             border-radius: 3px;
         }
+        .input-date {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+        .input-notes {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            resize: vertical;
+            min-height: 60px;
+        }
     </style>
 </head>
 <body style="padding: 20px;">
 
+    <!-- ข้อมูลพื้นฐาน -->
     <div class="form-section">
         <div class="section-title">ข้อมูลพื้นฐาน</div>        
         <table width="100%" cellpadding="0" cellspacing="0" border="0" class="INVENDATA no-border">
             <tr align="center" height="25px">
                 <td height="35" align="right" class="ui-state-default"><strong>หมวดหมู่อะไหล่:</strong></td>
-                <td height="35" align="left" colspan="2">
+                <td height="35" align="left" colspan="4">
                     <div class="readonly-field"><?php echo $pjsppname; ?></div>
-                </td>
-                <td height="35" align="right" class="ui-state-default"><strong>วันที่เปลี่ยนล่าสุด:</strong></td>
-                <td height="35" align="left">
-                    <input type="date" id="change_date" name="change_date" value="<?php echo date('Y-m-d'); ?>" required style="padding: 8px; width: 100%;">
                 </td>
             </tr>
         </table>
     </div>
 
+    <!-- รายการรถที่เลือก -->
     <div class="form-section">
-        <div class="section-title">รายการรถที่เลือก (<?php echo count($vehicle_data); ?> คัน)</div>
+        <div class="section-title">
+            รายการรถที่เลือก (<?php echo count($vehicle_data); ?> คัน)
+        </div>
         
         <div class="vehicle-list">
-            <table width="100%" border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+            <table width="100%" border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
                 <thead>
                     <tr style="background-color: #e8f4f8;">
-                        <th width="8%">ลำดับ</th>
-                        <th width="20%">ทะเบียน</th>
-                        <th width="45%">ชื่อรถ</th>
+                        <th width="5%" align="center"><b>ลำดับ</b></th>
+                        <th width="10%" align="center"><b>ทะเบียน</b></th>
+                        <th width="20%" align="center"><b>ชื่อรถ</b></th>
+                        <th width="25%" align="center"><b>วันที่เปลี่ยน</b></th>
+                        <th width="40%" align="center"><b>หมายเหตุ</b></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php 
                     $no = 1;
-                    foreach($vehicle_data as $vehicle): 
+                    foreach($vehicle_data as $index => $vehicle): 
                     ?>
                     <tr <?php echo ($no % 2 == 0) ? 'style="background-color: #f9f9f9;"' : ''; ?>>
                         <td align="center"><?php echo $no++; ?></td>
                         <td align="center"><strong><?php echo $vehicle['regis']; ?></strong></td>
                         <td><?php echo $vehicle['name']; ?></td>
+                        <td align="center">
+                            <input type="date" id="change_date_<?php echo $index; ?>" name="change_date_<?php echo $index; ?>" value="<?php echo date('Y-m-d'); ?>" class="input-date" required>
+                        </td>
+                        <td>
+                            <textarea id="notes_<?php echo $index; ?>" name="notes_<?php echo $index; ?>" class="input-notes" placeholder="กรอกหมายเหตุ (ถ้ามี)"></textarea>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -200,6 +225,7 @@ $pjsppcodename = isset($_GET['pjsppcodename']) ? $_GET['pjsppcodename'] : '';
         </div>
     </div>
 
+    <!-- ปุ่มควบคุม -->
     <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default" style="margin-top: 20px;">
         <tbody>    
         <tr align="center" height="25px">

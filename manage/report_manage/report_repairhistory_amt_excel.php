@@ -106,117 +106,109 @@ header("Pragma:no-cache");
         <table  border="1" style="width: 100%;">
             <thead>
                 <tr height="30">
-                    <th colspan="18" style="text-align:center;background-color: #dedede">รายงานประวัติการซ่อมบำรุง E-Maintenance (ประจำวันที่ <?=$ds?> - <?=$de?>)</th>
+                    <th colspan="19" style="text-align:center;background-color: #dedede">รายงานประวัติการซ่อมบำรุง E-Maintenance (ประจำวันที่ <?=$ds?> - <?=$de?>)</th>
                 </tr>
-				<tr height="30">
-					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">ลำดับ.</th>
-					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">บริษัท</th>
-					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">ลูกค้า</th>
-					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">วันที่</th>
-					<th colspan="3" width="15%" style="text-align:center;background-color: #dedede">ข้อมูลรถ</th>
-					<th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">เลข JOB</th>
-					<th colspan="10" width="60%" style="text-align:center;background-color: #dedede">รายละเอียดงานซ่อม</th>
-				</tr>
-				<tr height="30">
-					<th style="text-align:center;background-color: #dedede">ทะเบียนรถ</th>
-					<th style="text-align:center;background-color: #dedede">ทะเบียนเดิม</th>           
-					<th style="text-align:center;background-color: #dedede">เลขไมล์ล่าสุด</th>					
-					<th style="text-align:center;background-color: #dedede">ชื่องาน</th>
-					<th style="text-align:center;background-color: #dedede">รายละเอียด</th>
-					<th style="text-align:center;background-color: #dedede">ปริมาณ</th>
-					<th style="text-align:center;background-color: #dedede">ราคาต่อหน่วย</th>
-					<th style="text-align:center;background-color: #dedede">ราคาขาย</th>
-					<th style="text-align:center;background-color: #dedede">รวมเงิน</th>
-					<th style="text-align:center;background-color: #dedede">ค่าแรง</th>
-					<th style="text-align:center;background-color: #dedede">ผู้ขายอะไหล่</th>
-					<th style="text-align:center;background-color: #dedede">ชั่วโมงทำงานจริง</th>
-					<th style="text-align:center;background-color: #dedede">ชั่วโมงเก็บเงิน</th>
-				</tr>
+                <tr height="30">
+                    <th rowspan="2" width="3%" style="text-align:center;background-color: #dedede">ลำดับ.</th>
+                    <th rowspan="2" width="8%" style="text-align:center;background-color: #dedede">ชื่อลูกค้า</th>
+                    <th rowspan="2" width="5%" style="text-align:center;background-color: #dedede">รหัสลูกค้า</th>
+                    <th rowspan="2" width="7%" style="text-align:center;background-color: #dedede">วันที่ Job</th>
+                    <th colspan="5" width="25%" style="text-align:center;background-color: #dedede">ข้อมูลรถ</th>
+                    <th rowspan="2" width="8%" style="text-align:center;background-color: #dedede">เลขที่ Job</th>
+                    <th colspan="9" width="49%" style="text-align:center;background-color: #dedede">รายละเอียดงานซ่อม</th>
+                </tr>
+                <tr height="30">
+                    <th style="text-align:center;background-color: #dedede">ทะเบียน</th>
+                    <th style="text-align:center;background-color: #dedede">ชื่อรถ</th>
+                    <th style="text-align:center;background-color: #dedede">รุ่นรถ</th>
+                    <th style="text-align:center;background-color: #dedede">เลขตัวถัง</th>
+                    <th style="text-align:center;background-color: #dedede">เลขไมล์</th>
+                    <th style="text-align:center;background-color: #dedede">เลขใบกำกับ</th>
+                    <th style="text-align:center;background-color: #dedede">ประเภท</th>
+                    <th style="text-align:center;background-color: #dedede">ชื่องาน</th>
+                    <th style="text-align:center;background-color: #dedede">ประเภทการซ่อม</th>
+                    <th style="text-align:center;background-color: #dedede">จำนวน</th>
+                    <th style="text-align:center;background-color: #dedede">ราคา/หน่วย</th>
+                    <th style="text-align:center;background-color: #dedede">ราคาสุทธิ</th>
+                    <th style="text-align:center;background-color: #dedede">รวมราคา</th>
+                    <th style="text-align:center;background-color: #dedede">ทะเบียนจังหวัด</th>
+                </tr>
             </thead>
             <tbody>                      
 				<?php											   		
-                    if($rgsub!=''){
-                        $rsrg="REGNO LIKE '%$rgsub%' AND ";
-                    }else{$rsrg="";} 
+					// ปรับเงื่อนไขการค้นหาให้เหมาะกับตาราง IMPORT_HDMS
+					if($rgsub!=''){
+						$rsrg="LicensePlateNo LIKE '%$rgsub%' AND ";
+					}else{$rsrg="";} 
 					if($dscon!='-- 00:00' && $decon!='-- 00:00'){
-                        $rsse="OPENDATECON BETWEEN '$dscon' AND '$decon' AND ";
-                        // $rsse="OPENDATECON BETWEEN '$dscon' AND '$decon' AND ";
-                    }else{$rsse="";}
-                    if($co!=''){
-                        $rsco="NICKNM LIKE '%$co%' AND ";
-                    }else{$rsco="";}
-                    if($cu!=''){
-                        $rscu="CUSCOD LIKE '%$cu%' AND ";
-                    }else{$rscu="";}
-                    if($dt!=''){
-                        $rsdt="SPAREPARTSDETAIL LIKE '%$dt%' AND";
-                    }else{$rsdt="";}
-                    $wh=$rsrg.$rsse.$rsco.$rscu.$rsdt;
-                    if($wh==''){
-                        $rswh="OPENDATECON BETWEEN '00/00/0000 00:00' AND '00/00/000 00:00' AND ";
-                    }else{
-                        $rswh=$wh;
-                    }
+						$rsse="JobDate BETWEEN '$dscon' AND '$decon' AND ";
+					}else{$rsse="";}
+					if($co!=''){
+						$rsco="CustomerCode LIKE '%$co%' AND ";
+					}else{$rsco="";}
+					if($cu!=''){
+						$rscu="CustomerCode LIKE '%$cu%' AND ";
+					}else{$rscu="";}
+					if($dt!=''){
+						$rsdt="JobName LIKE '%$dt%' AND";
+					}else{$rsdt="";}
+					$wh=$rsrg.$rsse.$rsco.$rscu.$rsdt;
+					if($wh==''){
+						$rswh="JobDate BETWEEN '1900-01-01 00:00:00' AND '1900-01-01 00:00:00' AND ";
+					}else{
+						$rswh=$wh;
+					}
 
-					$sql_reporthdms = "SELECT * FROM vwRKTC_MERGENEWOLD_TEST WHERE ".$rswh." 1=1 ORDER BY OPENDATECON ASC";
-
-                    // $wh="REGNO LIKE '%$rgsub%' AND OPENDATE BETWEEN '$dscon' AND '$decon' AND NICKNM LIKE '%$co%' AND CUSCOD LIKE '%$cu%' AND SPAREPARTSDETAIL LIKE '%$dt%'";
-                    // $sql_reporthdms = "SELECT * FROM RKTC WHERE ".$wh."";
+					// ใช้ตาราง IMPORT_HDMS แทน vwRKTC_MERGENEWOLD_TEST
+					$sql_reporthdms = "SELECT * FROM IMPORT_HDMS WHERE ".$rswh." 1=1 ORDER BY JobDate ASC";
 					$query_reporthdms = sqlsrv_query($conn, $sql_reporthdms);
 					$no=0;
 					while($result_reporthdms = sqlsrv_fetch_array($query_reporthdms, SQLSRV_FETCH_ASSOC)){	
 						$no++;
-						$temp0 = $result_reporthdms['RKTCID'];
-						$temp1 = $result_reporthdms['NICKNM'];
-						$temp2 = $result_reporthdms['CUSCOD'];
-						$temp3 = $result_reporthdms['OPENDATECON'];
-						$temp4 = $result_reporthdms['CLOSEDATE'];
-						$temp5 = $result_reporthdms['TAXINVOICEDATE'];
-						$temp6 = $result_reporthdms['REGNO'];
-						$temp7 = $result_reporthdms['CHASSIS'];
-						$temp8 = $result_reporthdms['MILEAGE'];
-						$temp9 = $result_reporthdms['JOBNO']; 
-						$temp10 = $result_reporthdms['TYPNAME'];
-						$temp11 = $result_reporthdms['SPAREPARTSDETAIL'];
-						$temp12 = $result_reporthdms['NET'];
-						$temp13 = $result_reporthdms['COST'];
-						$temp14 = $result_reporthdms['SELLING'];
-						$temp15 = $result_reporthdms['SPAREPARTSSELLER'];
-						$temp16 = $result_reporthdms['SUMMARY'];
-						$temp17 = $result_reporthdms['WAGES'];
-						$temp18 = $result_reporthdms['MECHANIC'];
-						$temp19 = $result_reporthdms['WORKINGHOURS'];
-						$temp20 = $result_reporthdms['COLLECTIONHOURS'];
-						
-						$regisold = "SELECT VEHICLEREGISNUMBER,REMARK FROM vwVEHICLEINFO WHERE VEHICLEREGISNUMBER = '$temp6'";
-						$queryregisold = sqlsrv_query($conn, $regisold);
-						$resultregisold = sqlsrv_fetch_array($queryregisold, SQLSRV_FETCH_ASSOC);
-						if(isset($resultregisold["REMARK"])){
-							$REMARK = str_replace('ทะเบียนเดิม', '', $resultregisold["REMARK"]);
-						}
+						// ปรับตัวแปรให้ตรงกับฟิลด์และข้อมูลที่แสดง
+						$temp0 = $result_reporthdms['ID'];
+						$temp1 = $result_reporthdms['CustomerName'];           // ชื่อลูกค้า
+						$temp2 = $result_reporthdms['CustomerCode'];           // รหัสลูกค้า
+						$temp3 = $result_reporthdms['JobDate'];                // วันที่ Job
+						$temp4 = $result_reporthdms['LicensePlateNo'];         // เลขทะเบียน
+						$temp5 = $result_reporthdms['CarModel'];               // รุ่นรถ
+						$temp6 = $result_reporthdms['ChassisNo'];              // เลขตัวถัง
+						$temp7 = $result_reporthdms['OdometerReading'];        // เลขไมค์
+						$temp8 = $result_reporthdms['JobNo'];                  // เลขที่ Job
+						$temp9 = $result_reporthdms['Type'];                   // ประเภท
+						$temp10 = $result_reporthdms['JobName'];               // ชื่องาน
+						$temp11 = $result_reporthdms['Quantity'];              // จำนวน
+						$temp12 = $result_reporthdms['PricePerUnit'];          // ราคา/หน่วย
+						$temp13 = $result_reporthdms['NetPrice'];              // ราคาสุทธิ
+						$temp14 = $result_reporthdms['TotalPrice'];            // รวมราคา
+						$temp15 = $result_reporthdms['TaxInvoiceNo'];          // เลขใบกำกับ
+						$temp16 = $result_reporthdms['RepairType'];            // ประเภทการซ่อม
+						$temp17 = $result_reporthdms['LicensePlateProvince'];  // ทะเบียนจังหวัด
+						$temp18 = $result_reporthdms['TruckSideNo'];           // เลขข้างรถ
 				?>
 				<tr height="25px">
 					<td align="center"><?php print "$no";?></td>
-					<td align="center"><?php print "$temp1";?></td>
+					<td align="left"><?php print "$temp1";?></td>
 					<td align="center"><?php print "$temp2";?></td>
 					<td align="center"><?php print "$temp3";?></td>
+					<td align="center"><?php print "$temp4";?></td>
+					<td align="center"><?php print "$temp18";?></td>
+					<td align="center"><?php print "$temp5";?></td>
 					<td align="center"><?php print "$temp6";?></td>
-					<td align="center"><?php print "$REMARK";?></td>
+					<td align="right"><?php print "$temp7";?></td>
 					<td align="center"><?php print "$temp8";?></td>
-					<td align="center"><?php print "$temp9";?></td>
+					<td align="center"><?php print "$temp15";?></td>
+					<td align="left"><?php print "$temp9";?></td>
 					<td align="left"><?php print "$temp10";?></td>
-					<td align="left"><?php print "$temp11";?></td>
+					<td align="left"><?php print "$temp16";?></td>
+					<td align="right"><?php print "$temp11";?></td>
 					<td align="right"><?php print "$temp12";?></td>
 					<td align="right"><?php print "$temp13";?></td>
 					<td align="right"><?php print "$temp14";?></td>
-					<td align="right"><?php print "$temp16";?></td>
-					<td align="right"><?php print "$temp17";?></td>
-					<td align="left"><?php print "$temp15";?></td>
-					<td align="left"><?php print "$temp19";?></td>
-					<td align="right"><?php print "$temp20";?></td>
+					<td align="center"><?php print "$temp17";?></td>
 				</tr>
 				<?php }; ?>
-            </tbody>
+			</tbody>
         </table>
     </body>
 </html>

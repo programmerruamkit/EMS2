@@ -82,15 +82,54 @@
 				showConfirmButton: false,
 				timer: 1500
 			})
-			// alert('กรุณาเลือกอย่างน้อย 1 รายการ');
 			return false;
+		}
+
+		// ตรวจสอบหมายเหตุสำหรับการไม่อนุมัติ
+		if ($('#type_chk').val() == '5') {
+			var emptyRemarkItems = [];
+			
+			$('.largerCheckbox').each(function (index) {
+				if ($(this).attr('checked')) {
+					var remarkId = 'RPRQ_REMARK' + (index + 1);
+					var remarkValue = $('#' + remarkId).val().trim();
+					var rprqId = $('#RPRQID' + (index + 1)).val();
+					
+					if (remarkValue == '' || remarkValue.length == 0) {
+						emptyRemarkItems.push({
+							index: index + 1,
+							remarkId: remarkId,
+							rprqId: rprqId
+						});
+					}
+				}
+			});
+			
+			if (emptyRemarkItems.length > 0) {
+				var itemList = emptyRemarkItems.map(function(item) {
+					return 'รายการที่ ' + item.index + ' (หมายเลข: ' + item.rprqId + ')';
+				}).join('<br>');
+				
+				Swal.fire({
+					icon: 'warning',
+					title: 'กรุณาระบุสาเหตุที่ไม่อนุมัติ',
+					html: 'รายการที่ยังไม่กรอกหมายเหตุ:<br><br>' + itemList,
+					showConfirmButton: true,
+					confirmButtonText: 'ตกลง'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$('#' + emptyRemarkItems[0].remarkId).focus();
+					}
+				});
+				return false;
+			}
 		}
 
 		if (type_ch == true) {
 
 			if ($('#type_chk').val() == 4) {
 				Swal.fire({
-					title: 'ยืนยันการ Approve ข้อมูลหรือไม่ ?',
+					title: 'ยืนยันการอนุมัติแผนหรือไม่ ?',
 					icon: 'warning',
 					showCancelButton: true,
 					confirmButtonColor: '#00A300',
@@ -114,30 +153,14 @@
 							}).then((result) => {
 								loadViewdetail('<?=$path?>views_amt/approve_manage/approve_manage.php?type='+gettype);
 								closeUI();
-								// alert(data);
 							})
 							}
 						});
 					}
 				})
-			} else {
-				
-				
-				if($('#RPRQ_REMARK').val() == 0 ){
-					Swal.fire({
-						icon: 'warning',
-						title: 'กรุณาระบุสาเหตุที่ไม่อนุมัติ',
-						showConfirmButton: false,
-						timer: 1500,
-						onAfterClose: () => {
-							setTimeout(() => $("#RPRQ_REMARK").focus(), 0);
-						}
-					})
-					// return false;
-				}
-
+			} else if ($('#type_chk').val() == '5') {
 				Swal.fire({
-					title: 'ยืนยันการ Reject ข้อมูลหรือไม่ ?',
+					title: 'ยืนยันการไม่อนุมัติแผนหรือไม่ ?',
 					icon: 'warning',
 					showCancelButton: true,
 					confirmButtonColor: '#C82333',
@@ -161,7 +184,6 @@
 							}).then((result) => {
 								loadViewdetail('<?=$path?>views_amt/approve_manage/approve_manage.php?type='+gettype);
 								closeUI();
-								// alert(data);
 							})
 							}
 						});
@@ -207,7 +229,7 @@
     <td class="LEFT"></td>
     <td class="CENTER" align="center">
 		<form name="form_approve" id="form_approve">
-        
+        <!-- <form name="form_approve" id="form_approve" method="post" action="<?=$path?>views_amt/approve_manage/approve_manage_proc.php" enctype="multipart/form-data">  -->
 			<table width="100%" cellpadding="0" cellspacing="0" border="0" class="default">
 				<thead>
 					<tr align="center">
@@ -223,9 +245,9 @@
 				<tbody>			
 					<?php
 						if($GETTYPE == 'bm'){
-							$sql_rprq = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_STATUSREQUEST = 'รอตรวจสอบ' AND RPRQ_WORKTYPE = 'BM' AND RPRQ_AREA = '$SESSION_AREA'";
+							$sql_rprq = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_STATUSREQUEST = 'รอตรวจสอบ' AND RPRQ_WORKTYPE = 'BM' AND RPRQ_AREA = '$SESSION_AREA' ORDER BY RPRQ_ID ASC";
 						}else{
-							$sql_rprq = "SELECT * FROM vwREPAIRREQUEST_PM WHERE RPRQ_STATUSREQUEST = 'รอตรวจสอบ' AND RPRQ_WORKTYPE = 'PM' AND RPRQ_AREA = '$SESSION_AREA'";
+							$sql_rprq = "SELECT * FROM vwREPAIRREQUEST_PM WHERE RPRQ_STATUSREQUEST = 'รอตรวจสอบ' AND RPRQ_WORKTYPE = 'PM' AND RPRQ_AREA = '$SESSION_AREA' ORDER BY RPRQ_ID ASC";
 						}
 						$query_rprq = sqlsrv_query($conn, $sql_rprq);
 						$no=0;
@@ -240,7 +262,7 @@
 									<input type="hidden" name="GETTYPE" id="GETTYPE" value="<?=$GETTYPE;?>">
 									<input type="hidden" name="RPRQID" id="RPRQID<?php echo $no;?>" value="<?=$result_rprq['RPRQ_ID'];?>">
 									<input type="hidden" name="RPRQ_CODE<?php echo $no;?>" id="RPRQ_CODE" value="<?=$result_rprq['RPRQ_CODE'];?>">
-									
+									<!-- <input type="checkbox" name="RPRQ_ID<?php echo $no;?>" id="RPRQ_ID" value="<?=$result_rprq['RPRQ_ID'];?>" style="cursor:pointer" class="largerCheckbox" onclick="fncshowid('<?php echo $no;?>')">&nbsp; -->
 									<input type="checkbox" name="RPRQ_ID<?php echo $no;?>" id="RPRQ_ID" value="<?=$result_rprq['RPRQ_ID'];?>" style="cursor:pointer" class="largerCheckbox" onclick="fncshowid('<?php echo $no;?>')">&nbsp;
 								</label>
 							</div>
@@ -447,10 +469,10 @@
 				<div style="margin-top:10px; margin-right:15px; margin-bottom:10px;">
 					<div align="left">
 						<span id="show_save">
-							<button type="button" class="bg-color-green font-white b_save" 	onclick="$('#type_chk').val('4')">Approve</button>
+							<button type="button" class="bg-color-green font-white b_save" 	onclick="$('#type_chk').val('4')">อนุมัติ</button>
 						</span>&nbsp;&nbsp;&nbsp;
 						<span id="show_reject">
-							<button type="button" class="bg-color-red font-white b_save" 	onclick="$('#type_chk').val('5')">Reject</button>
+							<button type="button" class="bg-color-red font-white b_save" 	onclick="$('#type_chk').val('5')">ไม่อนุมัติ</button>
 						</span>
 					</div>
 				</div>

@@ -148,9 +148,9 @@
                 <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;ข้อมูลใบขอซ่อมรถ BM</h3></td>
                 <td width="617" align="right" valign="bottom" class="" nowrap>
                         <button class="bg-color-blue big" title="New" id="button_new_bm"><font color="white" size="4">New แจ้งซ่อม BM</font></button>
-                        
-                        
-                        
+                        <!-- <button class="bg-color-orange big" title="New" onClick="loadViewdetail('<?=$path?>views_amt/request_repair/request_repair_pm.php');"><font color="white" size="4">New แจ้งซ่อม PM</font></button> -->
+                        <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
+                        <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
                 </td>
             </tr>
         </table>
@@ -253,799 +253,171 @@
                         <?php }else { ?>
                             <li><a href="#tabs-1"><span style="font-size:13px">ข้อมูลทั้งหมด</span></a></li>
                         <?php } ?> 
-                    </ul> 
-                    <div id="tabs-1">
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable1">
+                    </ul>
+                    
+                    <?php
+                    // สร้าง array สำหรับวันในสัปดาห์
+                    $days_config = array();
+                    if($_GET['dateStart']!="sendplan"){
+                        $days_config = array(
+                            1 => array('name' => 'อาทิตย์', 'date' => $result_getdate_d1d7["D1"], 'var' => 'sonday'),
+                            2 => array('name' => 'จันทร์', 'date' => $result_getdate_d1d7["D2"], 'var' => 'monday'),
+                            3 => array('name' => 'อังคาร', 'date' => $result_getdate_d1d7["D3"], 'var' => 'tuesday'),
+                            4 => array('name' => 'พุธ', 'date' => $result_getdate_d1d7["D4"], 'var' => 'wednesday'),
+                            5 => array('name' => 'พฤหัสฯ', 'date' => $result_getdate_d1d7["D5"], 'var' => 'thursday'),
+                            6 => array('name' => 'ศุกร์', 'date' => $result_getdate_d1d7["D6"], 'var' => 'friday'),
+                            7 => array('name' => 'เสาร์', 'date' => $result_getdate_d1d7["D7"], 'var' => 'saturday')
+                        );
+                    } else {
+                        $days_config = array(
+                            1 => array('name' => 'ข้อมูลทั้งหมด', 'date' => '', 'var' => 'all')
+                        );
+                    }
+                    
+                    // ฟังก์ชันสำหรับแสดงสถานะ
+                    function getStatusText($status) {
+                        switch($status) {
+                            case "รอส่งแผน":
+                                return "<strong><font color='brown'>รอส่งแผน</font></strong>";
+                            case "รอตรวจสอบ":
+                                return "<strong><font color='red'>รอตรวจสอบ</font></strong>";
+                            case "รอคิวซ่อม":
+                                return "<strong><font color='red'>รอคิวซ่อม</font></strong>";
+                            case "กำลังซ่อม":
+                                return "<strong><font color='red'>กำลังซ่อม</font></strong>";
+                            case "ซ่อมเสร็จสิ้น":
+                                return "<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
+                            case "รอจ่ายงาน":
+                                return "<strong><font color='blue'>รอจ่ายงาน</font></strong>";
+                            case "ไม่อนุมัติ":
+                                return "<strong><font color='red'>ไม่อนุมัติ</font></strong>";
+                            default:
+                                return $status;
+                        }
+                    }
+                    
+                    // ฟังก์ชันสำหรับสร้าง SQL query
+                    function generateSqlQuery($day_date, $SESSION_AREA, $wh) {
+                        if($_GET['dateStart']=="sendplan"){
+                            return "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA' AND RPRQ_WORKTYPE = 'BM' AND NOT RPRQ_TYPECUSTOMER = 'cusout' $wh
+                                    UNION ALL
+                                    SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA' AND RPRQ_WORKTYPE = 'BM' AND RPRQ_STATUSREQUEST = 'รอส่งแผน' AND RPRQ_TYPECUSTOMER = 'cusout'";
+                        } else {
+                            return "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA' AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$day_date'";
+                        }
+                    }
+                    
+                    // ฟังก์ชันสำหรับแสดงปุ่มจัดการ
+                    function renderManageButtons($result_rprq, $result_nap, $path) {
+                        $output = '';
+                        if(($result_rprq['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq['RPRQ_STATUSREQUEST']=='รอส่งแผน')){
+                            $output .= '<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4(\''.$path.'views_amt/request_repair/request_repair_bm_form.php\',\'edit\',\''.$result_rprq['RPRQ_CODE'].'\',\'1=1\',\'1350\',\'670\',\'แก้ไขใบแจ้งซ่อม\');"><i class=\'icon-pencil icon-large\'></i></button>';
+                            $output .= '&nbsp;&nbsp;';
+                            $output .= '<button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair(\''.$result_rprq['RPRQ_CODE'].'\',\''.$result_rprq['RPRQ_ID'].'\')"><i class="icon-cancel icon-large"></i></button>';
+                        } else if($result_rprq['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ'){
+                            if(isset($result_nap['CD2']) && $result_nap['CD2'] != ''){
+                                $output .= '<strong>ID ใหม่ '.$result_nap['ID2'].'</strong>';
+                            } else {
+                                $output .= '<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4(\''.$path.'views_amt/request_repair/request_repair_bm_form.php\',\'copy\',\''.$result_rprq['RPRQ_CODE'].'\',\'1=1\',\'1350\',\'670\',\'คัดลอกใบแจ้งซ่อม\');"><i class=\'icon-new icon-large\'></i></button>';
+                            }
+                        }
+                        return $output;
+                    }
+                    
+                    // ฟังก์ชันสำหรับแสดงปุ่มส่งแผน
+                    function renderSendPlanButton($result_rprq, $SS_ROLE_NAME, $path) {
+                        if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){
+                            if($result_rprq['RPRQ_STATUSREQUEST']=='รอส่งแผน'){
+                                return '<button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4(\''.$path.'views_amt/request_repair/request_repair_bm_detail.php\',\'edit\',\''.$result_rprq['RPRQ_CODE'].'\',\'1=1\',\'1350\',\'530\',\'ตรวจสอบใบแจ้งซ่อม\');"><font color="white"><i class=\'icon-arrow-right icon-large\'></i></font></button>';
+                            }
+                        }
+                        return '';
+                    }
+                    
+                    // วนลูปสร้าง tabs
+                    foreach($days_config as $tab_num => $day_info):
+                    ?>
+                    <div id="tabs-<?php echo $tab_num; ?>">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable<?php echo $tab_num; ?>">
                             <thead>
                                 <tr height="30">
-                                    <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>	
-                                    <?php
-                                        if($_GET['dateStart']=="sendplan"){
-                                            echo "<th rowspan='2' align='center' width='8%'>วันที่แจ้งซ่อม";
-                                        }
-                                    ?>
+                                    <th rowspan="2" align="center" width="2%">ลำดับ</th>
+                                    <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
+                                    <?php if($_GET['dateStart']=="sendplan"): ?>
+                                        <th rowspan="2" align="center" width="8%">วันที่แจ้งซ่อม</th>
+                                    <?php endif; ?>
                                     <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                    <?php if($_GET['dateStart']!="sendplan"){ ?>       
+                                    <?php if($_GET['dateStart']!="sendplan"): ?>
                                         <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                    <?php } ?>
+                                    <?php endif; ?>
                                     <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
                                     <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
                                     <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
                                     <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
                                     <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
                                     <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                    <?php
-                                        if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
+                                    <?php if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"): ?>
                                         <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                    <?php } ?>
+                                    <?php endif; ?>
                                 </tr>
                                 <tr height="30">
-                                    <th align="center"width="5%">ทะเบียน</th>
-                                    <th align="center"width="10%">ชื่อรถ</th>           
-                                    <th align="center"width="5%">ทะเบียน</th>
-                                    <th align="center"width="10%">ชื่อรถ</th>    
+                                    <th align="center" width="5%">ทะเบียน</th>
+                                    <th align="center" width="10%">ชื่อรถ</th>
+                                    <th align="center" width="5%">ทะเบียน</th>
+                                    <th align="center" width="10%">ชื่อรถ</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
-                                    $D1=$result_getdate_d1d7["D1"];
-                                    if($_GET['dateStart']=="sendplan"){
-                                        $sql_rprq_sonday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA' AND RPRQ_WORKTYPE = 'BM' AND NOT RPRQ_TYPECUSTOMER = 'cusout' ".$wh."
-                                        UNION ALL
-                                        SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA' AND RPRQ_WORKTYPE = 'BM' AND RPRQ_STATUSREQUEST = 'รอส่งแผน' AND RPRQ_TYPECUSTOMER = 'cusout'";
-                                    }else{
-                                        $sql_rprq_sonday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D1'";
-                                    }
-                                    $query_rprq_sonday = sqlsrv_query($conn, $sql_rprq_sonday);
-                                    $no=0;
-                                    while($result_rprq_sonday = sqlsrv_fetch_array($query_rprq_sonday, SQLSRV_FETCH_ASSOC)){	
-                                        $no++;
-                                        $sql_nap_sonday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                            FROM REPAIRREQUEST_NONAPPROVE A
-                                            LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                            LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                            WHERE B.RPRQ_CODE = '".$result_rprq_sonday['RPRQ_CODE']."'";
-                                        $query_nap_sonday = sqlsrv_query( $conn,$sql_nap_sonday);	
-                                        $result_nap_sonday = sqlsrv_fetch_array($query_nap_sonday, SQLSRV_FETCH_ASSOC);
+                                // Query ข้อมูลสำหรับแต่ละวัน
+                                $sql_rprq = generateSqlQuery($day_info['date'], $SESSION_AREA, $wh);
+                                $query_rprq = sqlsrv_query($conn, $sql_rprq);
+                                $no = 0;
+                                
+                                while($result_rprq = sqlsrv_fetch_array($query_rprq, SQLSRV_FETCH_ASSOC)){
+                                    $no++;
+                                    
+                                    // Query ข้อมูล NONAPPROVE
+                                    $sql_nap = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
+                                        FROM REPAIRREQUEST_NONAPPROVE A
+                                        LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
+                                        LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
+                                        WHERE B.RPRQ_CODE = '".$result_rprq['RPRQ_CODE']."' ORDER BY B.RPRQ_ID ASC";
+                                    $query_nap = sqlsrv_query($conn, $sql_nap);
+                                    $result_nap = sqlsrv_fetch_array($query_nap, SQLSRV_FETCH_ASSOC);
                                 ?>
-                                <tr id="<?php print $result_rprq_sonday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                    <td align="center"><?php print $result_rprq_sonday['RPRQ_ID']; ?></td>			
-                                    <?php
-                                        if($_GET['dateStart']=="sendplan"){
-                                            echo '<td align="center">'.$result_rprq_sonday["RPRQ_CREATEDATE_REQUEST"].'</td>';
-                                        }
-                                    ?>  
-                                    <td align="center">                                
-                                        <?php
-                                            switch($result_rprq_sonday['RPRQ_STATUSREQUEST']) {
-                                                case "รอส่งแผน":
-                                                    $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                break;
-                                                case "รอตรวจสอบ":
-                                                    $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                break;
-                                                case "รอคิวซ่อม":
-                                                    $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                break;
-                                                case "กำลังซ่อม":
-                                                    $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                break;
-                                                case "ซ่อมเสร็จสิ้น":
-                                                  $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                break;
-                                                case "รอจ่ายงาน":
-                                                    $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                break;
-                                                case "ไม่อนุมัติ":
-                                                    $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                break;
-                                            }
-                                            print $text;
-                                        ?>
-                                    </td>     		
-                                    <?php if($_GET['dateStart']!="sendplan"){ ?>                  
+                                <tr id="<?php print $result_rprq['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">
+                                    <td align="center"><?php print $no; ?></td>
+                                    <td align="center"><?php print $result_rprq['RPRQ_ID']; ?></td>
+                                    <?php if($_GET['dateStart']=="sendplan"): ?>
+                                        <td align="center"><?php print $result_rprq["RPRQ_CREATEDATE_REQUEST"]; ?></td>
+                                    <?php endif; ?>
+                                    <td align="center"><?php echo getStatusText($result_rprq['RPRQ_STATUSREQUEST']); ?></td>
+                                    <?php if($_GET['dateStart']!="sendplan"): ?>
                                         <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_sonday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
+                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq['RPRQ_CODE']; ?>')">
+                                                <font color="white" size="2"><i class="icon-file-pdf"></i></font>
+                                            </button>
                                         </td>
-                                    <?php } ?>
-                                    <td align="center"><?php print $result_rprq_sonday['RPRQ_REGISHEAD']; ?></td>
-                                    <td align="center"><?php print $result_rprq_sonday['RPRQ_CARNAMEHEAD']; ?></td>
-                                    <td align="center"><?php print $result_rprq_sonday['RPRQ_REGISTAIL']; ?></td>
-                                    <td align="center"><?php print $result_rprq_sonday['RPRQ_CARNAMETAIL']; ?></td>
-                                    <td align="center"><?php print $result_rprq_sonday['RPRQ_MILEAGELAST']; ?></td>
-                                    <td align="center"><?php print $result_rprq_sonday['RPC_SUBJECT_CON']; ?></td>
-                                    <td align="left"><?php print $result_rprq_sonday['RPC_DETAIL']; ?></td>
-                                    <td align="center" >
-                                        <?php if(($result_rprq_sonday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_sonday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_sonday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                            <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_sonday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                            &nbsp;&nbsp;
-                                            <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_sonday['RPRQ_CODE']; ?>','<?php print $result_rprq_sonday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                        <?php }else if(($result_rprq_sonday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                            <?php 
-                                                if(isset($result_nap_sonday['CD2'])){ 
-                                                    echo '<strong>ID ใหม่ '.$result_nap_sonday['ID2'].'</strong>';
-                                                }else{ 
-                                            ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_sonday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                            <?php } ?>
-                                        <?php } ?>
-                                    </td>
-                                    <?php
-                                        if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <td align="center">
-                                                <?php if($result_rprq_sonday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                    <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_sonday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                <?php }; ?>
-                                            </td>
-                                    <?php } ?>
+                                    <?php endif; ?>
+                                    <td align="center"><?php print $result_rprq['RPRQ_REGISHEAD']; ?></td>
+                                    <td align="center"><?php print $result_rprq['RPRQ_CARNAMEHEAD']; ?></td>
+                                    <td align="center"><?php print $result_rprq['RPRQ_REGISTAIL']; ?></td>
+                                    <td align="center"><?php print $result_rprq['RPRQ_CARNAMETAIL']; ?></td>
+                                    <td align="center"><?php print $result_rprq['RPRQ_MILEAGELAST']; ?></td>
+                                    <td align="center"><?php print $result_rprq['RPC_SUBJECT_CON']; ?></td>
+                                    <td align="left"><?php print $result_rprq['RPC_DETAIL']; ?></td>
+                                    <td align="center"><?php echo renderManageButtons($result_rprq, $result_nap, $path); ?></td>
+                                    <?php if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"): ?>
+                                        <td align="center"><?php echo renderSendPlanButton($result_rprq, $SS_ROLE_NAME, $path); ?></td>
+                                    <?php endif; ?>
                                 </tr>
-                                <?php }; ?>
+                                <?php } ?>
                             </tbody>
-                        </table>       
-                        
-                    </div>  
-                    <?php if($_GET['dateStart']!="sendplan"){ ?>
-                        <div id="tabs-2">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable2">
-                                <thead>
-                                    <tr height="30">
-                                        <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
-                                        <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                        <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
-                                        <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
-                                        <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
-                                        <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
-                                        <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr height="30">
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>           
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th> 
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $D2=$result_getdate_d1d7["D2"];
-                                        $sql_rprq_monday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D2'";
-                                        $query_rprq_monday = sqlsrv_query($conn, $sql_rprq_monday);
-                                        $no=0;
-                                        while($result_rprq_monday = sqlsrv_fetch_array($query_rprq_monday, SQLSRV_FETCH_ASSOC)){	
-                                            $no++;
-                                            $sql_nap_monday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                                FROM REPAIRREQUEST_NONAPPROVE A
-                                                LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                                LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                                WHERE B.RPRQ_CODE = '".$result_rprq_monday['RPRQ_CODE']."'";
-                                            $query_nap_monday = sqlsrv_query( $conn,$sql_nap_monday);	
-                                            $result_nap_monday = sqlsrv_fetch_array($query_nap_monday, SQLSRV_FETCH_ASSOC);
-                                    ?>
-                                    <tr id="<?php print $result_rprq_monday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                        <td align="center"><?php print $result_rprq_monday['RPRQ_ID']; ?></td>
-                                        <td align="center">                                
-                                            <?php
-                                                switch($result_rprq_monday['RPRQ_STATUSREQUEST']) {
-                                                    case "รอส่งแผน":
-                                                        $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                    break;
-                                                    case "รอตรวจสอบ":
-                                                        $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                    break;
-                                                    case "รอคิวซ่อม":
-                                                        $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                    break;
-                                                    case "กำลังซ่อม":
-                                                        $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                    break;
-                                                    case "ซ่อมเสร็จสิ้น":
-                                                    $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                    break;
-                                                    case "รอจ่ายงาน":
-                                                        $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                    break;
-                                                    case "ไม่อนุมัติ":
-                                                        $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                    break;
-                                                }
-                                                print $text;
-                                            ?>
-                                        </td>        
-                                        <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_monday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
-                                        </td>
-                                        <td align="center"><?php print $result_rprq_monday['RPRQ_REGISHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_monday['RPRQ_CARNAMEHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_monday['RPRQ_REGISTAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_monday['RPRQ_CARNAMETAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_monday['RPRQ_MILEAGELAST']; ?></td>
-                                        <td align="center"><?php print $result_rprq_monday['RPC_SUBJECT_CON']; ?></td>
-                                        <td align="left"><?php print $result_rprq_monday['RPC_DETAIL']; ?></td>
-                                        <td align="center" >
-                                            <?php if(($result_rprq_monday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_monday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_monday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_monday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                                &nbsp;&nbsp;
-                                                <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_monday['RPRQ_CODE']; ?>','<?php print $result_rprq_monday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                            <?php }else if(($result_rprq_monday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                                <?php 
-                                                    if(isset($result_nap_monday['CD2'])){ 
-                                                        echo '<strong>ID ใหม่ '.$result_nap_monday['ID2'].'</strong>';
-                                                    }else{ 
-                                                ?>
-                                                    <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_monday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                                <?php } ?>
-                                            <?php } ?>
-                                        </td>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                                <td align="center">
-                                                    <?php if($result_rprq_monday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                        <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_monday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                    <?php }; ?>
-                                                </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <?php }; ?>
-                                </tbody>
-                            </table>       
-                            
-                        </div>   
-                        <div id="tabs-3">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable3">
-                                <thead>
-                                    <tr height="30">
-                                        <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
-                                        <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                        <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
-                                        <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
-                                        <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
-                                        <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
-                                        <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr height="30">
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>           
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>  
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $D3=$result_getdate_d1d7["D3"];
-                                        $sql_rprq_tuesday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D3'";
-                                        $query_rprq_tuesday = sqlsrv_query($conn, $sql_rprq_tuesday);
-                                        $no=0;
-                                        while($result_rprq_tuesday = sqlsrv_fetch_array($query_rprq_tuesday, SQLSRV_FETCH_ASSOC)){	
-                                            $no++;
-                                            $sql_nap_tuesday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                                FROM REPAIRREQUEST_NONAPPROVE A
-                                                LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                                LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                                WHERE B.RPRQ_CODE = '".$result_rprq_tuesday['RPRQ_CODE']."'";
-                                            $query_nap_tuesday = sqlsrv_query( $conn,$sql_nap_tuesday);	
-                                            $result_nap_tuesday = sqlsrv_fetch_array($query_nap_tuesday, SQLSRV_FETCH_ASSOC);
-                                    ?>
-                                    <tr id="<?php print $result_rprq_tuesday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                        <td align="center"><?php print $result_rprq_tuesday['RPRQ_ID']; ?></td>
-                                        <td align="center">                                
-                                            <?php
-                                                switch($result_rprq_tuesday['RPRQ_STATUSREQUEST']) {
-                                                    case "รอส่งแผน":
-                                                        $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                    break;
-                                                    case "รอตรวจสอบ":
-                                                        $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                    break;
-                                                    case "รอคิวซ่อม":
-                                                        $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                    break;
-                                                    case "กำลังซ่อม":
-                                                        $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                    break;
-                                                    case "ซ่อมเสร็จสิ้น":
-                                                    $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                    break;
-                                                    case "รอจ่ายงาน":
-                                                        $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                    break;
-                                                    case "ไม่อนุมัติ":
-                                                        $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                    break;
-                                                }
-                                                print $text;
-                                            ?>
-                                        </td>   
-                                        <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_tuesday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
-                                        </td>
-                                        <td align="center"><?php print $result_rprq_tuesday['RPRQ_REGISHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_tuesday['RPRQ_CARNAMEHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_tuesday['RPRQ_REGISTAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_tuesday['RPRQ_CARNAMETAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_tuesday['RPRQ_MILEAGELAST']; ?></td>
-                                        <td align="center"><?php print $result_rprq_tuesday['RPC_SUBJECT_CON']; ?></td>
-                                        <td align="left"><?php print $result_rprq_tuesday['RPC_DETAIL']; ?></td>
-                                        <td align="center" >
-                                            <?php if(($result_rprq_tuesday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_tuesday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_tuesday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_tuesday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                                &nbsp;&nbsp;
-                                                <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_tuesday['RPRQ_CODE']; ?>','<?php print $result_rprq_tuesday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                            <?php }else if(($result_rprq_tuesday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                                <?php 
-                                                    if(isset($result_nap_tuesday['CD2'])){ 
-                                                        echo '<strong>ID ใหม่ '.$result_nap_tuesday['ID2'].'</strong>';
-                                                    }else{ 
-                                                ?>
-                                                    <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_tuesday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                                <?php } ?>
-                                            <?php } ?>
-                                        </td>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                                <td align="center">
-                                                    <?php if($result_rprq_tuesday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                        <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_tuesday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                    <?php }; ?>
-                                                </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <?php }; ?>
-                                </tbody>
-                            </table>       
-                            
-                        </div> 
-                        <div id="tabs-4">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable4">
-                                <thead>
-                                    <tr height="30">
-                                        <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
-                                        <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                        <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
-                                        <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
-                                        <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
-                                        <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
-                                        <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr height="30">
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>           
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>   
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $D4=$result_getdate_d1d7["D4"];
-                                        $sql_rprq_wednesday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D4'";
-                                        $query_rprq_wednesday = sqlsrv_query($conn, $sql_rprq_wednesday);
-                                        $no=0;
-                                        while($result_rprq_wednesday = sqlsrv_fetch_array($query_rprq_wednesday, SQLSRV_FETCH_ASSOC)){	
-                                            $no++;
-                                            $sql_nap_wednesday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                                FROM REPAIRREQUEST_NONAPPROVE A
-                                                LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                                LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                                WHERE B.RPRQ_CODE = '".$result_rprq_wednesday['RPRQ_CODE']."'";
-                                            $query_nap_wednesday = sqlsrv_query( $conn,$sql_nap_wednesday);	
-                                            $result_nap_wednesday = sqlsrv_fetch_array($query_nap_wednesday, SQLSRV_FETCH_ASSOC);
-                                    ?>
-                                    <tr id="<?php print $result_rprq_wednesday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                        <td align="center"><?php print $result_rprq_wednesday['RPRQ_ID']; ?></td>
-                                        <td align="center">                                
-                                            <?php
-                                                switch($result_rprq_wednesday['RPRQ_STATUSREQUEST']) {
-                                                    case "รอส่งแผน":
-                                                        $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                    break;
-                                                    case "รอตรวจสอบ":
-                                                        $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                    break;
-                                                    case "รอคิวซ่อม":
-                                                        $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                    break;
-                                                    case "กำลังซ่อม":
-                                                        $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                    break;
-                                                    case "ซ่อมเสร็จสิ้น":
-                                                    $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                    break;
-                                                    case "รอจ่ายงาน":
-                                                        $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                    break;
-                                                    case "ไม่อนุมัติ":
-                                                        $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                    break;
-                                                }
-                                                print $text;
-                                            ?>
-                                        </td>                   
-                                        <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_wednesday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
-                                        </td>
-                                        <td align="center"><?php print $result_rprq_wednesday['RPRQ_REGISHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_wednesday['RPRQ_CARNAMEHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_wednesday['RPRQ_REGISTAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_wednesday['RPRQ_CARNAMETAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_wednesday['RPRQ_MILEAGELAST']; ?></td>
-                                        <td align="center"><?php print $result_rprq_wednesday['RPC_SUBJECT_CON']; ?></td>
-                                        <td align="left"><?php print $result_rprq_wednesday['RPC_DETAIL']; ?></td>
-                                        <td align="center" >
-                                            <?php if(($result_rprq_wednesday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_wednesday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_wednesday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_wednesday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                                &nbsp;&nbsp;
-                                                <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_wednesday['RPRQ_CODE']; ?>','<?php print $result_rprq_wednesday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                            <?php }else if(($result_rprq_wednesday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                                <?php 
-                                                    if(isset($result_nap_wednesday['CD2'])){ 
-                                                        echo '<strong>ID ใหม่ '.$result_nap_wednesday['ID2'].'</strong>';
-                                                    }else{ 
-                                                ?>
-                                                    <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_wednesday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                                <?php } ?>
-                                            <?php } ?>
-                                        </td>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                                <td align="center">
-                                                    <?php if($result_rprq_wednesday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                        <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_wednesday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                    <?php }; ?>
-                                                </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <?php }; ?>
-                                </tbody>
-                            </table>       
-                            
-                        </div> 
-                        <div id="tabs-5">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable5">
-                                <thead>
-                                    <tr height="30">
-                                        <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
-                                        <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                        <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
-                                        <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
-                                        <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
-                                        <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
-                                        <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr height="30">
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>           
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>   
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $D5=$result_getdate_d1d7["D5"];
-                                        $sql_rprq_thursday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D5'";
-                                        $query_rprq_thursday = sqlsrv_query($conn, $sql_rprq_thursday);
-                                        $no=0;
-                                        while($result_rprq_thursday = sqlsrv_fetch_array($query_rprq_thursday, SQLSRV_FETCH_ASSOC)){	
-                                            $no++;
-                                            $sql_nap_thursday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                                FROM REPAIRREQUEST_NONAPPROVE A
-                                                LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                                LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                                WHERE B.RPRQ_CODE = '".$result_rprq_thursday['RPRQ_CODE']."'";
-                                            $query_nap_thursday = sqlsrv_query( $conn,$sql_nap_thursday);	
-                                            $result_nap_thursday = sqlsrv_fetch_array($query_nap_thursday, SQLSRV_FETCH_ASSOC);
-                                    ?>
-                                    <tr id="<?php print $result_rprq_thursday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                        <td align="center"><?php print $result_rprq_thursday['RPRQ_ID']; ?></td>
-                                        <td align="center">                                
-                                            <?php
-                                                switch($result_rprq_thursday['RPRQ_STATUSREQUEST']) {
-                                                    case "รอส่งแผน":
-                                                        $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                    break;
-                                                    case "รอตรวจสอบ":
-                                                        $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                    break;
-                                                    case "รอคิวซ่อม":
-                                                        $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                    break;
-                                                    case "กำลังซ่อม":
-                                                        $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                    break;
-                                                    case "ซ่อมเสร็จสิ้น":
-                                                    $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                    break;
-                                                    case "รอจ่ายงาน":
-                                                        $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                    break;
-                                                    case "ไม่อนุมัติ":
-                                                        $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                    break;
-                                                }
-                                                print $text;
-                                            ?>
-                                        </td>           
-                                        <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_thursday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
-                                        </td>
-                                        <td align="center"><?php print $result_rprq_thursday['RPRQ_REGISHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_thursday['RPRQ_CARNAMEHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_thursday['RPRQ_REGISTAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_thursday['RPRQ_CARNAMETAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_thursday['RPRQ_MILEAGELAST']; ?></td>
-                                        <td align="center"><?php print $result_rprq_thursday['RPC_SUBJECT_CON']; ?></td>
-                                        <td align="left"><?php print $result_rprq_thursday['RPC_DETAIL']; ?></td>
-                                        <td align="center" >
-                                            <?php if(($result_rprq_thursday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_thursday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_thursday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_thursday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                                &nbsp;&nbsp;
-                                                <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_thursday['RPRQ_CODE']; ?>','<?php print $result_rprq_thursday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                            <?php }else if(($result_rprq_thursday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                                <?php 
-                                                    if(isset($result_nap_thursday['CD2'])){ 
-                                                        echo '<strong>ID ใหม่ '.$result_nap_thursday['ID2'].'</strong>';
-                                                    }else{ 
-                                                ?>
-                                                    <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_thursday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                                <?php } ?>
-                                            <?php } ?>
-                                        </td>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                                <td align="center">
-                                                    <?php if($result_rprq_thursday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                        <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_thursday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                    <?php }; ?>
-                                                </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <?php }; ?>
-                                </tbody>
-                            </table>       
-                            
-                        </div> 
-                        <div id="tabs-6">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable6">
-                                <thead>
-                                    <tr height="30">
-                                        <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
-                                        <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                        <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
-                                        <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
-                                        <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
-                                        <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
-                                        <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr height="30">
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>           
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>   
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $D6=$result_getdate_d1d7["D6"];
-                                        $sql_rprq_friday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D6'";
-                                        $query_rprq_friday = sqlsrv_query($conn, $sql_rprq_friday);
-                                        $no=0;
-                                        while($result_rprq_friday = sqlsrv_fetch_array($query_rprq_friday, SQLSRV_FETCH_ASSOC)){	
-                                            $no++;
-                                            $sql_nap_friday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                                FROM REPAIRREQUEST_NONAPPROVE A
-                                                LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                                LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                                WHERE B.RPRQ_CODE = '".$result_rprq_friday['RPRQ_CODE']."'";
-                                            $query_nap_friday = sqlsrv_query( $conn,$sql_nap_friday);	
-                                            $result_nap_friday = sqlsrv_fetch_array($query_nap_friday, SQLSRV_FETCH_ASSOC);
-                                    ?>
-                                    <tr id="<?php print $result_rprq_friday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                        <td align="center"><?php print $result_rprq_friday['RPRQ_ID']; ?></td>
-                                        <td align="center">                                
-                                            <?php
-                                                switch($result_rprq_friday['RPRQ_STATUSREQUEST']) {
-                                                    case "รอส่งแผน":
-                                                        $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                    break;
-                                                    case "รอตรวจสอบ":
-                                                        $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                    break;
-                                                    case "รอคิวซ่อม":
-                                                        $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                    break;
-                                                    case "กำลังซ่อม":
-                                                        $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                    break;
-                                                    case "ซ่อมเสร็จสิ้น":
-                                                    $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                    break;
-                                                    case "รอจ่ายงาน":
-                                                        $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                    break;
-                                                    case "ไม่อนุมัติ":
-                                                        $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                    break;
-                                                }
-                                                print $text;
-                                            ?>
-                                        </td>                  
-                                        <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_friday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
-                                        </td>
-                                        <td align="center"><?php print $result_rprq_friday['RPRQ_REGISHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_friday['RPRQ_CARNAMEHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_friday['RPRQ_REGISTAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_friday['RPRQ_CARNAMETAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_friday['RPRQ_MILEAGELAST']; ?></td>
-                                        <td align="center"><?php print $result_rprq_friday['RPC_SUBJECT_CON']; ?></td>
-                                        <td align="left"><?php print $result_rprq_friday['RPC_DETAIL']; ?></td>
-                                        <td align="center" >
-                                            <?php if(($result_rprq_friday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_friday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_friday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_friday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                                &nbsp;&nbsp;
-                                                <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_friday['RPRQ_CODE']; ?>','<?php print $result_rprq_friday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                            <?php }else if(($result_rprq_friday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                                <?php 
-                                                    if(isset($result_nap_friday['CD2'])){ 
-                                                        echo '<strong>ID ใหม่ '.$result_nap_friday['ID2'].'</strong>';
-                                                    }else{ 
-                                                ?>
-                                                    <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_friday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                                <?php } ?>
-                                            <?php } ?>
-                                        </td>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                                <td align="center">
-                                                    <?php if($result_rprq_friday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                        <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_friday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                    <?php }; ?>
-                                                </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <?php }; ?>
-                                </tbody>
-                            </table>       
-                            
-                        </div> 
-                        <div id="tabs-7">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="default hover pointer display" id="datatable7">
-                                <thead>
-                                    <tr height="30">
-                                        <th rowspan="2" align="center" width="8%">เลขที่ใบขอซ่อม</th>
-                                        <th rowspan="2" align="center" width="5%">สถานะ</th>
-                                        <th rowspan="2" align="center" width="5%">พิมพ์</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หัว)</th>
-                                        <th colspan="2" align="center" width="15%" class="ui-state-default">ข้อมูลรถ (หาง)</th>
-                                        <th rowspan="2" align="center" width="6%">ไมล์ล่าสุด</th>
-                                        <th rowspan="2" align="center" width="8%">ลักษณะงานซ่อม</th>
-                                        <th rowspan="2" align="center" width="22%">ปัญหาก่อนการซ่อม</th>
-                                        <th rowspan="2" align="center" width="10%">จัดการ</th>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                            <th rowspan="2" align="center" width="6%">ส่งแผน</th>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr height="30">
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>           
-                                        <th align="center"width="5%">ทะเบียน</th>
-                                        <th align="center"width="10%">ชื่อรถ</th>   
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $D7=$result_getdate_d1d7["D7"];
-                                        $sql_rprq_saturday = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_AREA = '$SESSION_AREA'  AND RPRQ_WORKTYPE = 'BM' AND RPRQ_CREATEDATE_REQUEST = '$D7'";
-                                        $query_rprq_saturday = sqlsrv_query($conn, $sql_rprq_saturday);
-                                        $no=0;
-                                        while($result_rprq_saturday = sqlsrv_fetch_array($query_rprq_saturday, SQLSRV_FETCH_ASSOC)){	
-                                            $no++;
-                                            $sql_nap_saturday = "SELECT DISTINCT B.RPRQ_ID ID1,B.RPRQ_CODE CD1,C.RPRQ_ID ID2,C.RPRQ_CODE CD2
-                                                FROM REPAIRREQUEST_NONAPPROVE A
-                                                LEFT JOIN vwREPAIRREQUEST B ON B.RPRQ_CODE = A.RPRQ_NAP_OLD_CODE
-                                                LEFT JOIN vwREPAIRREQUEST C ON C.RPRQ_CODE = A.RPRQ_NAP_NEW_CODE
-                                                WHERE B.RPRQ_CODE = '".$result_rprq_saturday['RPRQ_CODE']."'";
-                                            $query_nap_saturday = sqlsrv_query( $conn,$sql_nap_saturday);	
-                                            $result_nap_saturday = sqlsrv_fetch_array($query_nap_saturday, SQLSRV_FETCH_ASSOC);
-                                    ?>
-                                    <tr id="<?php print $result_rprq_saturday['RPRQ_CODE']; ?>" style="cursor:pointer" height="25px" align="center">   
-                                        <td align="center"><?php print $result_rprq_saturday['RPRQ_ID']; ?></td>
-                                        <td align="center">                                
-                                            <?php
-                                                switch($result_rprq_saturday['RPRQ_STATUSREQUEST']) {
-                                                    case "รอส่งแผน":
-                                                        $text="<strong><font color='brown'>รอส่งแผน</font></strong>";
-                                                    break;
-                                                    case "รอตรวจสอบ":
-                                                        $text="<strong><font color='red'>รอตรวจสอบ</font></strong>";
-                                                    break;
-                                                    case "รอคิวซ่อม":
-                                                        $text="<strong><font color='red'>รอคิวซ่อม</font></strong>";
-                                                    break;
-                                                    case "กำลังซ่อม":
-                                                        $text="<strong><font color='red'>กำลังซ่อม</font></strong>";
-                                                    break;
-                                                    case "ซ่อมเสร็จสิ้น":
-                                                    $text="<strong><font color='green'>ซ่อมเสร็จสิ้น</font></strong>";
-                                                    break;
-                                                    case "รอจ่ายงาน":
-                                                        $text="<strong><font color='blue'>รอจ่ายงาน</font></strong>";
-                                                    break;
-                                                    case "ไม่อนุมัติ":
-                                                        $text="<strong><font color='red'>ไม่อนุมัติ</font></strong>";
-                                                    break;
-                                                }
-                                                print $text;
-                                            ?>
-                                        </td>            
-                                        <td align="center">
-                                            <button type="button" class="mini bg-color-red" onclick="pdf_reportrepair_bm('<?php print $result_rprq_saturday['RPRQ_CODE']; ?>')"><font color="white" size="2"><i class="icon-file-pdf"></i> </font></button>
-                                        </td>
-                                        <td align="center"><?php print $result_rprq_saturday['RPRQ_REGISHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_saturday['RPRQ_CARNAMEHEAD']; ?></td>
-                                        <td align="center"><?php print $result_rprq_saturday['RPRQ_REGISTAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_saturday['RPRQ_CARNAMETAIL']; ?></td>
-                                        <td align="center"><?php print $result_rprq_saturday['RPRQ_MILEAGELAST']; ?></td>
-                                        <td align="center"><?php print $result_rprq_saturday['RPC_SUBJECT_CON']; ?></td>
-                                        <td align="left"><?php print $result_rprq_saturday['RPC_DETAIL']; ?></td>
-                                        <td align="center" >                                        
-                                            <?php if(($result_rprq_saturday['RPRQ_STATUSREQUEST']=='รอตรวจสอบ')||($result_rprq_saturday['RPRQ_STATUSREQUEST']=='รอจ่ายงาน'||$result_rprq_saturday['RPRQ_STATUSREQUEST']=='รอส่งแผน')){ ?>
-                                                <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="แก้ไขแผน" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','edit','<?php print $result_rprq_saturday['RPRQ_CODE'];; ?>','1=1','1350','670','แก้ไขใบแจ้งซ่อม');"><i class='icon-pencil icon-large'></i></button>
-                                                &nbsp;&nbsp;
-                                                <button type="button" class="mini bg-color-red" style="padding-top:12px;" title="ลบแผน" onclick="swaldelete_requestrepair('<?php print $result_rprq_saturday['RPRQ_CODE']; ?>','<?php print $result_rprq_saturday['RPRQ_ID']; ?>')"><i class="icon-cancel icon-large"></i></button>
-                                            <?php }else if(($result_rprq_saturday['RPRQ_STATUSREQUEST']=='ไม่อนุมัติ')){ ?>
-                                                <?php 
-                                                    if(isset($result_nap_saturday['CD2'])){ 
-                                                        echo '<strong>ID ใหม่ '.$result_nap_saturday['ID2'].'</strong>';
-                                                    }else{ 
-                                                ?>
-                                                    <button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="คัดลอกแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_form.php','copy','<?php print $result_rprq_saturday['RPRQ_CODE'];; ?>','1=1','1350','670','คัดลอกใบแจ้งซ่อม');"><i class='icon-new icon-large'></i></button>
-                                                <?php } ?>
-                                            <?php } ?>
-                                        </td>
-                                        <?php
-                                            if($SS_ROLE_NAME=="TENKO" || $SS_ROLE_NAME=="ADMIN" || $SS_ROLE_NAME=="DEV"){ ?>
-                                                <td align="center">
-                                                    <?php if($result_rprq_saturday['RPRQ_STATUSREQUEST']=='รอส่งแผน'){ ?>
-                                                        <button type="button" class="mini bg-color-blue" style="padding-top:12px;" title="ส่งแผน" onclick="javascript:ajaxPopup4('<?=$path?>views_amt/request_repair/request_repair_bm_detail.php','edit','<?php print $result_rprq_saturday['RPRQ_CODE']; ?>','1=1','1350','530','ตรวจสอบใบแจ้งซ่อม');"><font color="white"><i class='icon-arrow-right icon-large'></i></font></button>
-                                                    <?php }; ?>
-                                                </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <?php }; ?>
-                                </tbody>
-                            </table>       
-                            
-                        </div>     
-                    <?php } ?>       
+                        </table>
+                        <!-- <b><font color="red" align="left" >*สามารถกด Double Click ข้อมูลในตาราง เพื่อดูรายละเอียดได้ทันที</font></b> -->
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </form>
         </div>

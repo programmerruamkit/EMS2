@@ -35,7 +35,7 @@ if(isset($rg)){
 // print_r($_GET);
 // echo"</pre>";
 // exit();
-$strExcelFileName = "รายงานประวัติการซ่อมบำรุง(".$SESSION_AREA.")" . $txt_datestart_amt . ' ถึง ' . $txt_dateend_amt . ".xls";
+$strExcelFileName = "รายงานซ่อมบำรุงประจำวัน(".$SESSION_AREA.")" . $txt_datestart_amt . ' ถึง ' . $txt_dateend_amt . ".xls";
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: inline; filename=\"$strExcelFileName\"");
@@ -51,7 +51,7 @@ header("Pragma:no-cache");
         <table  border="1" style="width: 100%;">
             <thead>
                 <tr>
-                    <td colspan="28" style="text-align:center;background-color: #dedede">รายงานประวัติการซ่อมบำรุง (ประจำวันที่ <?=$txt_datestart_amt?>-<?=$txt_dateend_amt?>)</td>
+                    <td colspan="33" style="text-align:center;background-color: #dedede">รายงานซ่อมบำรุงประจำวัน (ประจำวันที่ <?=$txt_datestart_amt?>-<?=$txt_dateend_amt?>)</td>
                 </tr>
                 <tr>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ลำดับ</td>
@@ -65,10 +65,16 @@ header("Pragma:no-cache");
                     <td colspan="2" style="text-align:center;background-color: #dedede">ประเภทงานซ่อม</td>
                     <td colspan="6" style="text-align:center;background-color: #dedede">สถานะงานซ่อม</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ช่องซ่อม</td>
-                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม (แผน)</td>
+                    <!-- <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม (แผน)</td> -->
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาเริ่ม (แผน)</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาสิ้นสุด (แผน)</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ชม. ในการซ่อม (แผน)</td>
-                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม (จริง)</td>
+                    <!-- <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาในการซ่อม (จริง)</td> -->
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาเริ่ม (จริง)</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">เวลาสิ้นสุด (จริง)</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ชม. ในการซ่อม (จริง)</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">สถานะเริ่มงาน</td>
+                    <td rowspan="2" style="text-align:center;background-color: #dedede">สถานะจบงาน</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ผู้แจ้งซ่อม</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">วันที่แจ้งซ่อม</td>
                     <td rowspan="2" style="text-align:center;background-color: #dedede">ผู้รับแจ่งซ่อม</td>
@@ -222,6 +228,55 @@ header("Pragma:no-cache");
                             $query_emp_approve = sqlsrv_query( $conn, $stmt_emp_approve, $params_emp_approve);	
                             $result_emp_approve = sqlsrv_fetch_array($query_emp_approve, SQLSRV_FETCH_ASSOC);			
                                 $APPROVE_NAME=$result_emp_approve["nameT"];
+
+                        // เช็คเริ่มช้า
+                            $timeplan_start = $result_seRepairplan['TIMEPLANSTART']; // เวลาแผน
+                            $repair_start = $result_seRepairplan['REPAIRSTART']; // เวลาจริง
+                            
+                            $background_color = '#CCCCCC'; // สีเทา (default)
+                            $text_color = 'black';
+                            $status_text = "-";
+                            
+                            if (!empty($timeplan_start) && !empty($repair_start)) {
+                                // แปลงเป็น timestamp
+                                $plan_timestamp = DateTime::createFromFormat('d/m/Y H:i', $timeplan_start);
+                                $actual_timestamp = DateTime::createFromFormat('d/m/Y H:i', $repair_start);
+                                
+                                // เปรียบเทียบ: ถ้าเวลาจริงมากกว่าเวลาแผน = เริ่มช้า
+                                if ($actual_timestamp > $plan_timestamp) {
+                                    $background_color = '#FF0000'; // สีแดง
+                                    $text_color = 'white';
+                                    $status_text = "เริ่มช้า";
+                                } else {
+                                    $background_color = '#32CD32'; // สีเขียว
+                                    $text_color = 'white';
+                                    $status_text = "ตรงเวลา/เร็ว";
+                                }
+                            }
+                        // เช็คจบช้า
+                            $timeplan_end = $result_seRepairplan['TIMEPLANEND']; // เวลาแผนที่ควรเสร็จ
+                            $repair_end = $result_seRepairplan['REPAIREND']; // เวลาเสร็จจริง
+                            
+                            $background_color_end = '#CCCCCC'; // สีเทา (default)
+                            $text_color_end = 'black';
+                            $status_text_end = "-";
+                            
+                            if (!empty($timeplan_end) && !empty($repair_end)) {
+                                // แปลงเป็น timestamp
+                                $plan_end_timestamp = DateTime::createFromFormat('d/m/Y H:i', $timeplan_end);
+                                $actual_end_timestamp = DateTime::createFromFormat('d/m/Y H:i', $repair_end);
+                                
+                                // เปรียบเทียบ: ถ้าเวลาเสร็จจริงมากกว่าเวลาแผน = เสร็จช้า
+                                if ($actual_end_timestamp > $plan_end_timestamp) {
+                                    $background_color_end = '#FF0000'; // สีแดง
+                                    $text_color_end = 'white';
+                                    $status_text_end = "เสร็จช้า";
+                                } else {
+                                    $background_color_end = '#32CD32'; // สีเขียว
+                                    $text_color_end = 'white';
+                                    $status_text_end = "เสร็จตรง/เร็ว";
+                                }
+                            }
                         ?>                            
                         <tr>
                             <td style="text-align: center"><?=$i?></td>
@@ -243,10 +298,20 @@ header("Pragma:no-cache");
                             <td style="text-align: center"><?=$status5?></td>
                             <td style="text-align: center"><?=$status6?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['REPAIRAREA']?></td>
-                            <td style="text-align: center"><?=$result_seRepairplan['TIMEPLANSTART']?> - <?=$result_seRepairplan['TIMEPLANEND']?></td>
+                            <td style="text-align: center"><?=$result_seRepairplan['TIMEPLANSTART']?>
+                        <?php echo strtotime($timeplan_start), '<br>'; ?></td>
+                            <td style="text-align: center"><?=$result_seRepairplan['TIMEPLANEND']?></td>
                             <td style="text-align: center"><?=number_format( $PLANHOUR1,2)?></td>
-                            <td style="text-align: center"><?=$result_seRepairplan['REPAIRSTART']?> - <?=$result_seRepairplan['REPAIREND']?></td>
+                            <td style="text-align: center"><?=$result_seRepairplan['REPAIRSTART']?>
+                        <?php echo strtotime($repair_start), '<br>'; ?></td>
+                            <td style="text-align: center"><?=$result_seRepairplan['REPAIREND']?></td>
                             <td style="text-align: center"><?=number_format( $PLANHOUR2,2)?></td>
+                            <td style="text-align: center; background-color: <?= $background_color ?>; color: <?= $text_color ?>;">
+                                <?= $status_text ?>
+                            </td>
+                            <td style="text-align: center; background-color: <?= $background_color_end ?>; color: <?= $text_color_end ?>;">
+                                <?= $status_text_end ?>
+                            </td>
                             <td style="text-align: center"><?=$result_seRepairplan['RPRQ_REQUESTBY']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['RPRQ_CREATEDATE_REQUEST']?></td>
                             <td style="text-align: center"><?=$result_seRepairplan['RPRQ_REQUESTBY_SQ']?></td>
@@ -279,7 +344,7 @@ header("Pragma:no-cache");
                     <td style="text-align: center"><?= $sumstatus4 ?></td>
                     <td style="text-align: center"><?= $sumstatus5 ?></td>
                     <td style="text-align: center"><?= $sumstatus6 ?></td>
-                    <td colspan="11"></td>
+                    <td colspan="15"></td>
                 </tr>
             </tbody>
         </table>

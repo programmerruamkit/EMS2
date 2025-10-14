@@ -190,7 +190,7 @@
 		if( $stmt1 === false ) {
 			die( print_r( sqlsrv_errors(), true));
 		}else{
-			print "Approve เรียบร้อย";	
+			print "อนุมัติแผนเรียบร้อย";	
 		}
 	}
 	
@@ -341,7 +341,7 @@
 		if( $stmt1 === false ) {
 			die( print_r( sqlsrv_errors(), true));
 		}else{
-			print "Reject เรียบร้อย";	
+			print "ไม่อนุมัติแผนเรียบร้อย";	
 		}
 	}
 

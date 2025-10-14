@@ -282,97 +282,518 @@
                     }
                 });
             }
-    })
+        })
     } 
-    function save_successjob_bm(target,groub,rprqcode,subject,sparepart) {
-        // if(!confirm("ยืนยันการแก้ไข")) return false;      
+    // function save_successjob_bm(target, groub, rprqcode, subject, sparepart) {
+    //     // ขั้นตอนที่ 1: กรอกข้อความ
+    //     Swal.fire({
+    //         title: '<font color="black">กรอกข้อความเพื่อปิดงานซ่อม</font>',
+    //         html: '<p style="color: #666; margin-bottom: 15px;">กรุณากรอกข้อความสำหรับการปิดงานซ่อม</p>',
+    //         input: 'text',
+    //         inputPlaceholder: 'ตัวอย่าง 2JB-25060407',
+    //         inputAttributes: {
+    //             maxlength: 50,
+    //             style: `
+    //                 text-align: center; 
+    //                 font-size: 16px; 
+    //                 padding: 10px; 
+    //                 color: #000 !important; 
+    //                 background-color: #fff !important; 
+    //                 border: 2px solid #ddd !important; 
+    //                 border-radius: 5px !important;
+    //                 box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    //             `
+    //         },
+    //         customClass: {
+    //             input: 'swal2-input-custom'
+    //         },
+    //         showCancelButton: true,
+    //         confirmButtonText: 'ถัดไป',
+    //         cancelButtonText: 'ยกเลิก',
+    //         confirmButtonColor: '#3085d6',
+    //         inputValidator: (value) => {
+    //             if (!value || value.trim() === '') {
+    //                 return 'กรุณากรอกข้อความก่อนดำเนินการต่อ!';
+    //             }
+    //             if (value.length < 3) {
+    //                 return 'ข้อความต้องมีอย่างน้อย 3 ตัวอักษร!';
+    //             }
+    //         },
+    //         didOpen: () => {
+    //             // เพิ่ม CSS เพิ่มเติมเมื่อ modal เปิด
+    //             const style = document.createElement('style');
+    //             style.innerHTML = `
+    //                 .swal2-input-custom::placeholder {
+    //                     color: #999 !important;
+    //                     opacity: 1 !important;
+    //                 }
+    //                 .swal2-input-custom:focus {
+    //                     border-color: #3085d6 !important;
+    //                     outline: none !important;
+    //                     box-shadow: 0 0 10px rgba(48, 133, 214, 0.3) !important;
+    //                 }
+    //                 .swal2-input {
+    //                     color: #000 !important;
+    //                     background-color: #fff !important;
+    //                     border: 2px solid #ddd !important;
+    //                 }
+    //             `;
+    //             document.head.appendChild(style);
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed && result.value) {
+    //             const inputText = result.value.trim();
+                
+    //             // ขั้นตอนที่ 2: ยืนยันข้อความ
+    //             Swal.fire({
+    //                 title: '<font color="black">ยืนยันข้อความ</font>',
+    //                 html: `
+    //                     <div style="text-align: center;">
+    //                         <p style="color: #666; margin-bottom: 15px;">กรุณาตรวจสอบข้อความที่กรอก</p>
+    //                         <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; border: 1px solid #ddd;">
+    //                             <strong style="font-size: 18px; color: #2c3e50;">${inputText}</strong>
+    //                         </div>
+    //                         <p style="color: #e74c3c; font-size: 14px;">⚠️ ข้อความนี้จะถูกบันทึกลงในระบบและไม่สามารถแก้ไขได้</p>
+    //                     </div>
+    //                 `,
+    //                 icon: 'question',
+    //                 showCancelButton: true,
+    //                 confirmButtonText: 'ยืนยันและปิดงาน',
+    //                 cancelButtonText: 'แก้ไขข้อความ',
+    //                 confirmButtonColor: '#28a745',
+    //                 cancelButtonColor: '#6c757d'
+    //             }).then((confirmResult) => {
+    //                 if (confirmResult.isConfirmed) {
+    //                     // ขั้นตอนที่ 3: บันทึกข้อความและปิดงาน
+    //                     performCloseJob_BM_Mobile(target, groub, rprqcode, subject, sparepart, inputText);
+    //                 } else if (confirmResult.dismiss === Swal.DismissReason.cancel) {
+    //                     // กลับไปขั้นตอนที่ 1
+    //                     save_successjob_bm(target, groub, rprqcode, subject, sparepart);
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
+
+    // function save_successjob_pm(target, groub, rprqcode, subject) {
+    //     // ขั้นตอนที่ 1: กรอกข้อความ
+    //     Swal.fire({
+    //         title: '<font color="black">กรอกข้อความเพื่อปิดงานซ่อม</font>',
+    //         html: '<p style="color: #666; margin-bottom: 15px;">กรุณากรอกข้อความสำหรับการปิดงานซ่อม</p>',
+    //         input: 'text',
+    //         inputPlaceholder: 'ตัวอย่าง 2JB-25060407',
+    //         inputAttributes: {
+    //             maxlength: 50,
+    //             style: `
+    //                 text-align: center; 
+    //                 font-size: 16px; 
+    //                 padding: 10px; 
+    //                 color: #000 !important; 
+    //                 background-color: #fff !important; 
+    //                 border: 2px solid #ddd !important; 
+    //                 border-radius: 5px !important;
+    //                 box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    //             `
+    //         },
+    //         customClass: {
+    //             input: 'swal2-input-custom'
+    //         },
+    //         showCancelButton: true,
+    //         confirmButtonText: 'ถัดไป',
+    //         cancelButtonText: 'ยกเลิก',
+    //         confirmButtonColor: '#3085d6',
+    //         inputValidator: (value) => {
+    //             if (!value || value.trim() === '') {
+    //                 return 'กรุณากรอกข้อความก่อนดำเนินการต่อ!';
+    //             }
+    //             if (value.length < 3) {
+    //                 return 'ข้อความต้องมีอย่างน้อย 3 ตัวอักษร!';
+    //             }
+    //         },
+    //         didOpen: () => {
+    //             // เพิ่ม CSS เพิ่มเติมเมื่อ modal เปิด
+    //             const style = document.createElement('style');
+    //             style.innerHTML = `
+    //                 .swal2-input-custom::placeholder {
+    //                     color: #999 !important;
+    //                     opacity: 1 !important;
+    //                 }
+    //                 .swal2-input-custom:focus {
+    //                     border-color: #3085d6 !important;
+    //                     outline: none !important;
+    //                     box-shadow: 0 0 10px rgba(48, 133, 214, 0.3) !important;
+    //                 }
+    //                 .swal2-input {
+    //                     color: #000 !important;
+    //                     background-color: #fff !important;
+    //                     border: 2px solid #ddd !important;
+    //                 }
+    //             `;
+    //             document.head.appendChild(style);
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed && result.value) {
+    //             const inputText = result.value.trim();
+                
+    //             // ขั้นตอนที่ 2: ยืนยันข้อความ
+    //             Swal.fire({
+    //                 title: '<font color="black">ยืนยันข้อความ</font>',
+    //                 html: `
+    //                     <div style="text-align: center;">
+    //                         <p style="color: #666; margin-bottom: 15px;">กรุณาตรวจสอบข้อความที่กรอก</p>
+    //                         <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; border: 1px solid #ddd;">
+    //                             <strong style="font-size: 18px; color: #2c3e50;">${inputText}</strong>
+    //                         </div>
+    //                         <p style="color: #e74c3c; font-size: 14px;">⚠️ ข้อความนี้จะถูกบันทึกลงในระบบและไม่สามารถแก้ไขได้</p>
+    //                     </div>
+    //                 `,
+    //                 icon: 'question',
+    //                 showCancelButton: true,
+    //                 confirmButtonText: 'ยืนยันและปิดงาน',
+    //                 cancelButtonText: 'แก้ไขข้อความ',
+    //                 confirmButtonColor: '#28a745',
+    //                 cancelButtonColor: '#6c757d'
+    //             }).then((confirmResult) => {
+    //                 if (confirmResult.isConfirmed) {
+    //                     // ขั้นตอนที่ 3: บันทึกข้อความและปิดงาน
+    //                     performCloseJob_PM_Mobile(target, groub, rprqcode, subject, inputText);
+    //                 } else if (confirmResult.dismiss === Swal.DismissReason.cancel) {
+    //                     // กลับไปขั้นตอนที่ 1
+    //                     save_successjob_pm(target, groub, rprqcode, subject);
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
+    
+    function save_successjob_bm(area, target, groub, rprqcode, subject, sparepart) {
+        var prefix = (area === 'AMT') ? '1JB-' : '2JB-';
+                
+        const now = new Date();
+        // ปี พ.ศ. 2 หลัก
+        const year = (now.getFullYear()).toString().slice(-2);
+        // เดือน 2 หลัก
+        const month = ('0' + (now.getMonth() + 1)).slice(-2);
+        // เลขท้าย 4 ตัว (เช่น 0000)
+        const last4 = '0000';
+
         Swal.fire({
-            title: '<font color="black">คุณแน่ใจหรือไม่...ที่จะปิดงานซ่อมนี้</font>',
-            icon: 'warning',
+            title: '<font color="black">กรอกเลข Job จาก HDMS ก่อนปิดงานซ่อม</font>',
+            html: `
+                <p style="color: #666;">
+                    กรอกเฉพาะตัวเลข เช่น <strong>${year}${month}${last4}</strong><br>
+                    โดย <strong>${year}</strong> คือปี, <strong>${month}</strong> คือเดือน, <strong>${last4}</strong> คือเลขลำดับ 4 ตัว
+                </p>
+                <div id="jobnumber_rows_bm">
+                    ${renderJobRowMobile(prefix, 1, 'bm')}
+                </div>
+                <div style="margin:10px 0; text-align:center;">
+                    <button type="button" id="addRowBtn_bm" style="margin-right:10px;"><font color="blue"><b>+เพิ่มแถว</b></font></button>
+                    <button type="button" id="removeRowBtn_bm"><font color="red"><b>-ลดแถว</b></font></button>
+                </div>
+            `,
+            //ตัวอย่าง <strong>${prefix}25060407</strong>
             showCancelButton: true,
-            confirmButtonColor: 'green',
-            confirmButtonText: 'ใช่! ปิดงานซ่อม',
-            cancelButtonText: 'ยกเลิก'
+            confirmButtonText: 'ถัดไป',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#3085d6',
+            didOpen: () => {
+                let rowCount = 1;
+                document.getElementById('addRowBtn_bm').onclick = function() {
+                    rowCount++;
+                    document.getElementById('jobnumber_rows_bm').insertAdjacentHTML('beforeend', renderJobRowMobile(prefix, rowCount, 'bm'));
+                };
+                document.getElementById('removeRowBtn_bm').onclick = function() {
+                    if(rowCount > 1) {
+                        document.getElementById('job_row_bm_' + rowCount).remove();
+                        rowCount--;
+                    }
+                };
+            },
+            preConfirm: () => {
+                let jobs = [];
+                let rows = document.querySelectorAll('[id^="job_row_bm_"]');
+                for(let i=1; i<=rows.length; i++) {
+                    let val = document.getElementById('jobnumber_input_bm_' + i).value.trim();
+                    if (!val) {
+                        Swal.showValidationMessage('กรุณากรอกเลข Job ทุกแถว!');
+                        return false;
+                    }
+                    if (val.length < 3) {
+                        Swal.showValidationMessage('เลข Job ในแถวที่ ' + i + ' ต้องมีอย่างน้อย 3 ตัวอักษร!');
+                        return false;
+                    }
+                    if (!/^\d+$/.test(val)) {
+                        Swal.showValidationMessage('กรุณากรอกเฉพาะตัวเลขในแถวที่ ' + i + '!');
+                        return false;
+                    }
+                    jobs.push(prefix + val);
+                }
+                return jobs;
+            }
         }).then((result) => {
-            if (result.isConfirmed) {
-                var url = "../../service/assigned_working_proc.php";
-                $.ajax({
-                    type: "POST",
-                    url:url,
-                    // data: $("#form_project").serialize(),
-                    data: {
-                    target: target, 
-                    RPATTM_GROUP: groub, 
-                    RPRQ_CODE: rprqcode,
-                    RPC_SUBJECT: subject,
-                    RPRQ_SPAREPART: sparepart
-                    },
-                    success:function(data){
-                    // console.log(data)
-                    // alert(data);                              
+            if (result.isConfirmed && result.value) {
+                let jobListHtml = result.value.map((job, idx) => `<div style="margin-bottom:5px;"><strong>${job}</strong></div>`).join('');
+                Swal.fire({
+                    title: '<font color="black">ยืนยันเลข Job</font>',
+                    html: `
+                        <div style="text-align: center;">
+                            <p style="color: #666; margin-bottom: 15px;">กรุณาตรวจสอบเลข Job ที่กรอก</p>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                ${jobListHtml}
+                            </div>
+                            <p style="color: #e74c3c; font-size: 14px;">⚠️ ข้อความนี้จะถูกบันทึกลงในระบบและไม่สามารถแก้ไขได้</p>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันและปิดงาน',
+                    cancelButtonText: 'แก้ไขเลข Job',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d'
+                }).then((confirmResult) => {
+                    if (confirmResult.isConfirmed) {
+                        performCloseJob_BM_Mobile(target, groub, rprqcode, subject, sparepart, result.value);
+                    } else if (confirmResult.dismiss === Swal.DismissReason.cancel) {
+                        save_successjob_bm(area, target, groub, rprqcode, subject, sparepart);
+                    }
+                });
+            }
+        });
+    }
+    
+    function save_successjob_pm(area, target, groub, rprqcode, subject) {
+        var prefix = (area === 'AMT') ? '1JB-' : '2JB-';
+                
+        const now = new Date();
+        // ปี พ.ศ. 2 หลัก
+        const year = (now.getFullYear()).toString().slice(-2);
+        // เดือน 2 หลัก
+        const month = ('0' + (now.getMonth() + 1)).slice(-2);
+        // เลขท้าย 4 ตัว (เช่น 0000)
+        const last4 = '0000';
+
+        Swal.fire({
+            title: '<font color="black">กรอกเลข Job จาก HDMS ก่อนปิดงานซ่อม</font>',
+            html: `
+                <p style="color: #666;">
+                    กรอกเฉพาะตัวเลข เช่น <strong>${year}${month}${last4}</strong><br>
+                    โดย <strong>${year}</strong> คือปี, <strong>${month}</strong> คือเดือน, <strong>${last4}</strong> คือเลขลำดับ 4 ตัว
+                </p>
+                <div id="jobnumber_rows_pm">
+                    ${renderJobRowMobile(prefix, 1, 'pm')}
+                </div>
+                <div style="margin:10px 0; text-align:center;">
+                    <button type="button" id="addRowBtn_pm" style="margin-right:10px;"><font color="blue"><b>+เพิ่มแถว</b></font></button>
+                    <button type="button" id="removeRowBtn_pm"><font color="red"><b>-ลดแถว</b></font></button>
+                </div>
+            `,
+            //ตัวอย่าง <strong>${prefix}25060407</strong>
+            showCancelButton: true,
+            confirmButtonText: 'ถัดไป',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#3085d6',
+            didOpen: () => {
+                let rowCount = 1;
+                document.getElementById('addRowBtn_pm').onclick = function() {
+                    rowCount++;
+                    document.getElementById('jobnumber_rows_pm').insertAdjacentHTML('beforeend', renderJobRowMobile(prefix, rowCount, 'pm'));
+                };
+                document.getElementById('removeRowBtn_pm').onclick = function() {
+                    if(rowCount > 1) {
+                        document.getElementById('job_row_pm_' + rowCount).remove();
+                        rowCount--;
+                    }
+                };
+            },
+            preConfirm: () => {
+                let jobs = [];
+                let rows = document.querySelectorAll('[id^="job_row_pm_"]');
+                for(let i=1; i<=rows.length; i++) {
+                    let val = document.getElementById('jobnumber_input_pm_' + i).value.trim();
+                    if (!val) {
+                        Swal.showValidationMessage('กรุณากรอกเลข Job ทุกแถว!');
+                        return false;
+                    }
+                    if (val.length < 3) {
+                        Swal.showValidationMessage('เลข Job ในแถวที่ ' + i + ' ต้องมีอย่างน้อย 3 ตัวอักษร!');
+                        return false;
+                    }
+                    if (!/^\d+$/.test(val)) {
+                        Swal.showValidationMessage('กรุณากรอกเฉพาะตัวเลขในแถวที่ ' + i + '!');
+                        return false;
+                    }
+                    jobs.push(prefix + val);
+                }
+                return jobs;
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                let jobListHtml = result.value.map((job, idx) => `<div style="margin-bottom:5px;"><strong>${job}</strong></div>`).join('');
+                Swal.fire({
+                    title: '<font color="black">ยืนยันเลข Job</font>',
+                    html: `
+                        <div style="text-align: center;">
+                            <p style="color: #666; margin-bottom: 15px;">กรุณาตรวจสอบเลข Job ที่กรอก</p>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                ${jobListHtml}
+                            </div>
+                            <p style="color: #e74c3c; font-size: 14px;">⚠️ ข้อความนี้จะถูกบันทึกลงในระบบและไม่สามารถแก้ไขได้</p>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันและปิดงาน',
+                    cancelButtonText: 'แก้ไขเลข Job',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d'
+                }).then((confirmResult) => {
+                    if (confirmResult.isConfirmed) {
+                        performCloseJob_PM_Mobile(target, groub, rprqcode, subject, result.value);
+                    } else if (confirmResult.dismiss === Swal.DismissReason.cancel) {
+                        save_successjob_pm(area, target, groub, rprqcode, subject);
+                    }
+                });
+            }
+        });
+    }
+    
+    // สร้าง HTML สำหรับแต่ละแถว (Mobile)
+    // function renderJobRowMobile(prefix, idx, type) {
+    //     return `
+    //         <div id="job_row_${type}_${idx}" style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+    //             <div style="background: #ddd; color: #222; font-size: 1em; font-weight: bold; height: 48px; padding: 10px 20px; border: 1px solid #222; border-right: none; min-width: 90px;">
+    //                 ${prefix}
+    //             </div>
+    //             <input id="jobnumber_input_${type}_${idx}" type="text" maxlength="50"
+    //                 style="height: 48px; font-size: 2em; text-align: left; padding: 10px; color: #000 !important; background-color: #fff !important; border: 2px solid #ddd !important; border-left: none; border-radius: 0 5px 5px 0 !important; box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; width: 250px;">
+    //         </div>
+    //     `;
+    // }
+    // สร้าง HTML สำหรับแต่ละแถว (Mobile) แสดงเฉพาะตัวเลข
+    function renderJobRowMobile(prefix, idx, type) {
+        return `
+            <div id="job_row_${type}_${idx}" style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                <div style="background: #ddd; color: #222; font-size: 1em; font-weight: bold; height: 48px; padding: 10px 20px; border: 1px solid #222; border-right: none; min-width: 90px;">
+                    ${prefix}
+                </div>
+                <input
+                    id="jobnumber_input_${type}_${idx}"
+                    type="number"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    maxlength="50"
+                    style="height: 48px; font-size: 2em; text-align: left; padding: 10px; color: #000 !important; background-color: #fff !important; border: 2px solid #ddd !important; border-left: none; border-radius: 0 5px 5px 0 !important; box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; width: 250px;"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                >
+            </div>
+        `;
+    }
+    // ฟังก์ชันสำหรับปิดงาน BM (Mobile) รับ array
+    function performCloseJob_BM_Mobile(target, groub, rprqcode, subject, sparepart, jobNumbers) {
+        Swal.fire({
+            title: '<font color="black">กำลังบันทึกข้อมูล...</font>',
+            html: 'กรุณารอสักครู่',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    
+        var url = "../../service/assigned_working_proc.php";
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                target: target,
+                RPATTM_GROUP: groub,
+                RPRQ_CODE: rprqcode,
+                RPC_SUBJECT: subject,
+                RPRQ_SPAREPART: sparepart,
+                CLOSE_MESSAGE: JSON.stringify(jobNumbers) // ส่งเป็น array
+            },
+            success: function(data) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '<font color="black">ปิดงานซ่อมเรียบร้อยแล้ว</font>',
+                    html: `<p style="color: #666;">ข้อความที่บันทึก:</p>${jobNumbers.map(j => `<strong style="color: #2c3e50;">${j}</strong>`).join('<br>')}`,
+                    showConfirmButton: false,
+                    timer: 3000
+                }).then((result) => {
+                    location.assign('../');
+                });
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '<font color="black">เกิดข้อผิดพลาด</font>',
+                    text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        });
+    }
+    
+    // ฟังก์ชันสำหรับปิดงาน PM (Mobile) รับ array
+    function performCloseJob_PM_Mobile(target, groub, rprqcode, subject, jobNumbers) {
+        Swal.fire({
+            title: '<font color="black">กำลังบันทึกข้อมูล...</font>',
+            html: 'กรุณารอสักครู่',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    
+        var url = "../../service/assigned_working_proc.php";
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                target: target,
+                RPATTM_GROUP: groub,
+                RPRQ_CODE: rprqcode,
+                RPC_SUBJECT: subject,
+                CLOSE_MESSAGE: JSON.stringify(jobNumbers) // ส่งเป็น array
+            },
+            success: function(data) {
+                try {
+                    var responseData = JSON.parse(data);
                     Swal.fire({
                         icon: 'success',
-                        title: '<font color="black">ขณะนี้ คุณได้ปิดงานซ่อมเรียบร้อยแล้ว</font>',
+                        title: '<font color="black">ปิดงานซ่อมเรียบร้อยแล้ว</font>',
+                        html: `<p style="color: #666;">ข้อความที่บันทึก:</p>${jobNumbers.map(j => `<strong style="color: #2c3e50;">${j}</strong>`).join('<br>')}`,
                         showConfirmButton: false,
-                        timer: 2000
-                    }).then((result) => {	 
-                        location.assign('../') 
-                    })	
-                    }
+                        timer: 3000
+                    }).then((result) => {
+                        location.assign('../');
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '<font color="black">ปิดงานซ่อมเรียบร้อยแล้ว</font>',
+                        html: `<p style="color: #666;">ข้อความที่บันทึก:</p>${jobNumbers.map(j => `<strong style="color: #2c3e50;">${j}</strong>`).join('<br>')}`,
+                        showConfirmButton: false,
+                        timer: 3000
+                    }).then((result) => {
+                        location.assign('../');
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '<font color="black">เกิดข้อผิดพลาด</font>',
+                    text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                    confirmButtonText: 'ตกลง'
                 });
             }
-        })
-    } 
-    function save_successjob_pm(target,groub,rprqcode,subject) {
-        // if(!confirm("ยืนยันการแก้ไข")) return false;      
-        Swal.fire({
-            title: '<font color="black">คุณแน่ใจหรือไม่...ที่จะปิดงานซ่อมนี้</font>',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: 'green',
-            confirmButtonText: 'ใช่! ปิดงานซ่อม',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var url = "../../service/assigned_working_proc.php";
-                $.ajax({
-                    type: "POST",
-                    url:url,
-                    // data: $("#form_project").serialize(),
-                    data: {
-                    target: target, 
-                    RPATTM_GROUP: groub, 
-                    RPRQ_CODE: rprqcode, 
-                    RPC_SUBJECT: subject
-                    },
-                    success:function(data){
-                        // console.log(data)
-                        // alert(data); 
-                        var data = JSON.parse(data);
-                        if(data.statusCode==200){	                             
-                            Swal.fire({
-                                icon: 'success',
-                                title: '<font color="black">ขณะนี้ คุณได้ปิดงานซ่อมเรียบร้อยแล้ว</font>',
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then((result) => {	 
-                                location.assign('../') 
-                            })	
-                        }else if(data.statusCode==201){                                      
-                            Swal.fire({
-                            icon: 'success',
-                            title: '<font color="black">ปิดงานซ่อมเรียบร้อยแล้ว</font>',
-                            showConfirmButton: false,
-                            timer: 2000
-                            }).then((result) => {	 
-                                location.assign('./?id='+rprqcode+'&proc=add') 
-                            })
-                        }	
-                    }
-                });
-            }
-        })
-    } 
+        });
+    }
     function sendid_detailrepair(title,a1,a2,a3,a4,a5){
         document.getElementById('title_det').innerHTML = title;
         document.getElementById('title2_det').innerHTML = title;

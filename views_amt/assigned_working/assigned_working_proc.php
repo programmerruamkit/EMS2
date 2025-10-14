@@ -19,6 +19,42 @@
 	function time_diff($time1, $time2) {
 		return (strtotime($time1) - strtotime($time2)) / 60;
 	}
+	
+	######################################################################################################
+	if (isset($_POST['CLOSE_MESSAGE']) && !empty($_POST['CLOSE_MESSAGE'])) {
+		$closeMessages = json_decode($_POST['CLOSE_MESSAGE'], true); // รับเป็น array
+		$rprqCode = $_POST['RPRQ_CODE'];
+		$rpcSubject = $_POST['RPC_SUBJECT'];
+		$RPCHDMS_PROCESSBY = $_SESSION["AD_PERSONCODE"];
+		$RPCHDMS_PROCESSDATE = date("Y-m-d H:i:s");
+	
+		if (is_array($closeMessages)) {
+			foreach ($closeMessages as $closeMessage) {
+				$sql_insert_message = "INSERT INTO REPAIRCLOSE_HDMS 
+					(RPRQ_CODE, RPC_SUBJECT, RPATTM_GROUP, RPCHDMS_MESSAGE, RPCHDMS_CREATEDATE, RPCHDMS_CREATEBY) 
+					VALUES (?, ?, 'SUCCESS', ?, ?, ?)";
+				$params_insert = array($rprqCode, $rpcSubject, $closeMessage, $RPCHDMS_PROCESSDATE, $RPCHDMS_PROCESSBY);
+				$query_insert = sqlsrv_query($conn, $sql_insert_message, $params_insert);
+	
+				if (!$query_insert) {
+					echo json_encode(array('statusCode' => 500, 'message' => 'ไม่สามารถบันทึกข้อความได้'));
+					exit;
+				}
+			}
+		} else {
+			// กรณีส่งมาเป็นข้อความเดียว (backward compatibility)
+			$sql_insert_message = "INSERT INTO REPAIRCLOSE_HDMS 
+				(RPRQ_CODE, RPC_SUBJECT, RPATTM_GROUP, RPCHDMS_MESSAGE, RPCHDMS_CREATEDATE, RPCHDMS_CREATEBY) 
+				VALUES (?, ?, 'SUCCESS', ?, ?, ?)";
+			$params_insert = array($rprqCode, $rpcSubject, $closeMessages, $RPCHDMS_PROCESSDATE, $RPCHDMS_PROCESSBY);
+			$query_insert = sqlsrv_query($conn, $sql_insert_message, $params_insert);
+	
+			if (!$query_insert) {
+				echo json_encode(array('statusCode' => 500, 'message' => 'ไม่สามารถบันทึกข้อความได้'));
+				exit;
+			}
+		}
+	}
 	######################################################################################################
 	if($target=="save_openjob"){
 

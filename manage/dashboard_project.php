@@ -1,186 +1,379 @@
 <?php
     session_name("EMS"); session_start();
+	// เพิ่มที่ตอนต้นของไฟล์ หลังจาก session_start()
+	if (isset($_GET['refresh_cache'])) {
+		// ลบไฟล์ cache ทั้งหมด
+		$cache_pattern = sys_get_temp_dir() . '/card_data_' . $SESSION_AREA . '_*.json';
+		foreach (glob($cache_pattern) as $cache_file) {
+			if (file_exists($cache_file)) {
+				unlink($cache_file);
+			}
+		}
+	}
     $path='../';
     require($path."include/authen.php"); 
     require($path."include/connect.php");
     require($path."include/head.php");		
     require($path."include/script.php"); 
     $SESSION_AREA=$_SESSION["AD_AREA"];
+
+	// ฟังก์ชันคำนวณข้อมูลการ์ดแบบ Optimized
+    function calculateCardDataOptimized($conn, $SESSION_AREA) {
+        $card_data = array(
+            'due_soon' => 0,     // < 5 วัน
+            'approaching' => 0,  // < 15 วัน
+            'overdue' => 0       // > 1 วัน
+        );
+        
+        // ดึงข้อมูลอะไหล่ทั้งหมด
+        $stmt_spareparts = "SELECT DISTINCT PJSPP_CODENAME, PJSPP_EXPIRE_YEAR FROM [dbo].[PROJECT_SPAREPART] WHERE PJSPP_AREA = ?";
+        $params_spareparts = array($SESSION_AREA);
+        $query_spareparts = sqlsrv_query($conn, $stmt_spareparts, $params_spareparts);
+        
+        $sparepart_codes = array();
+        while($sparepart = sqlsrv_fetch_array($query_spareparts, SQLSRV_FETCH_ASSOC)) {
+            $sparepart_codes[] = $sparepart;
+        }
+        
+        // ดึงข้อมูลรถทั้งหมดในครั้งเดียว
+        $sql_vehicles = "SELECT DISTINCT vi.VEHICLEREGISNUMBER, vi.THAINAME
+                        FROM vwVEHICLEINFO vi
+                        WHERE vi.VEHICLEGROUPDESC = 'Transport' 
+                        AND NOT vi.VEHICLEGROUPCODE = 'VG-1403-0755' 
+                        AND vi.ACTIVESTATUS = '1'
+                        AND AFFCOMPANY IN('RKR','RKS','RKL','RCC','RRC','RATC')";
+        
+        $query_vehicles = sqlsrv_query($conn, $sql_vehicles);
+        $vehicles = array();
+        while($vehicle = sqlsrv_fetch_array($query_vehicles, SQLSRV_FETCH_ASSOC)) {
+            $vehicles[] = $vehicle;
+        }
+        
+        // วนลูปแยกตาม sparepart เพื่อประมวลผลแบบ batch
+        foreach($sparepart_codes as $sparepart) {
+            $PJSPP_CODENAME = $sparepart['PJSPP_CODENAME'];
+            $PJSPP_EXPIRE_YEAR = $sparepart['PJSPP_EXPIRE_YEAR'];
+            
+            $valid_codes = array("01","02","03","04","05","06","07","08");
+            if (!in_array($PJSPP_CODENAME, $valid_codes)) continue;
+            
+            $table = "PROJECT_SPAREPART_".$PJSPP_CODENAME;
+            $LCD = "PJSPP".$PJSPP_CODENAME."_LCD";
+            $VHCRG = "PJSPP".$PJSPP_CODENAME."_VHCRG";
+            $VHCRGNM = "PJSPP".$PJSPP_CODENAME."_VHCRGNM";
+            $CODENAME = "PJSPP".$PJSPP_CODENAME."_CODENAME";
+            $CREATEDATE = "PJSPP".$PJSPP_CODENAME."_CREATEDATE";
+            
+            // สร้าง WHERE clause สำหรับรถทั้งหมด
+            $vehicle_conditions = array();
+            $params = array();
+            
+            foreach($vehicles as $vehicle) {
+                $vehicle_conditions[] = "($VHCRG = ? OR $VHCRGNM = ?)";
+                $params[] = $vehicle['VEHICLEREGISNUMBER'];
+                $params[] = $vehicle['THAINAME'];
+            }
+            
+            if (empty($vehicle_conditions)) continue;
+            
+            // Query ข้อมูลรถทั้งหมดสำหรับ sparepart นี้ในครั้งเดียว
+            $sql_batch = "SELECT 
+                            $VHCRG as VEHICLEREGISNUMBER,
+                            $VHCRGNM as THAINAME,
+                            $LCD as LAST_CHANGE_DATE,
+                            ROW_NUMBER() OVER (PARTITION BY $VHCRG, $VHCRGNM ORDER BY $CREATEDATE DESC) as rn
+                          FROM [dbo].[$table] 
+                          WHERE $CODENAME = '$PJSPP_CODENAME' 
+                          AND (" . implode(' OR ', $vehicle_conditions) . ")
+                          AND $LCD IS NOT NULL";
+            
+            $query_batch = sqlsrv_query($conn, $sql_batch, $params);
+            
+            if ($query_batch) {
+                while($row = sqlsrv_fetch_array($query_batch, SQLSRV_FETCH_ASSOC)) {
+                    // ใช้เฉพาะข้อมูลล่าสุด (rn = 1)
+                    if ($row['rn'] != 1) continue;
+                    
+                    $lactchangedate = $row['LAST_CHANGE_DATE'];
+                    
+                    if ($lactchangedate) {
+                        // แปลงวันที่
+                        if (is_object($lactchangedate)) {
+                            $lactchangedate_str = $lactchangedate->format('Y-m-d');
+                        } else {
+                            $lactchangedate_str = date("Y-m-d", strtotime($lactchangedate));
+                        }
+                        
+                        // คำนวณวันที่ครบกำหนด
+                        $expire_date_str = date("Y-m-d", strtotime("+$PJSPP_EXPIRE_YEAR year", strtotime($lactchangedate_str)));
+                        
+                        // คำนวณจำนวนวันที่เหลือ
+                        $current_timestamp = time();
+                        $expire_timestamp = strtotime($expire_date_str);
+                        $day_diff = floor(($expire_timestamp - $current_timestamp) / (60 * 60 * 24));
+                        
+                        // จัดหมวดหมู่ตามเงื่อนไข
+                        if ($day_diff < 0 && abs($day_diff) > 1) {
+                            $card_data['overdue']++;
+                        } else if ($day_diff >= 0 && $day_diff < 6) {
+                            $card_data['due_soon']++;
+                        } else if ($day_diff > 5 && $day_diff < 16) {
+                            $card_data['approaching']++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $card_data;
+    }
     
-    // ดึงข้อมูล PROJECT_SPAREPART
-    $stmt_sparepart = "SELECT DISTINCT * FROM [dbo].[PROJECT_SPAREPART] WHERE PJSPP_AREA = '$SESSION_AREA' ORDER BY PJSPP_ID ASC";
-    $query_sparepart = sqlsrv_query($conn, $stmt_sparepart);
-    $sparepart_data = [];
+    // ใช้ cache สำหรับข้อมูลการ์ด (cache 30 นาที)
+    $cache_file = sys_get_temp_dir() . '/card_data_' . $SESSION_AREA . '_' . date('Y-m-d-H') . '_' . floor(date('i') / 30) . '.json';
+    
+    if (file_exists($cache_file) && (time() - filemtime($cache_file)) < 1800) {
+        // ใช้ข้อมูลจาก cache
+        $card_data = json_decode(file_get_contents($cache_file), true);
+    } else {
+        // คำนวณข้อมูลใหม่
+        $card_data = calculateCardDataOptimized($conn, $SESSION_AREA);
+        // บันทึกลง cache
+        file_put_contents($cache_file, json_encode($card_data));
+    }
+	
+	// ดึงข้อมูล PROJECT_SPAREPART แบบง่าย
+    $stmt_sparepart = "SELECT DISTINCT * FROM [dbo].[PROJECT_SPAREPART] WHERE PJSPP_AREA = ? ORDER BY PJSPP_ID ASC";
+    $params_sparepart = array($SESSION_AREA);
+    $query_sparepart = sqlsrv_query($conn, $stmt_sparepart, $params_sparepart);
+    $sparepart_data = array();
     while($result_sparepart = sqlsrv_fetch_array($query_sparepart)) {
         $sparepart_data[] = $result_sparepart;
     }
     
-    // ดึงข้อมูลรถทั้งหมดสำหรับ autocomplete
+    // ดึงข้อมูลรถสำหรับ autocomplete (จำกัด 200 รายการ)
     $wh = "AND ACTIVESTATUS = '1' AND AFFCOMPANY IN('RKR','RKS','RKL','RCC','RRC','RATC')";
-    $sql_all_vehicles = "SELECT DISTINCT VEHICLEREGISNUMBER, THAINAME FROM vwVEHICLEINFO 
-        LEFT JOIN VEHICLECARTYPEMATCHGROUP ON VHCTMG_VEHICLEREGISNUMBER = VEHICLEREGISNUMBER COLLATE Thai_CI_AI
-        LEFT JOIN VEHICLECARTYPE ON VEHICLECARTYPE.VHCCT_ID = VEHICLECARTYPEMATCHGROUP.VHCCT_ID
+    $sql_all_vehicles = "SELECT DISTINCT TOP 200 VEHICLEREGISNUMBER, THAINAME FROM vwVEHICLEINFO 
         WHERE VEHICLEGROUPDESC = 'Transport' AND NOT VEHICLEGROUPCODE = 'VG-1403-0755' $wh 
         ORDER BY VEHICLEREGISNUMBER ASC";
     $query_all_vehicles = sqlsrv_query($conn, $sql_all_vehicles);
-    $all_vehicles = [];
+    $all_vehicles = array();
     while($result_vehicle = sqlsrv_fetch_array($query_all_vehicles, SQLSRV_FETCH_ASSOC)) {
-        $all_vehicles[] = [
+        $all_vehicles[] = array(
             'value' => $result_vehicle['VEHICLEREGISNUMBER'],
             'label' => $result_vehicle['VEHICLEREGISNUMBER'] . ' - ' . $result_vehicle['THAINAME']
-        ];
+        );
     }
     
     // ตัวแปรสำหรับการค้นหา
     $selected_vehicle = isset($_GET['vehicle_search']) ? $_GET['vehicle_search'] : '';
     $vehicle_data = null;
-	
-	// กำหนดปีเริ่มต้นและปีสิ้นสุด
-	$yearstart = date('Y')-0;
-	$yearend = date('Y')+6;
+    
+    // กำหนดปีเริ่มต้นและปีสิ้นสุด
+    $yearstart = date('Y')-0;
+    $yearend = date('Y')+6;
     
     // ค้นหาข้อมูลรถที่เลือก
     if (!empty($selected_vehicle)) {
         $wh = "AND ACTIVESTATUS = '1' AND AFFCOMPANY IN('RKR','RKS','RKL','RCC','RRC','RATC')";
-        $sql_vehicleinfo = "SELECT * FROM vwVEHICLEINFO 
+        $sql_vehicleinfo = "SELECT TOP 1 * FROM vwVEHICLEINFO 
             LEFT JOIN VEHICLECARTYPEMATCHGROUP ON VHCTMG_VEHICLEREGISNUMBER = VEHICLEREGISNUMBER COLLATE Thai_CI_AI
             LEFT JOIN VEHICLECARTYPE ON VEHICLECARTYPE.VHCCT_ID = VEHICLECARTYPEMATCHGROUP.VHCCT_ID
             WHERE VEHICLEGROUPDESC = 'Transport' AND NOT VEHICLEGROUPCODE = 'VG-1403-0755' $wh 
-            AND (VEHICLEREGISNUMBER LIKE '%$selected_vehicle%' OR THAINAME LIKE '%$selected_vehicle%')
-            ORDER BY REGISTYPE ASC, VEHICLEREGISNUMBER ASC";
-        $query_vehicleinfo = sqlsrv_query($conn, $sql_vehicleinfo);
+            AND (VEHICLEREGISNUMBER LIKE ? OR THAINAME LIKE ?)
+            ORDER BY 
+                CASE WHEN VEHICLEREGISNUMBER = ? THEN 1
+                     WHEN THAINAME = ? THEN 2 
+                     ELSE 3 END,
+                REGISTYPE ASC, VEHICLEREGISNUMBER ASC";
+        
+        $search_term = '%' . $selected_vehicle . '%';
+        $params_search = array($search_term, $search_term, $selected_vehicle, $selected_vehicle);
+        $query_vehicleinfo = sqlsrv_query($conn, $sql_vehicleinfo, $params_search);
         $vehicle_data = sqlsrv_fetch_array($query_vehicleinfo, SQLSRV_FETCH_ASSOC);
     }
-	// เพิ่มใน PHP section หลังจาก ค้นหาข้อมูลรถที่เลือก
-	if (!empty($selected_vehicle) && $vehicle_data) {
-		// ดึงข้อมูล PM Standard
-		$sql_pm_standard = "SELECT
-			DISTINCT
-			A.RPRQ_REGISHEAD,
-			A.RPRQ_CARNAMEHEAD,
-			A.RPRQ_MILEAGEFINISH,
-			A.RPRQ_CARTYPE,
-			CONVERT(VARCHAR(10), B.RPATTM_PROCESS, 120) AS RPATTM_PROCESS,
-			CONVERT(VARCHAR(4), B.RPATTM_PROCESS, 120) AS YEAR
-			FROM
-			REPAIRREQUEST A
-			LEFT JOIN REPAIRACTUAL_TIME B ON B.RPRQ_CODE = A.RPRQ_CODE
-			WHERE
-			(A.RPRQ_REGISHEAD = '$selected_vehicle' OR A.RPRQ_CARNAMEHEAD = '$selected_vehicle')
-			AND A.RPRQ_WORKTYPE = 'PM'
-			AND A.RPRQ_STATUSREQUEST = 'ซ่อมเสร็จสิ้น'
-			AND CONVERT(VARCHAR(4), B.RPATTM_PROCESS, 120) BETWEEN '$yearstart' AND '$yearend'
-			ORDER BY CONVERT(VARCHAR(10), B.RPATTM_PROCESS, 120) ASC";
-		
-		$query_pm_standard = sqlsrv_query($conn, $sql_pm_standard);
-		$pm_standard_data = [];
-		while($result_pm = sqlsrv_fetch_array($query_pm_standard, SQLSRV_FETCH_ASSOC)) {
-			$pm_standard_data[] = $result_pm;
-		}
-	}
-	if (!empty($selected_vehicle) && $vehicle_data) {
-		// ดึงข้อมูล PM Standard
-		$sql_pm_standard = "SELECT
-			DISTINCT
-			A.RPRQ_REGISHEAD,
-			A.RPRQ_CARNAMEHEAD,
-			A.RPRQ_MILEAGEFINISH,
-			A.RPRQ_CARTYPE,
-			CONVERT(VARCHAR(10), B.RPATTM_PROCESS, 120) AS RPATTM_PROCESS,
-			CONVERT(VARCHAR(4), B.RPATTM_PROCESS, 120) AS YEAR
-			FROM
-			REPAIRREQUEST A
-			LEFT JOIN REPAIRACTUAL_TIME B ON B.RPRQ_CODE = A.RPRQ_CODE
-			WHERE
-			(A.RPRQ_REGISHEAD = '$selected_vehicle' OR A.RPRQ_CARNAMEHEAD = '$selected_vehicle')
-			AND A.RPRQ_WORKTYPE = 'PM'
-			AND A.RPRQ_STATUSREQUEST = 'ซ่อมเสร็จสิ้น'
-			AND CONVERT(VARCHAR(4), B.RPATTM_PROCESS, 120) BETWEEN '$yearstart' AND '$yearend'
-			ORDER BY CONVERT(VARCHAR(10), B.RPATTM_PROCESS, 120) ASC";
-		
-		$query_pm_standard = sqlsrv_query($conn, $sql_pm_standard);
-		$pm_standard_data = [];
-		while($result_pm = sqlsrv_fetch_array($query_pm_standard, SQLSRV_FETCH_ASSOC)) {
-			$pm_standard_data[] = $result_pm;
-		}
-		
-		// คำนวณ PM ครั้งถัดไป (ใช้สูตรจาก request_repair_pm_form.php)
-		$next_pm_info = null;
-		if (!empty($pm_standard_data)) {
-			$VEHICLEREGISNUMBER = $vehicle_data['VEHICLEREGISNUMBER'];
-			$THAINAME = $vehicle_data['THAINAME'];
-			$VHCTMG_LINEOFWORK = $vehicle_data['VHCCT_PM'];
-			
-			// ไมล์ล่าสุดจาก PM ล่าสุด
-			$last_pm = end($pm_standard_data);
-			$MAXMILEAGENUMBER = $last_pm['RPRQ_MILEAGEFINISH'];
+    
+    // ดึงข้อมูล PM Standard แบบ optimized
+    $pm_standard_data = array();
+    $next_pm_info = null;
+    
+    if (!empty($selected_vehicle) && $vehicle_data) {
+        $sql_pm_standard = "SELECT DISTINCT TOP 50
+            A.RPRQ_REGISHEAD,
+            A.RPRQ_CARNAMEHEAD,
+            A.RPRQ_MILEAGEFINISH,
+            A.RPRQ_CARTYPE,
+            CONVERT(VARCHAR(10), B.RPATTM_PROCESS, 120) AS RPATTM_PROCESS,
+            CONVERT(VARCHAR(4), B.RPATTM_PROCESS, 120) AS YEAR
+            FROM REPAIRREQUEST A
+            LEFT JOIN REPAIRACTUAL_TIME B ON B.RPRQ_CODE = A.RPRQ_CODE
+            WHERE (A.RPRQ_REGISHEAD = ? OR A.RPRQ_CARNAMEHEAD = ?)
+            AND A.RPRQ_WORKTYPE = 'PM'
+            AND A.RPRQ_STATUSREQUEST = 'ซ่อมเสร็จสิ้น'
+            AND CONVERT(VARCHAR(4), B.RPATTM_PROCESS, 120) BETWEEN ? AND ?
+            AND B.RPATTM_PROCESS IS NOT NULL
+            ORDER BY CONVERT(VARCHAR(10), B.RPATTM_PROCESS, 120) ASC";
+        
+        $params_pm = array($selected_vehicle, $selected_vehicle, $yearstart, $yearend);
+        $query_pm_standard = sqlsrv_query($conn, $sql_pm_standard, $params_pm);
+        
+        while($result_pm = sqlsrv_fetch_array($query_pm_standard, SQLSRV_FETCH_ASSOC)) {
+            $pm_standard_data[] = $result_pm;
+        }
+        
+        // คำนวณ PM ครั้งถัดไป
+        if (!empty($pm_standard_data)) {
+            $VEHICLEREGISNUMBER = $vehicle_data['VEHICLEREGISNUMBER'];
+            $THAINAME = $vehicle_data['THAINAME'];
+            $VHCTMG_LINEOFWORK = $vehicle_data['VHCCT_PM'];
+            
+            $last_pm = end($pm_standard_data);
+            $MAXMILEAGENUMBER = $last_pm['RPRQ_MILEAGEFINISH'];
 
-			
-			// หรือดึงจาก TEMP_MILEAGE ถ้าต้องการไมล์ปัจจุบัน
-			if($_GET['vehicle_search']=="AMT"||$_GET['vehicle_search']=="RKS"||$_GET['vehicle_search']=="RKR"||$_GET['vehicle_search']=="RKL"){     
-				$field="VEHICLEREGISNUMBER = '$VEHICLEREGISNUMBER'";
-			} else {
-				$explodes = explode('(', $THAINAME);
-				$THAINAME_CLEAN = $explodes[0];
-				$field="THAINAME = '$THAINAME_CLEAN'";
-			}
-			
-			$sql_mileage = "SELECT TOP 1 * FROM TEMP_MILEAGE WHERE $field ORDER BY CREATEDATE DESC ";
-			$query_mileage = sqlsrv_query($conn, $sql_mileage);
-			$result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
-			
-			if(isset($result_mileage['MAXMILEAGENUMBER'])){
-				if($result_mileage['MAXMILEAGENUMBER']>1000000){
-					$CURRENT_MILEAGE = $result_mileage['MAXMILEAGENUMBER']-1000000;
-				}else{
-					$CURRENT_MILEAGE = $result_mileage['MAXMILEAGENUMBER'];
-				}
-			} else {
-				$CURRENT_MILEAGE = $MAXMILEAGENUMBER;
-			}
+            // ดึงข้อมูลไมล์ปัจจุบัน
+            if($selected_vehicle == "AMT" || $selected_vehicle == "RKS" || $selected_vehicle == "RKR" || $selected_vehicle == "RKL"){     
+                $sql_mileage = "SELECT TOP 1 MAXMILEAGENUMBER FROM TEMP_MILEAGE WHERE VEHICLEREGISNUMBER = ? ORDER BY CREATEDATE DESC";
+                $params_mileage = array($VEHICLEREGISNUMBER);
+            } else {
+                $explodes = explode('(', $THAINAME);
+                $THAINAME_CLEAN = trim($explodes[0]);
+                $sql_mileage = "SELECT TOP 1 MAXMILEAGENUMBER FROM TEMP_MILEAGE WHERE THAINAME = ? ORDER BY CREATEDATE DESC";
+                $params_mileage = array($THAINAME_CLEAN);
+            }
+            
+            $query_mileage = sqlsrv_query($conn, $sql_mileage, $params_mileage);
+            $result_mileage = sqlsrv_fetch_array($query_mileage, SQLSRV_FETCH_ASSOC); 
+            
+            $CURRENT_MILEAGE = $MAXMILEAGENUMBER; // Default
+            if(isset($result_mileage['MAXMILEAGENUMBER'])){
+                if($result_mileage['MAXMILEAGENUMBER'] > 1000000){
+                    $CURRENT_MILEAGE = $result_mileage['MAXMILEAGENUMBER'] - 1000000;
+                } else {
+                    $CURRENT_MILEAGE = $result_mileage['MAXMILEAGENUMBER'];
+                }
+            }
 
-			// คำนวณช่วงไมล์
-			if(($CURRENT_MILEAGE >= '0') && ($CURRENT_MILEAGE <= '1000000')){
-				$fildsfind="MLPM_MILEAGE_10K1M";
-			}else if(($CURRENT_MILEAGE >= '1000001') && ($CURRENT_MILEAGE <= '2000000')){
-				$fildsfind="MLPM_MILEAGE_1M2M";
-			}else if(($CURRENT_MILEAGE >= '2000001') && ($CURRENT_MILEAGE <= '3000000')){
-				$fildsfind="MLPM_MILEAGE_2M3M";
-			}
-			
-			$MILEAGE_FOR_CALC = $CURRENT_MILEAGE;
-
-			// หา PM ครั้งถัดไป
-			$sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = '$VHCTMG_LINEOFWORK' AND $fildsfind > '$MILEAGE_FOR_CALC' ORDER BY $fildsfind ASC";
-			$query_rankpm = sqlsrv_query($conn, $sql_rankpm);
-			$result_rankpm = sqlsrv_fetch_array($query_rankpm, SQLSRV_FETCH_ASSOC);        
-			$MLPM_MILEAGE = $result_rankpm[$fildsfind];
-			
-			// คำนวณวันที่คาดว่าจะถึง PM ครั้งถัดไป
-			if($MLPM_MILEAGE && $vehicle_data['VHCCT_KILOFORDAY'] > 0) {
-				$remaining_mileage = $MLPM_MILEAGE - $CURRENT_MILEAGE;
-				$estimated_days = ceil($remaining_mileage / $vehicle_data['VHCCT_KILOFORDAY']);
-				$estimated_date = date('Y-m-d', strtotime("+$estimated_days days"));
-				
-				$next_pm_info = [
-					'pm_name' => $result_rankpm['MLPM_NAME'],
-					'target_mileage' => $MLPM_MILEAGE,
-					'current_mileage' => $CURRENT_MILEAGE,
-					'remaining_mileage' => $remaining_mileage,
-					'estimated_days' => $estimated_days,
-					'estimated_date' => $estimated_date,
-					'km_per_day' => $vehicle_data['VHCCT_KILOFORDAY']
-				];
-			}
-		}
-	}
+            // คำนวณช่วงไมล์
+            $fildsfind = "MLPM_MILEAGE_10K1M";
+            if(($CURRENT_MILEAGE >= 1000001) && ($CURRENT_MILEAGE <= 2000000)){
+                $fildsfind = "MLPM_MILEAGE_1M2M";
+            } else if(($CURRENT_MILEAGE >= 2000001) && ($CURRENT_MILEAGE <= 3000000)){
+                $fildsfind = "MLPM_MILEAGE_2M3M";
+            }
+            
+            // หา PM ครั้งถัดไป
+            if($VHCTMG_LINEOFWORK) {
+                $sql_rankpm = "SELECT TOP 1 * FROM MILEAGESETPM WHERE MLPM_LINEOFWORK = ? AND $fildsfind > ? ORDER BY $fildsfind ASC";
+                $params_rankpm = array($VHCTMG_LINEOFWORK, $CURRENT_MILEAGE);
+                $query_rankpm = sqlsrv_query($conn, $sql_rankpm, $params_rankpm);
+                $result_rankpm = sqlsrv_fetch_array($query_rankpm, SQLSRV_FETCH_ASSOC);
+                
+                if ($result_rankpm) {
+                    $MLPM_MILEAGE = $result_rankpm[$fildsfind];
+                    
+                    if($MLPM_MILEAGE && isset($vehicle_data['VHCCT_KILOFORDAY']) && $vehicle_data['VHCCT_KILOFORDAY'] > 0) {
+                        $remaining_mileage = $MLPM_MILEAGE - $CURRENT_MILEAGE;
+                        $estimated_days = ceil($remaining_mileage / $vehicle_data['VHCCT_KILOFORDAY']);
+                        $estimated_date = date('Y-m-d', strtotime("+$estimated_days days"));
+                        
+                        $next_pm_info = array(
+                            'pm_name' => $result_rankpm['MLPM_NAME'],
+                            'target_mileage' => $MLPM_MILEAGE,
+                            'current_mileage' => $CURRENT_MILEAGE,
+                            'remaining_mileage' => $remaining_mileage,
+                            'estimated_days' => $estimated_days,
+                            'estimated_date' => $estimated_date,
+                            'km_per_day' => $vehicle_data['VHCCT_KILOFORDAY']
+                        );
+                    }
+                }
+            }
+        }
+    }
 ?>
 
-
-
+<!-- เพิ่ม jQuery UI CSS และ JS -->
+<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/ui-lightness/jquery-ui.css"> -->
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
+<!-- เพิ่ม Loading และ Progress Bar -->
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+        display: none;
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .loading-content {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        min-width: 300px;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 15px 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #007bff, #0056b3);
+        width: 0%;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+    }
+    
+    .card-loading {
+        position: relative;
+        opacity: 0.6;
+    }
+    
+    .card-loading::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .refresh-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255,255,255,0.9);
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 5px 8px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .refresh-btn:hover {
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
 
+<!-- เพิ่ม CSS สำหรับ maintenance bar -->
 <style>
 	.maintenance-table {
 		width: 100%;
@@ -736,327 +929,459 @@
 	}
 </style>
 
+<link rel="stylesheet" href="<?=$path;?>css/dashboard.css" />	
 <body> 
-    <div id="dialog_popup" title="เพิ่ม / แก้ไขรายการ" align="center"></div>
+	<!-- Loading Overlay -->
+	<div class="loading-overlay" id="loadingOverlay">
+		<div class="loading-content">
+			<h4>กำลังโหลดข้อมูล...</h4>
+			<div class="progress-bar">
+				<div class="progress-fill" id="progressFill"></div>
+			</div>
+			<p id="loadingText">กำลังเตรียมข้อมูล...</p>
+		</div>
+	</div>
     <table width="100%"  height="100%"  border="0" cellpadding="0" cellspacing="0" class="no-border">
         <tr valign="top">
             <td height="1"><?php include ($path."include/navtop.php");?></td>
         </tr>
-        <tr valign="top">
-            <td><input type="hidden" id="toggle_menu" value="ปิด">
-                <input name="current_menu_id" type="hidden" id="current_menu_id">
-                <table width="100%" height="100%" border="0" align="center" cellpadding="0" cellspacing="0" id="main">
-                    <tr>
-                        <td width="86%" valign="top" id="td_detail">
-                            <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="INVENDATA no-border">
-                            <tr class="TOP">
-                                <td class="LEFT"></td>
-                                <td class="CENTER">
-                                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td width="25" valign="middle" class=""><img src="../images/88.png" width="48" height="48"></td>
-                                            <td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;Timeline การบำรุงรักษารถ</h3></td>
-                                            <td width="617" align="right" valign="bottom" class="" nowrap></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                                <td class="RIGHT"></td>
-                            </tr>
-                            <tr class="CENTER">
-                                <td class="LEFT"></td>
-                                <td class="CENTER" align="center">
-                                    
-                                    
-                                    <div class="search-form">
-                                        <h4>🔍 ค้นหารถ</h4>
-                                        <form method="GET" action="" id="searchForm">
-                                            <input type="hidden" name="menu_id" value="dashboard">
-                                            <div class="search-input-container">
-                                                <i class="search-icon">🔍</i>
-                                                <input type="text" 
-														name="vehicle_search" 
-														id="vehicle_search" 
-														class="search-input" 
-														placeholder="ป้อนทะเบียนรถ หรือ ชื่อรถ..." 
-														value="<?php echo htmlspecialchars($selected_vehicle); ?>"
-														autocomplete="off">
-                                                <div class="search-loading">
-                                                    <i class="fa fa-spinner fa-spin"></i>
-                                                </div>
-                                            </div>
-                                            
-                                            <?php if (!empty($selected_vehicle)): ?>
-												&emsp;
-                                                <a href="<?php echo $path; ?>manage/dashboard_project.php?menu_id=dashboard">
-                                                    <button class="bg-color-red font-white" type="button" style="background-color: #dc3545;">❌ ล้างการค้นหา</button>
-                                                </a>
-                                            <?php endif; ?>
-                                        </form>
-                                    </div>
-
-                                    <?php if (!empty($selected_vehicle)): ?>
-                                        <?php if ($vehicle_data): ?>
-                                            
-                                            <div class="vehicle-profile">
-                                                <h3>🚗 ข้อมูลรถ</h3>
-                                                <div class="vehicle-details">
-                                                    <div class="vehicle-detail-item">
-                                                        <strong>ทะเบียน:</strong> <?php echo $vehicle_data['VEHICLEREGISNUMBER']; ?>
-                                                    </div>
-                                                    <div class="vehicle-detail-item">
-                                                        <strong>ชื่อรถ:</strong> <?php echo $vehicle_data['THAINAME']; ?>
-                                                    </div>
-                                                    <div class="vehicle-detail-item">
-                                                        <strong>ประเภท:</strong> <?php echo $vehicle_data['REGISTYPE']; ?>
-                                                    </div>
-                                                    <div class="vehicle-detail-item">
-                                                        <strong>บริษัท:</strong> <?php echo $vehicle_data['AFFCOMPANY']; ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-											<table width="100%" border="0" cellpadding="0" cellspacing="0">
-												<tr>
-													<td width="617" align="right" valign="bottom" class="" nowrap>
-														<div class="toolbar">
-																<?php date_default_timezone_set('Asia/Bangkok'); ?>
-															<span style="font-size: 20px; margin-right: 20px;">
-																Date: <?php echo date("d/m/Y"); ?>
-															</span>
-														</div>
-													</td>
-												</tr>
-											</table>
-                                            
-                                            <table class="timeline-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th align="center" >ประเภทการบำรุงรักษา</th>
-                                                        <th >วันที่เปลี่ยนล่าสุด</th>
-                                                        <th >วันที่ครบกำหนด</th>
-                                                        <th class="year-column" id="last-change-header">ครั้งล่าสุด</th>														
-                                                        <?php
-                                                        for($year = $yearstart; $year <= $yearend; $year++): ?>
-															<th class="year-column"><?php echo $year; ?></th>
-                                                        <?php endfor; ?>
-                                                        <th>จำนวนวันที่เหลือ</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    
-													<tr class="timeline-row pm-standard-row" data-row="pm">
-														<td class="maintenance-type-cell">
-															<strong>PM Standard</strong>
-															<div class="sub-text">การบำรุงรักษาตามกำหนด</div>
-														</td>
-														<td>
-															<?php 
-															if (!empty($pm_standard_data)) {
-																$last_pm = end($pm_standard_data);
-																$last_pm_date = date('d/m/Y', strtotime($last_pm['RPATTM_PROCESS']));
-																echo $last_pm_date;
-															} else {
-																echo "-";
-															}
-															?>
-														</td>
-														<td>
-															<?php 
-															if($next_pm_info) {
-																echo date('d/m/Y', strtotime($next_pm_info['estimated_date']));
-															} else {
-																echo "-";
-															}
-															?>
-														</td>
-														<td class="timeline-cell" id="last-change-pm"></td>
-														
-														<?php for($year = $yearstart; $year <= $yearend; $year++): ?>
-															<td class="timeline-cell" id="cell-pm-<?php echo $year; ?>">
-																
-															</td>
-														<?php endfor; ?>
-														
-														<td style="font-weight: bold; color: <?php 
-															if($next_pm_info) {
-																if($next_pm_info['estimated_days'] <= 30) {
-																	echo '#ffc107'; // Warning
-																} else if($next_pm_info['estimated_days'] <= 7) {
-																	echo '#dc3545'; // Danger
-																} else {
-																	echo '#28a745'; // Normal
-																}
-															} else {
-																echo '#6c757d'; // Gray
-															}
-														?>;">
-															<?php 
-															if($next_pm_info) {
-																if($next_pm_info['estimated_days'] > 0) {
-																	echo "เหลือ " . $next_pm_info['estimated_days'] . " วัน";
-																} else {
-																	echo "เกิน " . abs($next_pm_info['estimated_days']) . " วัน";
-																}
-															} else {
-																echo "-";
-															}
-															?>
-														</td>
-														
-														
-														<?php if (!empty($pm_standard_data)): ?>
-														<script>
-															document.addEventListener('DOMContentLoaded', function() {
-																setTimeout(function() {
-																	createPMStandardBar(
-																		<?php echo json_encode($pm_standard_data); ?>,
-																		'<?php echo $vehicle_data['VEHICLEREGISNUMBER']; ?>',
-																		'<?php echo $vehicle_data['THAINAME']; ?>',
-																		<?php echo $yearstart; ?>,
-																		<?php echo $yearend; ?>,
-																		<?php echo json_encode($next_pm_info); ?>
-																	);
-																}, 100);
-															});
-														</script>
-														<?php endif; ?>
+		<tr valign="top">
+			<td>
+				<br>
+				<div class="row">
+					<div class="col-12">
+						<div class="row">
+							<div class="col-1">&nbsp;</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<div class="col-2">
+								<a href="<?=$path?>manage/dashboard_project.php?menu_id=dashboard">							
+									<div class="small-box bg-success">
+										<div class="inner">
+											<h3><h4><font color='white' size='4'>Timeline</font></h4></h3>
+											<b><font color='white' size='4'>การบำรุงรักษารถ</font></b>						
+										</div>
+										<div class="small-box-footer"><b><font color='white' size='3'>จัดการ</font></b></div>
+									</div>
+								</a>
+							</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;					
+							<div class="col-2">
+								<div style="position: relative;">
+									<a href="dashboard_project_view.php?type=due_soon&menu_id=dashboard">
+										<div class="small-box bg-info">
+											<div class="inner">
+												<h3><font color='white'><?php echo $card_data['due_soon']; ?></font></h3>
+												<b><font color='white' size='4'>ถึงกำหนดเปลี่ยน</font></b>
+												<b><font color='white' size='1'> < 5 วัน</font></b>
+											</div>
+											<div class="small-box-footer"><b><font color='white' size='3'>จัดการ</font></b></div>
+										</div>
+									</a>
+									<button class="refresh-btn" onclick="refreshCardData()" title="รีเฟรชข้อมูล">
+										🔄 รีเฟรช
+									</button>
+								</div>
+							</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<div class="col-2"> 
+								<a href="dashboard_project_view.php?type=approaching&menu_id=dashboard">	
+									<div class="small-box bg-warning">
+										<div class="inner">
+											<h3><font color='white'><?php echo $card_data['approaching']; ?></font></h3>
+											<b><font color='white' size='4'>ใกล้ถึงกำหนด</font></b>
+											<b><font color='white' size='1'> < 15 วัน</font></b>
+										</div>
+										<div class="small-box-footer"><b><font color='white' size='3'>จัดการ</font></b></div>
+									</div>
+								</a>
+							</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<div class="col-2">
+								<a href="dashboard_project_view.php?type=overdue&menu_id=dashboard">	
+									<div class="small-box bg-danger">
+										<div class="inner">
+											<h3><font color='white'><?php echo $card_data['overdue']; ?></font></h3>
+											<b><font color='white' size='4'>เกินกำหนด</font></b>
+											<b><font color='white' size='1'> > 1 วัน</font></b>
+										</div>
+										<div class="small-box-footer"><b><font color='white' size='3'>จัดการ</font></b></div>
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<table width="100%" height="100%" border="0" align="center" cellpadding="0" cellspacing="0" id="main">
+							<tr>
+								<td width="86%" valign="top" id="td_detail">
+									<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="INVENDATA no-border">
+										<tr class="TOP">
+											<td class="LEFT"></td>
+											<td class="CENTER">
+												<table width="100%" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td width="25" valign="middle" class=""><img src="../images/88.png" width="48" height="48"></td>
+														<td width="419" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;Timeline การบำรุงรักษารถ</h3></td>
+														<td width="617" align="right" valign="bottom" class="" nowrap></td>
 													</tr>
+												</table>
+											</td>
+											<td class="RIGHT"></td>
+										</tr>
+										<tr class="CENTER">
+											<td class="LEFT"></td>
+											<td class="CENTER" align="center">
+												
+												<!-- ฟอร์มค้นหาพร้อม Autocomplete -->
+												<div class="search-form">
+													<h4>🔍 ค้นหารถ</h4>
+													<form method="GET" action="" id="searchForm">
+														<input type="hidden" name="menu_id" value="dashboard">
+														<div class="search-input-container">
+															<i class="search-icon">🔍</i>
+															<input type="text" 
+																	name="vehicle_search" 
+																	id="vehicle_search" 
+																	class="search-input" 
+																	placeholder="ป้อนทะเบียนรถ หรือ ชื่อรถ..." 
+																	value="<?php echo htmlspecialchars($selected_vehicle); ?>"
+																	autocomplete="off">
+															<div class="search-loading">
+																<i class="fa fa-spinner fa-spin"></i>
+															</div>
+														</div>
+														<!-- <button type="submit" class="search-btn"><i class="icon-search"></i> ค้นหา</button> -->
+														<?php if (!empty($selected_vehicle)): ?>
+															&emsp;
+															<a href="<?php echo $path; ?>manage/dashboard_project.php?menu_id=dashboard">
+																<button class="bg-color-red font-white" type="button" style="background-color: #dc3545;">❌ ล้างการค้นหา</button>
+															</a>
+														<?php endif; ?>
+													</form>
+												</div>
 
-                                                    
-                                                    <?php foreach($sparepart_data as $index => $sparepart): ?>
-                                                    <tr class="timeline-row" data-row="<?php echo $index; ?>">
-													<td class="maintenance-type-cell">
-														<strong><?php echo $sparepart['PJSPP_NAME']; ?></strong>
-														<div class="sub-text">อายุการใช้งาน: <?php echo $sparepart['PJSPP_EXPIRE_YEAR']; ?> ปี</div>
-													</td>
+												<?php if (!empty($selected_vehicle)): ?>
+													<?php if ($vehicle_data): ?>
+														<!-- ส่วนแสดงข้อมูลรถและ Timeline เหมือนเดิม... -->
+														<div class="vehicle-profile">
+															<h3>🚗 ข้อมูลรถ</h3>
+															<div class="vehicle-details">
+																<div class="vehicle-detail-item">
+																	<strong>ทะเบียน:</strong> <?php echo $vehicle_data['VEHICLEREGISNUMBER']; ?>
+																</div>
+																<div class="vehicle-detail-item">
+																	<strong>ชื่อรถ:</strong> <?php echo $vehicle_data['THAINAME']; ?>
+																</div>
+																<div class="vehicle-detail-item">
+																	<strong>ประเภท:</strong> <?php echo $vehicle_data['REGISTYPE']; ?>
+																</div>
+																<div class="vehicle-detail-item">
+																	<strong>บริษัท:</strong> <?php echo $vehicle_data['AFFCOMPANY']; ?>
+																</div>
+															</div>
+														</div>
+														<table width="100%" border="0" cellpadding="0" cellspacing="0">
+															<tr>
+																<td width="617" align="right" valign="bottom" class="" nowrap>
+																	<div class="toolbar">
+																			<?php date_default_timezone_set('Asia/Bangkok'); ?>
+																		<span style="font-size: 20px; margin-right: 20px;">
+																			Date: <?php echo date("d/m/Y"); ?>
+																		</span>
+																	</div>
+																</td>
+															</tr>
+														</table>
+														<!-- Timeline การบำรุงรักษา -->
+														<table class="timeline-table">
+															<thead>
+																<tr>
+																	<th align="center" >ประเภทการบำรุงรักษา</th>
+																	<th >วันที่เปลี่ยนล่าสุด</th>
+																	<th >วันที่ครบกำหนด</th>
+																	<th class="year-column" id="last-change-header">ครั้งล่าสุด</th>														
+																	<?php
+																	for($year = $yearstart; $year <= $yearend; $year++): ?>
+																		<th class="year-column"><?php echo $year; ?></th>
+																	<?php endfor; ?>
+																	<th>จำนวนวันที่เหลือ</th>
+																</tr>
+															</thead>
+															<tbody>
+																<!-- แถว PM Standard -->
+																<tr class="timeline-row pm-standard-row" data-row="pm">
+																	<td class="maintenance-type-cell">
+																		<strong>PM Standard</strong>
+																		<div class="sub-text">การบำรุงรักษาตามกำหนด</div>
+																	</td>
+																	<td>
+																		<?php 
+																		if (!empty($pm_standard_data)) {
+																			$last_pm = end($pm_standard_data);
+																			$last_pm_date = date('d/m/Y', strtotime($last_pm['RPATTM_PROCESS']));
+																			echo $last_pm_date;
+																		} else {
+																			echo "-";
+																		}
+																		?>
+																	</td>
+																	<td>
+																		<?php 
+																		if($next_pm_info) {
+																			echo date('d/m/Y', strtotime($next_pm_info['estimated_date']));
+																		} else {
+																			echo "-";
+																		}
+																		?>
+																	</td>
+																	<td class="timeline-cell" id="last-change-pm"></td>
+																	
+																	<?php for($year = $yearstart; $year <= $yearend; $year++): ?>
+																		<td class="timeline-cell" id="cell-pm-<?php echo $year; ?>">
+																			<!-- Empty cell for PM bar -->
+																		</td>
+																	<?php endfor; ?>
+																	
+																	<td style="font-weight: bold; color: <?php 
+																		if($next_pm_info) {
+																			if($next_pm_info['estimated_days'] <= 30) {
+																				echo '#ffc107'; // Warning
+																			} else if($next_pm_info['estimated_days'] <= 7) {
+																				echo '#dc3545'; // Danger
+																			} else {
+																				echo '#28a745'; // Normal
+																			}
+																		} else {
+																			echo '#6c757d'; // Gray
+																		}
+																	?>;">
+																		<?php 
+																		if($next_pm_info) {
+																			if($next_pm_info['estimated_days'] > 0) {
+																				echo "เหลือ " . $next_pm_info['estimated_days'] . " วัน";
+																			} else {
+																				echo "เกิน " . abs($next_pm_info['estimated_days']) . " วัน";
+																			}
+																		} else {
+																			echo "-";
+																		}
+																		?>
+																	</td>
+																	
+																	<!-- Script สำหรับสร้าง PM bar -->
+																	<?php if (!empty($pm_standard_data)): ?>
+																	<script>
+																		document.addEventListener('DOMContentLoaded', function() {
+																			setTimeout(function() {
+																				createPMStandardBar(
+																					<?php echo json_encode($pm_standard_data); ?>,
+																					'<?php echo $vehicle_data['VEHICLEREGISNUMBER']; ?>',
+																					'<?php echo $vehicle_data['THAINAME']; ?>',
+																					<?php echo $yearstart; ?>,
+																					<?php echo $yearend; ?>,
+																					<?php echo json_encode($next_pm_info); ?>
+																				);
+																			}, 100);
+																		});
+																	</script>
+																	<?php endif; ?>
+																</tr>
 
-                                                        <?php
-															// ใช้สูตรจาก request_repair_sparepart_form.php
-															$PJSPP_CODENAME = $sparepart['PJSPP_CODENAME'];
-															$PJSPP_EXPIRE_YEAR = $sparepart['PJSPP_EXPIRE_YEAR'];
-															$VEHICLEREGISNUMBER = $vehicle_data['VEHICLEREGISNUMBER'];
-															$THAINAME = $vehicle_data['THAINAME'];
-															
-															$lactchangedate_display = "-";
-															$PJSPP_EXPIRE_DATE = "-";
-															$days_text = "-";
-															$day_diff = 0;
-															$has_data = false;
-															$lactchangedate = null;
-															$expire_date_str = null;
-															
-															$valid_codes = ["01","02","03","04","05","06","07","08"];
-															if (in_array($PJSPP_CODENAME, $valid_codes)) {
-																$table = "PROJECT_SPAREPART_".$PJSPP_CODENAME;
-																$CODENAME = "PJSPP".$PJSPP_CODENAME."_CODENAME"; 
-																$VHCRG = "PJSPP".$PJSPP_CODENAME."_VHCRG"; 
-																$VHCRGNM = "PJSPP".$PJSPP_CODENAME."_VHCRGNM"; 
-																$CREATEDATE = "PJSPP".$PJSPP_CODENAME."_CREATEDATE"; 
-																$LCD = "PJSPP".$PJSPP_CODENAME."_LCD";
-																
-																// ดึงข้อมูลจากตาราง PROJECT_SPAREPART_CODENAME
-																$sql_sparepart = "SELECT TOP 1 * FROM [dbo].[$table] WHERE $CODENAME = '$PJSPP_CODENAME' AND ($VHCRG = '$VEHICLEREGISNUMBER' OR $VHCRGNM = '$THAINAME') ORDER BY $CREATEDATE DESC";
-																$query_sparepart_detail = sqlsrv_query($conn, $sql_sparepart);
-																$result_sparepart_detail = sqlsrv_fetch_array($query_sparepart_detail, SQLSRV_FETCH_ASSOC);
+																<!-- แถวอะไหล่ต่างๆ เหมือนเดิม -->
+																<?php foreach($sparepart_data as $index => $sparepart): ?>
+																<tr class="timeline-row" data-row="<?php echo $index; ?>">
+																<td class="maintenance-type-cell">
+																	<strong><?php echo $sparepart['PJSPP_NAME']; ?></strong>
+																	<div class="sub-text">อายุการใช้งาน: <?php echo $sparepart['PJSPP_EXPIRE_YEAR']; ?> ปี</div>
+																</td>
 
-																if($result_sparepart_detail && isset($result_sparepart_detail[$LCD]) && $result_sparepart_detail[$LCD] != null){
-																	$lactchangedate = $result_sparepart_detail[$LCD];
-																	$lactchangedate_display = date("d/m/Y", strtotime($lactchangedate));
+																	<?php
+																		// ใช้สูตรจาก request_repair_sparepart_form.php
+																		$PJSPP_CODENAME = $sparepart['PJSPP_CODENAME'];
+																		$PJSPP_EXPIRE_YEAR = $sparepart['PJSPP_EXPIRE_YEAR'];
+																		$VEHICLEREGISNUMBER = $vehicle_data['VEHICLEREGISNUMBER'];
+																		$THAINAME = $vehicle_data['THAINAME'];
+																		
+																		$lactchangedate_display = "-";
+																		$PJSPP_EXPIRE_DATE = "-";
+																		$days_text = "-";
+																		$day_diff = 0;
+																		$has_data = false;
+																		$lactchangedate = null;
+																		$expire_date_str = null;
+																		
+																		$valid_codes = ["01","02","03","04","05","06","07","08"];
+																		if (in_array($PJSPP_CODENAME, $valid_codes)) {
+																			$table = "PROJECT_SPAREPART_".$PJSPP_CODENAME;
+																			$CODENAME = "PJSPP".$PJSPP_CODENAME."_CODENAME"; 
+																			$VHCRG = "PJSPP".$PJSPP_CODENAME."_VHCRG"; 
+																			$VHCRGNM = "PJSPP".$PJSPP_CODENAME."_VHCRGNM"; 
+																			$CREATEDATE = "PJSPP".$PJSPP_CODENAME."_CREATEDATE"; 
+																			$LCD = "PJSPP".$PJSPP_CODENAME."_LCD";
+																			$REMARK = "PJSPP".$PJSPP_CODENAME."_REMARK";
+																			
+																			// ดึงข้อมูลจากตาราง PROJECT_SPAREPART_CODENAME
+																			$sql_sparepart = "SELECT TOP 1 * FROM [dbo].[$table] WHERE $CODENAME = '$PJSPP_CODENAME' AND ($VHCRG = '$VEHICLEREGISNUMBER' OR $VHCRGNM = '$THAINAME') ORDER BY $CREATEDATE DESC";
+																			$query_sparepart_detail = sqlsrv_query($conn, $sql_sparepart);
+																			$result_sparepart_detail = sqlsrv_fetch_array($query_sparepart_detail, SQLSRV_FETCH_ASSOC);
+
+																			if($result_sparepart_detail && isset($result_sparepart_detail[$LCD]) && $result_sparepart_detail[$LCD] != null){
+																				$lactchangedate = $result_sparepart_detail[$LCD];
+																				$lactchangedate_display = date("d/m/Y", strtotime($lactchangedate));
+																				
+																				// วันที่ครบกำหนด
+																				$expire_date_str = date("Y-m-d", strtotime("+$PJSPP_EXPIRE_YEAR year", strtotime($lactchangedate)));
+																				$PJSPP_EXPIRE_DATE = date("d/m/Y", strtotime($expire_date_str));
+																				
+																				// คำนวณจำนวนวันระหว่างวันนี้กับวันครบกำหนด
+																				$date1 = date_create(date("Y-m-d"));
+																				$date2 = date_create($expire_date_str);
+																				$diff = date_diff($date1, $date2);
+																				$day_diff = (int)$diff->format("%R%a");
+																				
+																				if ($day_diff < 0) {
+																					$days_text = "เกิน " . abs($day_diff) . " วัน";
+																				} else {
+																					$days_text = "เหลือ " . $day_diff . " วัน";
+																				}
+																				
+																				$has_data = true;
+											
+																				$remarkdisplay = $result_sparepart_detail['PJSPP'.$PJSPP_CODENAME.'_REMARK']; 
+																			}
+																		}
+																	?>
 																	
-																	// วันที่ครบกำหนด
-																	$expire_date_str = date("Y-m-d", strtotime("+$PJSPP_EXPIRE_YEAR year", strtotime($lactchangedate)));
-																	$PJSPP_EXPIRE_DATE = date("d/m/Y", strtotime($expire_date_str));
+																	<td><?php echo $lactchangedate_display; ?></td>
+																	<td><?php echo $PJSPP_EXPIRE_DATE; ?></td>
+																	<td class="timeline-cell" id="last-change-<?php echo $index; ?>"></td>
 																	
-																	// คำนวณจำนวนวันระหว่างวันนี้กับวันครบกำหนด
-																	$date1 = date_create(date("Y-m-d"));
-																	$date2 = date_create($expire_date_str);
-																	$diff = date_diff($date1, $date2);
-																	$day_diff = (int)$diff->format("%R%a");
+																	<?php // แสดงแต่ละปี $yearstart-$yearend
+																	for($year = $yearstart; $year <= $yearend; $year++): ?>
+																		<td class="timeline-cell" id="cell-<?php echo $index; ?>-<?php echo $year; ?>">
+																			<!-- Empty cell for spanning bar -->
+																		</td>
+																	<?php endfor; ?>
 																	
-																	if ($day_diff < 0) {
-																		$days_text = "เกิน " . abs($day_diff) . " วัน";
-																	} else {
-																		$days_text = "เหลือ " . $day_diff . " วัน";
-																	}
+																	<td style="font-weight: bold; color: <?php echo ($day_diff < 0 ? '#dc3545' : ($day_diff <= 30 ? '#ffc107' : '#28a745')); ?> !important;">
+																		<?php echo $days_text; ?>
+																	</td>
 																	
-																	$has_data = true;
-																}
-															}
-                                                        ?>
-                                                        
-                                                        <td><?php echo $lactchangedate_display; ?></td>
-                                                        <td><?php echo $PJSPP_EXPIRE_DATE; ?></td>
-                                                        <td class="timeline-cell" id="last-change-<?php echo $index; ?>"></td>
-                                                        
-                                                        <?php // แสดงแต่ละปี $yearstart-$yearend
-                                                        for($year = $yearstart; $year <= $yearend; $year++): ?>
-                                                            <td class="timeline-cell" id="cell-<?php echo $index; ?>-<?php echo $year; ?>">
-                                                                
-                                                            </td>
-                                                        <?php endfor; ?>
-                                                        
-														<td style="font-weight: bold; color: <?php echo ($day_diff < 0 ? '#dc3545' : ($day_diff <= 30 ? '#ffc107' : '#28a745')); ?> !important;">
-															<?php echo $days_text; ?>
-														</td>
-                                                        
-                                                        <?php if ($has_data): ?>
-                                                        <script>
-                                                            // สร้าง spanning bar สำหรับแถวนี้
-                                                            document.addEventListener('DOMContentLoaded', function() {
-                                                                setTimeout(function() {
-                                                                    createSpanningBar(
-                                                                        <?php echo $index; ?>,
-                                                                        '<?php echo $sparepart['PJSPP_NAME']; ?>',
-                                                                        '<?php echo $lactchangedate_display; ?>',
-                                                                        '<?php echo $PJSPP_EXPIRE_DATE; ?>',
-                                                                        '<?php echo $VEHICLEREGISNUMBER; ?>',
-																		'<?php echo $THAINAME; ?>',
-                                                                        <?php echo $day_diff; ?>,
-																		<?php echo $yearstart; ?>,
-																		<?php echo $yearend; ?>
-                                                                    );
-                                                                }, 100);
-                                                            });
-                                                        </script>
-                                                        <?php endif; ?>
-                                                    </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>                                            
-                                        <?php else: ?>
-                                            <div class="alert alert-info">
-                                                <strong>ไม่พบข้อมูล!</strong> ไม่พบรถที่ค้นหา "<?php echo htmlspecialchars($selected_vehicle); ?>"
-                                            </div>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <div class="no-data">
-                                            <h4>🔍 กรุณาค้นหารถที่ต้องการดู Timeline การบำรุงรักษา</h4>
-                                            <p>เริ่มพิมพ์ทะเบียนรถ หรือ ชื่อรถ ในช่องค้นหาด้านบน</p>
-                                            <p><small>💡 ระบบจะแสดงรายการรถที่ตรงกันขณะที่คุณพิมพ์</small></p>
-                                        </div>
-                                    <?php endif; ?>
-                                    
-                                </td>
-                                <td class="RIGHT"></td>
-                            </tr>
-                            <tr class="BOTTOM">
-                                <td class="LEFT">&nbsp;</td>
-                                <td class="CENTER">&nbsp;		
-                                    <center>
-                                        <input type="button" class="button_gray" value="รีเฟรช" onclick="javascript:window.location.reload();">
-                                    </center>
-                                </td>
-                                <td class="RIGHT">&nbsp;</td>
-                            </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>				
+																	<?php if ($has_data): ?>
+																	<script>
+																		// สร้าง spanning bar สำหรับแถวนี้
+																		document.addEventListener('DOMContentLoaded', function() {
+																			setTimeout(function() {
+																				createSpanningBar(
+																					<?php echo $index; ?>,
+																					'<?php echo $sparepart['PJSPP_NAME']; ?>',
+																					'<?php echo $lactchangedate_display; ?>',
+																					'<?php echo $PJSPP_EXPIRE_DATE; ?>',
+																					'<?php echo $VEHICLEREGISNUMBER; ?>',
+																					'<?php echo $THAINAME; ?>',
+																					<?php echo $day_diff; ?>,
+																					<?php echo $yearstart; ?>,
+																					<?php echo $yearend; ?>,
+																					'<?php echo $remarkdisplay; ?>'
+																				);
+																			}, 100);
+																		});
+																	</script>
+																	<?php endif; ?>
+																</tr>
+																<?php endforeach; ?>
+															</tbody>
+														</table>                                            
+													<?php else: ?>
+														<div class="alert alert-info">
+															<strong>ไม่พบข้อมูล!</strong> ไม่พบรถที่ค้นหา "<?php echo htmlspecialchars($selected_vehicle); ?>"
+														</div>
+													<?php endif; ?>
+												<?php else: ?>
+													<div class="no-data">
+														<h4>🔍 กรุณาค้นหารถที่ต้องการดู Timeline การบำรุงรักษา</h4>
+														<p>เริ่มพิมพ์ทะเบียนรถ หรือ ชื่อรถ ในช่องค้นหาด้านบน</p>
+														<p><small>💡 ระบบจะแสดงรายการรถที่ตรงกันขณะที่คุณพิมพ์</small></p>
+													</div>
+												<?php endif; ?>
+												
+											</td>
+											<td class="RIGHT"></td>
+										</tr>
+										<tr class="BOTTOM">
+											<td class="LEFT">&nbsp;</td>
+											<td class="CENTER">&nbsp;		
+												<center>
+													<input type="button" class="button_gray" value="รีเฟรช" onclick="javascript:window.location.reload();">
+												</center>
+											</td>
+											<td class="RIGHT">&nbsp;</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</td>
+		</tr>			
         <tr valign="bottom">
             <td class="fg-toolbar ui-toolbar ui-widget-header ui-corner-bl ui-corner-br" height="5">&nbsp;</td>
         </tr>
     </table>
+
+	<script>
+		// ฟังก์ชัน Loading
+		function showLoading(text) {
+			document.getElementById('loadingOverlay').style.display = 'flex';
+			document.getElementById('loadingText').textContent = text || 'กำลังโหลดข้อมูล...';
+			document.getElementById('progressFill').style.width = '0%';
+		}
+
+		function updateProgress(percent, text) {
+			document.getElementById('progressFill').style.width = percent + '%';
+			if (text) document.getElementById('loadingText').textContent = text;
+		}
+
+		function hideLoading() {
+			document.getElementById('loadingOverlay').style.display = 'none';
+		}
+
+		// ฟังก์ชัน Refresh ข้อมูลการ์ด
+		function refreshCardData() {
+			showLoading('กำลังรีเฟรชข้อมูล...');
+			
+			// จำลองการลบ cache
+			updateProgress(30, 'กำลังล้างข้อมูลเก่า...');
+			
+			setTimeout(function() {
+				updateProgress(60, 'กำลังคำนวณข้อมูลใหม่...');
+				
+				// เพิ่ม parameter เพื่อบังคับให้คำนวณใหม่
+				const url = new URL(window.location);
+				url.searchParams.set('refresh_cache', '1');
+				url.searchParams.set('t', Date.now());
+				
+				setTimeout(function() {
+					updateProgress(100, 'เสร็จสิ้น!');
+					window.location.href = url.toString();
+				}, 500);
+			}, 500);
+		}
+
+		// Auto-hide loading เมื่อโหลดเสร็จ
+		document.addEventListener('DOMContentLoaded', function() {
+			hideLoading();
+		});
+
+		// เพิ่ม event สำหรับแสดง loading เมื่อ submit form
+		document.addEventListener('DOMContentLoaded', function() {
+			const searchForm = document.getElementById('searchForm');
+			if (searchForm) {
+				searchForm.addEventListener('submit', function() {
+					showLoading('กำลังค้นหาข้อมูลรถ...');
+				});
+			}
+		});
+	</script>
 
     <script>
         // ข้อมูลรถสำหรับ autocomplete
@@ -1215,7 +1540,7 @@
             barContainer.style.width = width + 'px';
         }
 
-        function createSpanningBar(rowIndex, maintenanceType, lastDate, nextDate, vehicleRegis, vehicleName, daysDiff, yearStart, yearEnd) {
+        function createSpanningBar(rowIndex, maintenanceType, lastDate, nextDate, vehicleRegis, vehicleName, daysDiff, yearStart, yearEnd, remark) {
 			// หาตำแหน่งของ cell เริ่มต้น (คอลัมน์ "ครั้งล่าสุด")
 			const startCell = document.getElementById(`last-change-${rowIndex}`);
 			
@@ -1283,7 +1608,7 @@
 			
 			// เพิ่ม event listener สำหรับ click
 			bar.addEventListener('click', function() {
-				showMaintenanceDetails(vehicleRegis, maintenanceType, lastDate, nextDate, daysDiff, vehicleName);
+				showMaintenanceDetails(vehicleRegis, maintenanceType, lastDate, nextDate, daysDiff, vehicleName, remark);
 			});
 			
 			// สร้าง point markers
@@ -1346,7 +1671,7 @@
 			});
         }
 
-        function showMaintenanceDetails(vehicleRegis, maintenanceType, lastDate, nextDate, daysDiff, vehicleName) {
+        function showMaintenanceDetails(vehicleRegis, maintenanceType, lastDate, nextDate, daysDiff, vehicleName, remark) {
             let statusText = '';
             let statusColor = '';
             let iconType = '';
@@ -1391,6 +1716,9 @@
                         <div style="margin-bottom: 15px; padding: 10px; background-color: white; border-radius: 5px;">
                             <strong>⏰ วันที่กำหนดเปลี่ยนครั้งถัดไป:</strong> ${nextDate} (ปี ${endYear})
                         </div>
+						<div style="margin-bottom: 15px; padding: 10px; background-color: white; border-radius: 5px;">
+							<strong>💬 หมายเหตุ:</strong> ${remark ? remark : ''}
+						</div>
                         <div style="padding: 15px; background-color: white; border-radius: 5px; border-left: 4px solid ${statusColor};">
                             <strong>📈 สถานะ:</strong> <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
                         </div>

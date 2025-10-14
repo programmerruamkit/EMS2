@@ -26,6 +26,42 @@ function ajaxPopup2(url,proc,con,w,h,title){
 		//$('#dialog_popup').empty().dialog("open").append(data);
 	});
 }
+function ajaxPopup2post(url, proc, con, w, h, title, method = "GET") {
+    var id = getIdSelect();
+    if (proc != 'add' && proc != "") {
+        if (!id) {
+            Swal.fire({
+                position: 'center',
+                icon: 'warning',
+                title: 'กรุณาเลือกข้อมูล',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return false;
+        }
+    }
+    if (method === "POST") {
+        // con ควรเป็น object (data) สำหรับ POST
+        var data = con;
+        data.proc = proc;
+        data.id = id;
+        $.post(url, data, function (data) {
+            $("#dialog_popup").dialog("option", "width", w).dialog("option", "height", h);
+            $('#dialog_popup').empty().dialog("open").append(data);
+            $("#dialog_popup").dialog({ title: title });
+        });
+    } else {
+        // GET แบบเดิม
+        url = url + "?proc=" + proc;
+        url += "&id=" + id;
+        url += "&" + con;
+        $.get(url, function (data) {
+            $("#dialog_popup").dialog("option", "width", w).dialog("option", "height", h);
+            $('#dialog_popup').empty().dialog("open").append(data);
+            $("#dialog_popup").dialog({ title: title });
+        });
+    }
+}
 function ajaxPopup4(url,proc,id,con,w,h,title){
 	var url = url+"?proc="+proc;
 	var id = id;

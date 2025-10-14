@@ -195,7 +195,7 @@ function log_repass(logcode,remark,refcode){
     });
 }
 
-function role_session(username, password, role, roleaccount){
+function role_session(username, password, role, roleaccount, rolename){
     $.ajax({
         type: 'post',
         url: '../controllers/setting.php',
@@ -217,8 +217,12 @@ function role_session(username, password, role, roleaccount){
             console.log(2)
             console.log(RS)
             if (RS == '"complete"') {
-                location.href = "../manage/dashboard.php?menu_id=dashboard"
-                // location.href = "../main/main_menu.php"
+                if (rolename === "PROJECT TTT" || rolename === "PROJECT" || rolename === "TTT") {
+                    // location.href = "../main/main_menu.php"
+                    location.href = "../manage/dashboard_project.php?menu_id=dashboard"
+                }else {
+                    location.href = "../manage/dashboard.php?menu_id=dashboard"
+                }
             }
         },
             error: function(){
