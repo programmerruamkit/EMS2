@@ -155,7 +155,9 @@ $tablebody =    "<tbody>";
                     }
 
                     // ใช้ตาราง IMPORT_HDMS แทน vwRKTC_MERGENEWOLD_TEST
-                    $sql_reporthdms = "SELECT * FROM IMPORT_HDMS WHERE ".$rswh." 1=1 ORDER BY JobDate ASC";
+					$sql_reporthdms = "SELECT * FROM IMPORT_HDMS
+					LEFT JOIN vwVEHICLEINFO A ON A.VEHICLEREGISNUMBER = LicensePlateNo
+					WHERE ".$rswh." 1=1 ORDER BY JobDate ASC";
                     $query_reporthdms = sqlsrv_query($conn, $sql_reporthdms);
                     $no=0;
                     while($result_reporthdms = sqlsrv_fetch_array($query_reporthdms, SQLSRV_FETCH_ASSOC)){	
@@ -180,6 +182,12 @@ $tablebody =    "<tbody>";
                         $temp16 = $result_reporthdms['RepairType'];            // ประเภทการซ่อม
                         $temp17 = $result_reporthdms['LicensePlateProvince'];  // ทะเบียนจังหวัด
                         $temp18 = $result_reporthdms['TruckSideNo'];           // เลขข้างรถ
+						$temp19 = $result_reporthdms['THAINAME'];			   // ชื่อรถ
+						if(empty($temp18)){
+							$namecar = $temp19;
+						}else{
+							$namecar = $temp18;
+						}
                         
 $tablebody .=   "<tr height='25px'>
                     <td align='center'>".$no."</td>
@@ -187,7 +195,7 @@ $tablebody .=   "<tr height='25px'>
                     <td align='center'>".$temp2."</td>
                     <td align='center'>".$temp3."</td>
                     <td align='center'>".$temp4."</td>
-                    <td align='center'>".$temp18."</td>
+					<td align='center'>".$namecar."</td>
                     <td align='center'>".$temp5."</td>
                     <td align='center'>".$temp6."</td>
                     <td align='right'>".$temp7."</td>
