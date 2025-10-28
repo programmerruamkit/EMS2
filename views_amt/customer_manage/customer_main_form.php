@@ -142,6 +142,12 @@
                               <input type="text" class="time" name="CTM_TAXNUMBER" id="CTM_TAXNUMBER" value="<?=$result_edit_customer["CTM_TAXNUMBER"];?>" onFocus="$(this).select();" />
                             </div>
                           </td>
+                          <td height="35" align="right" class="ui-state-default"><strong>อีเมล :</strong></td>
+                          <td height="35" align="left" class="bg-white">
+                            <div class="input-control text">
+                              <input type="text" class="time" name="CTM_MAIL" id="CTM_MAIL" value="<?=$result_edit_customer["CTM_MAIL"];?>" onFocus="$(this).select();" />
+                            </div>
+                          </td>
                         </tr>
                         <tr align="center" height="25px">
                           <td height="35" align="right" class="ui-state-default"><strong>เบอร์โทรศัพท์ :</strong></td>

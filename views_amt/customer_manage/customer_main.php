@@ -8,7 +8,7 @@
 <script type="text/javascript">
 	$(document).ready(function(e) {	   
 		$("#button_new").click(function(){
-			ajaxPopup2("<?=$path?>views_amt/customer_manage/customer_main_form.php","add","1=1","800","430","เพิ่มลูกค้าใหม่");
+			ajaxPopup2("<?=$path?>views_amt/customer_manage/customer_main_form.php","add","1=1","800","500","เพิ่มลูกค้าใหม่");
 		});
 	
 		$("#button_edit").click(function(){
@@ -102,10 +102,10 @@
         <td width="90%" height="10%" valign="bottom" class=""><h3>&nbsp;&nbsp;จัดการข้อมูลลูกค้า - บริษัท</h3></td>
         <td width="5%" align="right" valign="bottom" class="" nowrap>
             <div class="toolbar">
-                
+                <!-- <button class="bg-color-greenLight" style="padding-top:8px;" title="Detail" id="button_detail"><i class='icon-search icon-large'></i></button> -->
                 <button class="bg-color-blue" style="padding-top:8px;" title="New" id="button_new"><i class='icon-plus icon-large'></i></button>
-                
-                
+                <!-- <button class="bg-color-yellow" style="padding-top:8px;" title="Edit" id="button_edit"><i class='icon-pencil icon-large'></i></button> -->
+                <!-- <button class="bg-color-red" style="padding-top:8px;" title="Del" id="button_delete"><i class="icon-cancel icon-large"></i></button> -->
             </div>
         </td>
         </tr>
@@ -168,7 +168,7 @@
 				<td align="left" >&nbsp;<?php if($result_customer['CTM_GROUP']== "cusin"){ echo "ลูกค้าภายใน"; }else if($result_customer['CTM_GROUP']== "cusout"){ echo "ลูกค้าภายนอก"; } ?></td>
 				<td align="center" >&nbsp;<?php if($CTM_STATUS=="Y"){print "<img src='../images/check_true.gif' width='16' height='16'>";}else{print "<img src='../images/check_del.gif' width='16' height='16'>";}?></td>
 				<td align="center" >
-					<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/customer_manage/customer_main_form.php','edit','<?php print $CTM_CODE; ?>','1=1','1350','430','แก้ไขข้อมูลลูกค้า');"><i class='icon-pencil icon-large'></i></button>
+					<button type="button" class="mini bg-color-yellow" style="padding-top:12px;" title="Edit" onClick="javascript:ajaxPopup4('<?=$path?>views_amt/customer_manage/customer_main_form.php','edit','<?php print $CTM_CODE; ?>','1=1','1350','500','แก้ไขข้อมูลลูกค้า');"><i class='icon-pencil icon-large'></i></button>
 					&nbsp;&nbsp;
 					<button type="button" class="mini bg-color-red" style="padding-top:12px;" title="Del" onclick="swaldelete_customer_main('<?php print $CTM_CODE; ?>','<?php print $no;?>')"><i class="icon-cancel icon-large"></i></button>
 				</td>
