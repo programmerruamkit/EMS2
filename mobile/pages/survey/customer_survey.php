@@ -603,25 +603,27 @@
             }
             
             .header {
-                flex-direction: column;
-                text-align: center;
-                padding: 15px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 15px;
                 gap: 10px;
             }
             
             .header-left, .header-right {
-                order: 1;
+                flex: 0 0 auto;
             }
             
             .header-center {
-                order: 2;
-                width: 100%;
-                min-width: auto;
+                flex: 1;
+                text-align: center;
+                min-width: 0;
+                padding: 0 10px;
             }
             
             .header-logo {
-                max-width: 60px;
-                max-height: 60px;
+                max-width: 50px;
+                max-height: 50px;
             }
             
             .form-section {
@@ -785,16 +787,36 @@
             }
             
             .header {
-                padding: 10px;
+                padding: 8px 10px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .header-left, .header-right {
+                flex: 0 0 auto;
+            }
+            
+            .header-center {
+                flex: 1;
+                text-align: center;
+                min-width: 0;
+                padding: 0 8px;
+            }
+            
+            .header-logo {
+                max-width: 40px;
+                max-height: 40px;
             }
             
             .header h1 {
-                font-size: 16px;
+                font-size: 14px;
                 line-height: 1.3;
+                margin-bottom: 2px;
             }
             
             .header p {
-                font-size: 12px;
+                font-size: 10px;
             }
             
             .form-section {
@@ -836,12 +858,25 @@
         
         /* Very Small Screens (320px and below) */
         @media (max-width: 320px) {
+            .header {
+                padding: 5px 8px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .header-logo {
+                max-width: 35px;
+                max-height: 35px;
+            }
+            
             .header h1 {
-                font-size: 14px;
+                font-size: 12px;
+                margin-bottom: 1px;
             }
             
             .header p {
-                font-size: 11px;
+                font-size: 9px;
             }
             
             .evaluation-table {
