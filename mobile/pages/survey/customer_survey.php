@@ -1,301 +1,321 @@
-<?php
-$path = "../";
-require($path.'../include/connect.php');
+<?php 
+    include('../../include/db.php');
+    session_name("EMS"); // session_start();
+    error_reporting(E_ALL); //E_ALL แสดง error ทั้งหมด | ใส่ 0 ปิดแสดง error ทั้งหมด
+    date_default_timezone_set('Asia/Bangkok');
+        $serverName = $HOST;
+        $userName = $USERNAME;
+        $userPassword = $PASSWORD;
+        $dbName = $DATABASE;
 
-$SESSION_AREA = $_SESSION["AD_AREA"];
+    $connectionInfo = array("Database"=>$dbName, "UID"=>$userName, "PWD"=>$userPassword, "MultipleActiveResultSets"=>true,"CharacterSet"  => 'UTF-8');
+    $conn = sqlsrv_connect($serverName, $connectionInfo);
+    if($conn)
+    {
+        // echo "Database Connected.";
+    }else{
+        // die( print_r( sqlsrv_errors(), true));
+    }
+	###########################################################################################################
 
-// รับ survey_id จาก URL หรือใช้ default
-$survey_id = isset($_GET['sm']) ? $_GET['sm'] : 1;
-
-// ดึงข้อมูลแบบประเมิน
-$stmt_survey = "SELECT SM_CODE,SM_NAME,SM_TARGET_GROUP FROM SURVEY_MAIN WHERE SM_ID = ? AND SM_STATUS = 'Y'";
-$params_survey = array($survey_id);
-$query_survey = sqlsrv_query($conn, $stmt_survey, $params_survey);
-$survey_data = sqlsrv_fetch_array($query_survey, SQLSRV_FETCH_ASSOC);
-
-// ดึงข้อมูลแจ้งซ่อม
-$repair_data = null;
-$existing_survey_data = null;
-$existing_answers = array();
-
-// ถ้ามี code parameter มาแสดงว่าต้องการแก้ไขข้อมูลเดิม
-if (isset($_GET['code']) && !empty($_GET['code'])) {
-    $survey_code = $_GET['code'];
+    $path = "../../";   
+	$title="E-Maintenance";	
+	$iconimage="https://img2.pic.in.th/pic/car_repair.png";	
     
-    // ดึงข้อมูลการประเมินเดิม
-    $stmt_existing = "SELECT sr.*, vr.* FROM SURVEY_RESPONSES sr 
-                      LEFT JOIN vwREPAIRREQUEST vr ON sr.SR_REPAIR_ID = vr.RPRQ_ID 
-                      WHERE sr.SR_CODE = ?";
-    $params_existing = array($survey_code);
-    $query_existing = sqlsrv_query($conn, $stmt_existing, $params_existing);
-    if ($query_existing) {
-        $existing_survey_data = sqlsrv_fetch_array($query_existing, SQLSRV_FETCH_ASSOC);
-        if ($existing_survey_data) {
-            $repair_data = $existing_survey_data; // ใช้ข้อมูลจาก existing survey
-            
-            // ดึงคำตอบเดิม
-            $stmt_answers = "SELECT sa.SQ_ID, sa.SA_RATING, sa.SA_COMMENT 
-                            FROM SURVEY_ANSWERS sa 
-                            WHERE sa.SR_ID = ? AND sa.SA_STATUS = '1'";
-            $params_answers = array($existing_survey_data['SR_ID']);
-            $query_answers = sqlsrv_query($conn, $stmt_answers, $params_answers);
-            while ($answer = sqlsrv_fetch_array($query_answers, SQLSRV_FETCH_ASSOC)) {
-                $existing_answers[$answer['SQ_ID']] = array(
-                    'rating' => $answer['SA_RATING'],
-                    'comment' => $answer['SA_COMMENT']
-                );
+	###########################################################################################################
+
+    // รับ survey_id จาก URL หรือใช้ default
+    $survey_id = isset($_GET['sm']) ? $_GET['sm'] : 1;
+
+    // ดึงข้อมูลแบบประเมิน
+    $stmt_survey = "SELECT SM_CODE,SM_NAME,SM_TARGET_GROUP FROM SURVEY_MAIN WHERE SM_ID = ? AND SM_STATUS = 'Y'";
+    $params_survey = array($survey_id);
+    $query_survey = sqlsrv_query($conn, $stmt_survey, $params_survey);
+    $survey_data = sqlsrv_fetch_array($query_survey, SQLSRV_FETCH_ASSOC);
+
+    // ดึงข้อมูลแจ้งซ่อม
+    $repair_data = null;
+    $existing_survey_data = null;
+    $existing_answers = array();
+
+    // ถ้ามี code parameter มาแสดงว่าต้องการแก้ไขข้อมูลเดิม
+    if (isset($_GET['code']) && !empty($_GET['code'])) {
+        $survey_code = $_GET['code'];
+        
+        // ดึงข้อมูลการประเมินเดิม
+        $stmt_existing = "SELECT sr.*, vr.* FROM SURVEY_RESPONSES sr 
+                        LEFT JOIN vwREPAIRREQUEST vr ON sr.SR_REPAIR_ID = vr.RPRQ_ID 
+                        WHERE sr.SR_CODE = ?";
+        $params_existing = array($survey_code);
+        $query_existing = sqlsrv_query($conn, $stmt_existing, $params_existing);
+        if ($query_existing) {
+            $existing_survey_data = sqlsrv_fetch_array($query_existing, SQLSRV_FETCH_ASSOC);
+            if ($existing_survey_data) {
+                $repair_data = $existing_survey_data; // ใช้ข้อมูลจาก existing survey
+                
+                // ดึงคำตอบเดิม
+                $stmt_answers = "SELECT sa.SQ_ID, sa.SA_RATING, sa.SA_COMMENT 
+                                FROM SURVEY_ANSWERS sa 
+                                WHERE sa.SR_ID = ? AND sa.SA_STATUS = '1'";
+                $params_answers = array($existing_survey_data['SR_ID']);
+                $query_answers = sqlsrv_query($conn, $stmt_answers, $params_answers);
+                while ($answer = sqlsrv_fetch_array($query_answers, SQLSRV_FETCH_ASSOC)) {
+                    $existing_answers[$answer['SQ_ID']] = array(
+                        'rating' => $answer['SA_RATING'],
+                        'comment' => $answer['SA_COMMENT']
+                    );
+                }
             }
         }
     }
-}
 
-if (isset($_GET['rp']) && !empty($_GET['rp'])) {
-    $repair_id = $_GET['rp'];
-    
-    // ดึงข้อมูลจากตาราง MBCALL หรือตารางที่เก็บข้อมูลแจ้งซ่อม
-    $stmt_repair = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_ID = ?";
-    $params_repair = array($repair_id);
-    $query_repair = sqlsrv_query($conn, $stmt_repair, $params_repair);
-    if ($query_repair) {
-        $repair_data = sqlsrv_fetch_array($query_repair, SQLSRV_FETCH_ASSOC);
+    if (isset($_GET['rp']) && !empty($_GET['rp'])) {
+        $repair_id = $_GET['rp'];
+        
+        // ดึงข้อมูลจากตาราง MBCALL หรือตารางที่เก็บข้อมูลแจ้งซ่อม
+        $stmt_repair = "SELECT * FROM vwREPAIRREQUEST WHERE RPRQ_ID = ?";
+        $params_repair = array($repair_id);
+        $query_repair = sqlsrv_query($conn, $stmt_repair, $params_repair);
+        if ($query_repair) {
+            $repair_data = sqlsrv_fetch_array($query_repair, SQLSRV_FETCH_ASSOC);
+        }
     }
-}
 
-if (!$survey_data || !$repair_data) {
-?>
-    <!DOCTYPE html>
-    <html lang="th">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>ไม่พบแบบประเมิน</title>
-            <link rel="shortcut icon" type="image/x-icon" href="<?=$iconimage;?>">
-            <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                body {
-                    font-family: 'Sarabun', Arial, sans-serif;
-                    background: linear-gradient(135deg, #F5F5F5 0%, #DCDCDC 100%);
-                    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-                    min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #333;
-                }
-                .error-container {
-                    background: white;
-                    padding: 60px 40px;
-                    border-radius: 20px;
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                    text-align: center;
-                    max-width: 700px;
-                    width: 90%;
-                    animation: fadeInUp 0.6s ease-out;
-                }
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
+    if (!$survey_data || !$repair_data) {
+    ?>
+        <!DOCTYPE html>
+        <html lang="th">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>ไม่พบแบบประเมิน</title>
+                <link rel="shortcut icon" type="image/x-icon" href="<?=$iconimage;?>">
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
                     }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
+                    body {
+                        font-family: 'Sarabun', Arial, sans-serif;
+                        background: linear-gradient(135deg, #F5F5F5 0%, #DCDCDC 100%);
+                        /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+                        min-height: 100vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #333;
                     }
-                }
-                .error-icon {
-                    width: 100px;
-                    height: 100px;
-                    margin: 0 auto 30px;
-                    background: linear-gradient(135deg, #ff6b6b, #ffa726);
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 50px;
-                    color: white;
-                    animation: pulse 2s infinite;
-                }
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                }
-                .error-title {
-                    font-size: 32px;
-                    font-weight: bold;
-                    color: #2c3e50;
-                    margin-bottom: 20px;
-                }
-                .error-message {
-                    font-size: 18px;
-                    color: #7f8c8d;
-                    margin-bottom: 30px;
-                    line-height: 1.6;
-                }
-                .error-details {
-                    background: #f8f9fa;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin-bottom: 30px;
-                    border-left: 4px solid #e74c3c;
-                }
-                .error-details h4 {
-                    color: #e74c3c;
-                    margin-bottom: 10px;
-                    font-size: 16px;
-                }
-                .error-details p {
-                    color: #6c757d;
-                    font-size: 14px;
-                    margin: 5px 0;
-                }
-                .back-btn {
-                    background: linear-gradient(135deg, #667eea, #764ba2);
-                    color: white;
-                    padding: 15px 30px;
-                    border: none;
-                    border-radius: 50px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    text-decoration: none;
-                    display: inline-block;
-                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-                }
-                .back-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-                }
-                .contact-info {
-                    margin-top: 30px;
-                    padding-top: 20px;
-                    border-top: 1px solid #ecf0f1;
-                    font-size: 14px;
-                    color: #95a5a6;
-                }
-                .search-section {
-                    background: #f8f9fa;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin-bottom: 30px;
-                    border-left: 4px solid #3498db;
-                }
-                .search-form {
-                    display: flex;
-                    gap: 10px;
-                    margin-bottom: 10px;
-                    flex-wrap: wrap;
-                }
-                .search-input {
-                    flex: 1;
-                    min-width: 250px;
-                    padding: 12px 15px;
-                    border: 2px solid #3498db;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    outline: none;
-                    transition: all 0.3s ease;
-                }
-                .search-input:focus {
-                    border-color: #2980b9;
-                    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-                }
-                .search-btn {
-                    background: linear-gradient(135deg, #3498db, #2980b9);
-                    color: white;
-                    padding: 12px 25px;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-                    min-width: 100px;
-                }
-                .search-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-                }
-                .search-btn:active {
-                    transform: translateY(0);
-                }
-                @media (max-width: 600px) {
+                    .error-container {
+                        background: white;
+                        padding: 60px 40px;
+                        border-radius: 20px;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                        text-align: center;
+                        max-width: 700px;
+                        width: 90%;
+                        animation: fadeInUp 0.6s ease-out;
+                    }
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    .error-icon {
+                        width: 100px;
+                        height: 100px;
+                        margin: 0 auto 30px;
+                        background: linear-gradient(135deg, #ff6b6b, #ffa726);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 50px;
+                        color: white;
+                        animation: pulse 2s infinite;
+                    }
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.05); }
+                    }
+                    .error-title {
+                        font-size: 32px;
+                        font-weight: bold;
+                        color: #2c3e50;
+                        margin-bottom: 20px;
+                    }
+                    .error-message {
+                        font-size: 18px;
+                        color: #7f8c8d;
+                        margin-bottom: 30px;
+                        line-height: 1.6;
+                    }
+                    .error-details {
+                        background: #f8f9fa;
+                        padding: 20px;
+                        border-radius: 10px;
+                        margin-bottom: 30px;
+                        border-left: 4px solid #e74c3c;
+                    }
+                    .error-details h4 {
+                        color: #e74c3c;
+                        margin-bottom: 10px;
+                        font-size: 16px;
+                    }
+                    .error-details p {
+                        color: #6c757d;
+                        font-size: 14px;
+                        margin: 5px 0;
+                    }
+                    .back-btn {
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        padding: 15px 30px;
+                        border: none;
+                        border-radius: 50px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-decoration: none;
+                        display: inline-block;
+                        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                    }
+                    .back-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+                    }
+                    .contact-info {
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #ecf0f1;
+                        font-size: 14px;
+                        color: #95a5a6;
+                    }
+                    .search-section {
+                        background: #f8f9fa;
+                        padding: 20px;
+                        border-radius: 10px;
+                        margin-bottom: 30px;
+                        border-left: 4px solid #3498db;
+                    }
                     .search-form {
-                        flex-direction: column;
+                        display: flex;
+                        gap: 10px;
+                        margin-bottom: 10px;
+                        flex-wrap: wrap;
                     }
                     .search-input {
-                        min-width: 100%;
+                        flex: 1;
+                        min-width: 250px;
+                        padding: 12px 15px;
+                        border: 2px solid #3498db;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        outline: none;
+                        transition: all 0.3s ease;
                     }
-                }
-            </style>
-            <script>
-                function searchRepair() {
-                    const repairId = document.getElementById('repairId').value.trim();
-                    
-                    if (!repairId) {
-                        alert('กรุณากรอกเลขที่แจ้งซ่อม');
-                        return;
+                    .search-input:focus {
+                        border-color: #2980b9;
+                        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+                    }
+                    .search-btn {
+                        background: linear-gradient(135deg, #3498db, #2980b9);
+                        color: white;
+                        padding: 12px 25px;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+                        min-width: 100px;
+                    }
+                    .search-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+                    }
+                    .search-btn:active {
+                        transform: translateY(0);
+                    }
+                    @media (max-width: 600px) {
+                        .search-form {
+                            flex-direction: column;
+                        }
+                        .search-input {
+                            min-width: 100%;
+                        }
+                    }
+                </style>
+                <script>
+                    function searchRepair() {
+                        const repairId = document.getElementById('repairId').value.trim();
+                        
+                        if (!repairId) {
+                            alert('กรุณากรอกเลขที่แจ้งซ่อม');
+                            return;
+                        }
+                        
+                        // สร้าง URL ใหม่พร้อมพารามิเตอร์
+                        const surveyId = <?= $survey_id ?>;
+                        const url = `customer_survey.php?sm=${surveyId}&rp=${encodeURIComponent(repairId)}`;
+                        
+                        // เด้งไปหน้าใหม่
+                        window.location.href = url;
                     }
                     
-                    // สร้าง URL ใหม่พร้อมพารามิเตอร์
-                    const surveyId = <?= $survey_id ?>;
-                    const url = `customer_survey.php?sm=${surveyId}&rp=${encodeURIComponent(repairId)}`;
-                    
-                    // เด้งไปหน้าใหม่
-                    window.location.href = url;
-                }
-                
-                // ให้สามารถกด Enter ในช่อง input ได้
-                document.addEventListener('DOMContentLoaded', function() {
-                    const input = document.getElementById('repairId');
-                    if (input) {
-                        input.addEventListener('keypress', function(e) {
-                            if (e.key === 'Enter') {
-                                searchRepair();
-                            }
-                        });
-                    }
-                });
-            </script>
-        </head>
-        <body>
-            <div class="error-container">
-                <div class="error-icon">
-                    📋
-                </div>
-                <h1 class="error-title">แบบประเมินความพึงพอใจ</h1>
-                <p class="error-message">
-                    เพื่อให้เราสามารถปรับปรุงและพัฒนาการบริการให้ดียิ่งขึ้น<br>
-                    กรุณากรอกเลขที่แจ้งซ่อมเพื่อเริ่มทำแบบประเมิน
-                </p>
-                
-                <div class="search-section">
-                    <h4 style="color: #2c3e50; margin-bottom: 15px;">กรุณากรอกเลขที่แจ้งซ่อมของท่าน:</h4>
-                    <div class="search-form">
-                        <input type="number" id="repairId" inputmode="numeric" placeholder="กรอกเลขที่แจ้งซ่อม 6 หลัก เช่น 012345" class="search-input" autocomplete="off">
-                        <button onclick="searchRepair()" class="search-btn">ค้นหา</button>
+                    // ให้สามารถกด Enter ในช่อง input ได้
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const input = document.getElementById('repairId');
+                        if (input) {
+                            input.addEventListener('keypress', function(e) {
+                                if (e.key === 'Enter') {
+                                    searchRepair();
+                                }
+                            });
+                        }
+                    });
+                </script>
+            </head>
+            <body>
+                <div class="error-container">
+                    <div class="error-icon">
+                        📋
                     </div>
-                    <p style="color: #7f8c8d; font-size: 14px; margin-top: 10px;">
-                        * หากไม่ทราบเลขที่แจ้งซ่อม กรุณาติดต่อฝ่ายบริการลูกค้า
+                    <h1 class="error-title">แบบประเมินความพึงพอใจ</h1>
+                    <p class="error-message">
+                        เพื่อให้เราสามารถปรับปรุงและพัฒนาการบริการให้ดียิ่งขึ้น<br>
+                        กรุณากรอกเลขที่แจ้งซ่อมเพื่อเริ่มทำแบบประเมิน
                     </p>
+                    
+                    <div class="search-section">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">กรุณากรอกเลขที่แจ้งซ่อมของท่าน:</h4>
+                        <div class="search-form">
+                            <input type="number" id="repairId" inputmode="numeric" placeholder="กรอกเลขที่แจ้งซ่อม 6 หลัก เช่น 012345" class="search-input" autocomplete="off">
+                            <button onclick="searchRepair()" class="search-btn">ค้นหา</button>
+                        </div>
+                        <p style="color: #7f8c8d; font-size: 14px; margin-top: 10px;">
+                            * หากไม่ทราบเลขที่แจ้งซ่อม กรุณาติดต่อฝ่ายบริการลูกค้า
+                        </p>
+                    </div>
+                    
+                    <div class="contact-info">
+                        หากต้องการความช่วยเหลือ กรุณาติดต่อ<br>
+                        <strong>บริษัท ร่วมกิจรุ่งเรือง ทรัค ดีเทลส์ จำกัด</strong><br>
+                        <!-- โทร: 02-xxx-xxxx -->
+                    </div>
                 </div>
-                
-                <div class="contact-info">
-                    หากต้องการความช่วยเหลือ กรุณาติดต่อ<br>
-                    <strong>บริษัท ร่วมกิจรุ่งเรือง ทรัค ดีเทลส์ จำกัด</strong><br>
-                    <!-- โทร: 02-xxx-xxxx -->
-                </div>
-            </div>
-        </body>
-    </html>
-<?php
-    exit();
-}
+            </body>
+        </html>
+    <?php
+        exit();
+    }
 
 ?>
 <!DOCTYPE html>
