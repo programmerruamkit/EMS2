@@ -179,7 +179,7 @@
                             id="customer_email" 
                             value="<?php echo isset($result_email['CTM_MAIL']) ? $result_email['CTM_MAIL'] : ''; ?>" 
                             placeholder="กรอกอีเมลลูกค้า เช่น a@email.com,b@email.com" 
-                            multiple>
+                            multiple autocomplete="off">
                       <input type="hidden" id="customer_name" value="<?php echo addslashes($customer_name); ?>">
                       <button type="button" 
                               class="bg-color-blue" 
