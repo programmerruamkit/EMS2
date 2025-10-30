@@ -630,7 +630,7 @@ if ($JOBTYPE == 'PM') {
         $boxname2='บุรินชัย เบอร์ไธสง';
         $boxposition='RTD';
     }else{
-        $boxname_s1='อาทิตย์ แสงสว่าง';
+        $boxname_s1='แสงชัย ธรรมนิยม';
         $boxname_s2='อาทิตย์ แสงสว่าง';
         $boxname_s3='สำนวน พรมพา ';
         $boxname_s4='อาทิตย์ แสงสว่าง';
@@ -1232,7 +1232,7 @@ if ($JOBTYPE == 'PM') {
             $boxposition='RTD';
         }else{
             if($result_seRepaircause_check['SUBJECT'] == 'เครื่องยนต์'){
-                $boxname='อาทิตย์ แสงสว่าง';
+                $boxname='แสงชัย ธรรมนิยม';
             }else if($result_seRepaircause_check['SUBJECT'] == 'โครงสร้าง'){
                 $boxname='อาทิตย์ แสงสว่าง';
             }else if($result_seRepaircause_check['SUBJECT'] == 'ยาง ช่วงล่าง'){
