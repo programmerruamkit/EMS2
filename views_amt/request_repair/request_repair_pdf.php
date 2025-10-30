@@ -622,21 +622,21 @@ if ($JOBTYPE == 'PM') {
                     </table>';  
     // CheckifSet    
     if($AREA=='AMT'){
-        $boxname_s1='สุริยา แน่นหนา';
-        $boxname_s2='สุริยา แน่นหนา';
-        $boxname_s3='เกียรติพงษ์ สดรัมย์';
-        $boxname_s4='วิชัย ประสานดี';
-        $boxname1='นัฏชาพรรณ สังข์จีน';
-        $boxname2='บุรินชัย เบอร์ไธสง';
-        $boxposition='RTD';
+        $boxname_s1='สุริยา แน่นหนา'; // เครื่องยนต์
+        $boxname_s2='สุริยา แน่นหนา'; // โครงสร้าง
+        $boxname_s3='เกียรติพงษ์ สดรัมย์'; // ยาง ช่วงล่าง
+        $boxname_s4='วิชัย ประสานดี'; // ระบบไฟ
+        $boxname1='นัฏชาพรรณ สังข์จีน'; // เจ้าหน้าที่ SA
+        $boxname2='บุรินชัย เบอร์ไธสง'; // หัวหน้างาน
+        $boxposition='RTD'; // แผนก
     }else{
-        $boxname_s1='แสงชัย ธรรมนิยม';
-        $boxname_s2='อาทิตย์ แสงสว่าง';
-        $boxname_s3='สำนวน พรมพา ';
-        $boxname_s4='อาทิตย์ แสงสว่าง';
-        $boxname1='เติมพงศ์ กลิ่นนุช';
-        $boxname2='ศิวะ เเป้นทอง ';
-        $boxposition='RTD';
+        $boxname_s1='แสงชัย ธรรมนิยม'; // เครื่องยนต์
+        $boxname_s2='อำนวย บุญมา'; // โครงสร้าง
+        $boxname_s3='สำนวน พรมพา'; // ยาง ช่วงล่าง
+        $boxname_s4='สำนวน พรมพา'; // ระบบไฟ
+        $boxname1='เติมพงศ์ กลิ่นนุช'; // เจ้าหน้าที่ SA
+        $boxname2='ศิวะ เเป้นทอง '; // หัวหน้างาน
+        $boxposition='RTD'; // แผนก
     }
     // CheckifSet  
     $tb_section_pm_8_01 = '<table id="bg-table" width="100%" style="border-collapse: collapse;font-size:10;margin-top:30px;">
@@ -1234,11 +1234,11 @@ if ($JOBTYPE == 'PM') {
             if($result_seRepaircause_check['SUBJECT'] == 'เครื่องยนต์'){
                 $boxname='แสงชัย ธรรมนิยม';
             }else if($result_seRepaircause_check['SUBJECT'] == 'โครงสร้าง'){
-                $boxname='อาทิตย์ แสงสว่าง';
+                $boxname='อำนวย บุญมา';
             }else if($result_seRepaircause_check['SUBJECT'] == 'ยาง ช่วงล่าง'){
-                $boxname='สำนวน พรมพา ';
+                $boxname='สำนวน พรมพา';
             }else if($result_seRepaircause_check['SUBJECT'] == 'ระบบไฟ'){
-                $boxname='อาทิตย์ แสงสว่าง';
+                $boxname='สำนวน พรมพา';
             }
             $boxname1='เติมพงศ์ กลิ่นนุช';
             $boxname2='ศิวะ เเป้นทอง ';
