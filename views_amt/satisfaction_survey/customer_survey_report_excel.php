@@ -6,6 +6,7 @@ require($path.'../include/connect.php');
 $SESSION_AREA = $_SESSION["AD_AREA"];
 
 // รับค่าจากฟอร์มค้นหา
+$customer = isset($_GET['customer']) ? $_GET['customer'] : '';
 $getsurvey = isset($_GET['survey']) ? $_GET['survey'] : '';
 $getselectdaystart = isset($_GET['dateStart']) ? $_GET['dateStart'] : '';
 $getselectdayend = isset($_GET['dateEnd']) ? $_GET['dateEnd'] : '';
@@ -31,13 +32,19 @@ if ($getsurvey) {
 $stmt = "SELECT 
     sr.SR_ID, sr.SM_ID, sr.SR_CODE, sr.SR_REPAIR_ID, sr.SR_SURVEY_DATE, 
     sr.SR_ADDITIONAL_COMMENTS, sr.SR_CREATED_DATE, sr.SR_STATUS,
-    sm.SM_TARGET_GROUP, sm.SM_CODE as SURVEY_CODE
+    sm.SM_TARGET_GROUP, sm.SM_CODE as SURVEY_CODE,
+    rprq.RPRQ_COMPANYCASH
 FROM SURVEY_RESPONSES sr
 LEFT JOIN SURVEY_MAIN sm ON sm.SM_ID = sr.SM_ID
+LEFT JOIN REPAIRREQUEST rprq ON rprq.RPRQ_ID = sr.SR_REPAIR_ID
 WHERE sm.SM_AREA = '$SESSION_AREA' ";
 
 // เพิ่มเงื่อนไขการค้นหาตามฟอร์ม
 $params = array();
+if (!empty($customer)) {
+    $stmt .= " AND rprq.RPRQ_COMPANYCASH = ? ";
+    $params[] = $customer;
+}
 if (!empty($getsurvey)) {
     $stmt .= " AND sr.SM_ID = ? ";
     $params[] = $getsurvey;
@@ -266,7 +273,7 @@ echo "\xEF\xBB\xBF"; // BOM for UTF-8
             <td colspan="8" style="border: none; font-weight: bold;">รายการสำรวจความพึงพอใจของลูกค้า (<?= $survey_info ? htmlspecialchars($survey_info['SM_TARGET_GROUP']) : 'ไม่ระบุ' ?>) ประจำวันที่ <font style="text-decoration: underline;">&emsp;&emsp;<?= $getselectdaystart ? $getselectdaystart : '' ?>&emsp;&emsp;</font> ถึง <font style="text-decoration: underline;">&emsp;&emsp;<?= $getselectdayend ? $getselectdayend : '' ?>&emsp;&emsp;</font></td>
         </tr>
         <tr>
-            <td colspan="4" style="border: none; font-weight: bold;">รายงานสรุปผลการประเมิน <font style="text-decoration: underline;">&emsp;<?= number_format($total_responses) ?>&emsp;</font> รายการ</td>
+            <td colspan="4" style="border: none; font-weight: bold;">รายงานสรุปผลการประเมิน <font style="text-decoration: underline;">&emsp;<?= number_format($total_responses) ?>&emsp;</font> รายการ <?= $customer ? '(ลูกค้า: ' . htmlspecialchars($customer) . ')' : '' ?></td>
         </tr>
         <tr></tr>
     </table>

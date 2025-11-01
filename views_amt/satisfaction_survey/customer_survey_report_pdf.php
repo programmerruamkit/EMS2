@@ -6,6 +6,7 @@ require($path.'../include/connect.php');
 $SESSION_AREA = $_SESSION["AD_AREA"];
 
 // รับค่าจากฟอร์มค้นหา
+$customer = isset($_GET['customer']) ? $_GET['customer'] : '';
 $getsurvey = isset($_GET['survey']) ? $_GET['survey'] : '';
 $getselectdaystart = isset($_GET['dateStart']) ? $_GET['dateStart'] : '';
 $getselectdayend = isset($_GET['dateEnd']) ? $_GET['dateEnd'] : '';
@@ -26,13 +27,19 @@ if ($getsurvey) {
 $stmt = "SELECT 
     sr.SR_ID, sr.SM_ID, sr.SR_CODE, sr.SR_REPAIR_ID, sr.SR_SURVEY_DATE, 
     sr.SR_ADDITIONAL_COMMENTS, sr.SR_CREATED_DATE, sr.SR_STATUS,
-    sm.SM_TARGET_GROUP, sm.SM_CODE as SURVEY_CODE
+    sm.SM_TARGET_GROUP, sm.SM_CODE as SURVEY_CODE,
+    rprq.RPRQ_COMPANYCASH
 FROM SURVEY_RESPONSES sr
 LEFT JOIN SURVEY_MAIN sm ON sm.SM_ID = sr.SM_ID
+LEFT JOIN REPAIRREQUEST rprq ON rprq.RPRQ_ID = sr.SR_REPAIR_ID
 WHERE sm.SM_AREA = '$SESSION_AREA' ";
 
 // เพิ่มเงื่อนไขการค้นหาตามฟอร์ม
 $params = array();
+if (!empty($customer)) {
+    $stmt .= " AND rprq.RPRQ_COMPANYCASH = ? ";
+    $params[] = $customer;
+}
 if (!empty($getsurvey)) {
     $stmt .= " AND sr.SM_ID = ? ";
     $params[] = $getsurvey;
@@ -266,7 +273,7 @@ $html = '
         <td class="header-info">รายการสำรวจความพึงพอใจของลูกค้า (' . ($survey_info ? htmlspecialchars($survey_info['SM_TARGET_GROUP']) : 'ไม่ระบุ') . ') ประจำวันที่ <u>&nbsp;&nbsp;&nbsp;' . ($getselectdaystart ? $getselectdaystart : '') . '&nbsp;&nbsp;&nbsp;</u> ถึง <u>&nbsp;&nbsp;&nbsp;' . ($getselectdayend ? $getselectdayend : '') . '&nbsp;&nbsp;&nbsp;</u></td>
     </tr>
     <tr>
-        <td class="header-info">รายงานสรุปผลการประเมิน <u>&nbsp;' . number_format($total_responses) . '&nbsp;</u> รายการ</td>
+        <td class="header-info">รายงานสรุปผลการประเมิน <u>&nbsp;' . number_format($total_responses) . '&nbsp;</u> รายการ ' . ($customer ? '(ลูกค้า: ' . htmlspecialchars($customer) . ')' : '') . '</td>
     </tr>
 </table>
 

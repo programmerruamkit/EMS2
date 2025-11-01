@@ -5,6 +5,7 @@
 	$SESSION_AREA=$_SESSION["AD_AREA"];
 
     // รับค่าจากฟอร์มค้นหา
+        $customer = isset($_GET['customer']) ? $_GET['customer'] : '';
         $getsurvey = isset($_GET['survey']) ? $_GET['survey'] : '';
         $getselectdaystart = isset($_GET['dateStart']) ? $_GET['dateStart'] : '';
         $getselectdayend = isset($_GET['dateEnd']) ? $_GET['dateEnd'] : '';
@@ -14,15 +15,21 @@
 	// ดึงสถิติโดยรวม
         $stmt_stats = "SELECT 
             COUNT(*) as total_responses,
-            COUNT(DISTINCT SR_REPAIR_ID) as unique_repairs,
+            COUNT(DISTINCT sr.SR_REPAIR_ID) as unique_repairs,
             AVG(CAST(sa.SA_RATING as FLOAT)) as avg_rating,
             MIN(sr.SR_CREATED_DATE) as first_response,
-            MAX(sr.SR_CREATED_DATE) as last_response
+            MAX(sr.SR_CREATED_DATE) as last_response,
+            MAX(rprq.RPRQ_COMPANYCASH) as company_cash
         FROM SURVEY_RESPONSES sr
         LEFT JOIN SURVEY_ANSWERS sa ON sr.SR_ID = sa.SR_ID AND sa.SA_STATUS = '1'
         LEFT JOIN SURVEY_MAIN sm ON sm.SM_ID = sr.SM_ID
+        LEFT JOIN REPAIRREQUEST rprq ON rprq.RPRQ_ID = sr.SR_REPAIR_ID
         WHERE sm.SM_AREA = '$SESSION_AREA' ";
         // เพิ่มเงื่อนไขการค้นหาตามฟอร์ม
+        if (!empty($customer)) {
+            $stmt_stats .= " AND rprq.RPRQ_COMPANYCASH = ? ";
+            $params_stats[] = $customer;
+        }
         if (!empty($getsurvey)) {
             $stmt_stats .= " AND sr.SM_ID = ? ";
             $params_stats[] = $getsurvey;
@@ -54,8 +61,13 @@
         FROM SURVEY_ANSWERS sa
         LEFT JOIN SURVEY_RESPONSES sr ON sr.SR_ID = sa.SR_ID AND sa.SA_STATUS = '1'						
         LEFT JOIN SURVEY_MAIN sm ON sm.SM_ID = sr.SM_ID
+        LEFT JOIN REPAIRREQUEST rprq ON rprq.RPRQ_ID = sr.SR_REPAIR_ID
         WHERE sa.SA_STATUS = '1' AND sm.SM_AREA = '$SESSION_AREA' ";
         // เพิ่มเงื่อนไขการค้นหาตามฟอร์ม
+        if (!empty($customer)) {
+            $stmt_rating .= " AND rprq.RPRQ_COMPANYCASH = ? ";
+            $params_rating[] = $customer;
+        }
         if (!empty($getsurvey)) {
             $stmt_rating .= " AND sr.SM_ID = ? ";
             $params_rating[] = $getsurvey;
@@ -92,12 +104,18 @@
             sr.SR_ID, sr.SM_ID, sr.SR_CODE, sr.SR_REPAIR_ID, sr.SR_SURVEY_DATE, 
             sr.SR_ADDITIONAL_COMMENTS, sr.SR_CREATED_DATE, sr.SR_STATUS,
             AVG(CAST(sa.SA_RATING as FLOAT)) as avg_rating,
-            COUNT(sa.SA_ID) as total_answers
+            COUNT(sa.SA_ID) as total_answers,
+            rprq.RPRQ_COMPANYCASH
         FROM SURVEY_RESPONSES sr
         LEFT JOIN SURVEY_ANSWERS sa ON sr.SR_ID = sa.SR_ID AND sa.SA_STATUS = '1'
         LEFT JOIN SURVEY_MAIN sm ON sm.SM_ID = sr.SM_ID
+        LEFT JOIN REPAIRREQUEST rprq ON rprq.RPRQ_ID = sr.SR_REPAIR_ID
         WHERE sm.SM_AREA = '$SESSION_AREA' ";
         // เพิ่มเงื่อนไขการค้นหาตามฟอร์ม
+        if (!empty($customer)) {
+            $stmt .= " AND rprq.RPRQ_COMPANYCASH = ? ";
+            $params[] = $customer;
+        }
         if (!empty($getsurvey)) {
             $stmt .= " AND sr.SM_ID = ? ";
             $params[] = $getsurvey;
@@ -121,7 +139,7 @@
             }
         }
         $stmt .= " GROUP BY sr.SR_ID, sr.SM_ID, sr.SR_CODE, sr.SR_REPAIR_ID, sr.SR_SURVEY_DATE, 
-                sr.SR_ADDITIONAL_COMMENTS, sr.SR_CREATED_DATE, sr.SR_STATUS";
+                sr.SR_ADDITIONAL_COMMENTS, sr.SR_CREATED_DATE, sr.SR_STATUS, rprq.RPRQ_COMPANYCASH";
         if (!empty($level)) {
             if ($level == 'verygood') {
                 $stmt .= " HAVING AVG(CAST(sa.SA_RATING as FLOAT)) >= 4.5 ";
@@ -136,46 +154,95 @@
         $query = sqlsrv_query($conn, $stmt, isset($params) ? $params : array());
         $number = 0;
         // echo "SQL Query: " . $stmt . "\n";
+        
+    function autocomplete_customer($CONDI) {
+        $path = "../";   	
+        require($path.'../include/connect.php');
+        $data = "";
+        $sql = "SELECT CTM_ID, CTM_MAIL, CTM_COMCODE, CTM_NAMETH, CTM_NAMEEN FROM CUSTOMER WHERE $CONDI";
+        $query = sqlsrv_query($conn, $sql);
+        while ($result = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
+            $data .= "'".$result['CTM_COMCODE']."',";
+        }
+        return rtrim($data, ",");
+    }
+    $result_customer = autocomplete_customer("CTM_STATUS = 'Y'");
+    // echo $result_customer;
 ?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>รายงานการประเมินความพึงพอใจลูกค้า</title>
+    <!-- SweetAlert2 for notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<script>    
+<script>
+    function showWarning(title, text = null) {
+        const options = {
+            icon: 'warning',
+            title: title,
+            showConfirmButton: false,
+            confirmButtonColor: '#ffc107',
+            timerProgressBar: true,
+            timer: 3000
+        };
+        
+        if (text) options.text = text;
+        
+        Swal.fire(options);
+    }
     function querySurvey(){
+        var customer = $("#customer").val();
         var company = $("#survey").val();
         var ds = $("#dateStart").val();
         var de = $("#dateEnd").val();
         var important = $("#satisfaction_level").val();
-        var getsel = "?survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
+        var getsel = "?customer="+encodeURIComponent(customer)+"&survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
         loadViewdetail('<?=$path?>views_amt/satisfaction_survey/customer_survey_report.php'+getsel);
     }
     
-    function excel_survey_report(){
+    function excel_survey_report(){        
         var company = $("#survey").val();
+        if (!company) {
+            showWarning('กรุณาเลือกกลุ่มแบบประเมิน!', 'โปรดเลือกกลุ่มแบบประเมินก่อนออกรายงาน Excel');
+            return false;
+        }
+        
+        var customer = $("#customer").val();
         var ds = $("#dateStart").val();
         var de = $("#dateEnd").val();
         var important = $("#satisfaction_level").val();
-        var getsel = "?survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
+        var getsel = "?customer="+encodeURIComponent(customer)+"&survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
         window.open('<?=$path?>views_amt/satisfaction_survey/customer_survey_report_excel.php'+getsel, '_blank');
     }
     
     function pdf_survey_report(){
         var company = $("#survey").val();
+        if (!company) {
+            showWarning('กรุณาเลือกกลุ่มแบบประเมิน!', 'โปรดเลือกกลุ่มแบบประเมินก่อนออกรายงาน PDF');
+            return false;
+        }
+        
+        var customer = $("#customer").val();
         var ds = $("#dateStart").val();
         var de = $("#dateEnd").val();
         var important = $("#satisfaction_level").val();
-        var getsel = "?survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
+        var getsel = "?customer="+encodeURIComponent(customer)+"&survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
         window.open('<?=$path?>views_amt/satisfaction_survey/customer_survey_report_pdf.php'+getsel, '_blank');
     }
     
     function chart_survey_report(){
         var company = $("#survey").val();
+        if (!company) {
+            showWarning('กรุณาเลือกกลุ่มแบบประเมิน!', 'โปรดเลือกกลุ่มแบบประเมินก่อนดูกราฟความพึงพอใจ');
+            return false;
+        }
+        
+        var customer = $("#customer").val();
         var ds = $("#dateStart").val();
         var de = $("#dateEnd").val();
         var important = $("#satisfaction_level").val();
-        var getsel = "?survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
+        var getsel = "?customer="+encodeURIComponent(customer)+"&survey="+encodeURIComponent(company)+"&dateStart="+encodeURIComponent(ds)+"&dateEnd="+encodeURIComponent(de)+"&satisfaction_level="+encodeURIComponent(important);
         window.open('<?=$path?>views_amt/satisfaction_survey/customer_survey_chart.php'+getsel, '_blank');
     }
     $(document).ready(function(e) {
@@ -189,6 +256,10 @@
     function date1todate2(){
         document.getElementById('dateEnd').value = document.getElementById('dateStart').value;
     }
+    
+    var source2 = [<?= $result_customer ?>];
+    AutoCompleteNormal("customer", source2); 
+
 </script>
 <body>
     <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="INVENDATA no-border">
@@ -225,6 +296,14 @@
                             <tr align="center">
                                 <!-- <td width="1%" align="right">&nbsp;</td> -->
                                 <td width="15%" align="left">                                
+                                    <div class="input-control select">ค้นหาลูกค้า    
+                                        <div class="input-control text">
+                                            <input type="text" name="customer" id="customer" placeholder="พิมพ์ชื่อลูกค้า" value="<?=$customer;?>" class="time" autocomplete="off">
+                                        </div>
+                                    </div>
+                                </td>
+                                <!-- <td width="1%" align="right">&nbsp;</td> -->
+                                <td width="15%" align="left">                                
                                     <div class="input-control select">กลุ่มแบบประเมิน     
                                         <?php
                                             // ดึงข้อมูลกลุ่มแบบสอบถามที่ active
@@ -251,19 +330,19 @@
                                     </div>
                                 </td>
                                 <!-- <td width="1%" align="right">&nbsp;</td> -->
-                                <td width="15%" align="left">
+                                <td width="10%" align="left">
                                     <div class="row input-control">วันที่เริ่มต้น
                                         <input type="text" name="dateStart" id="dateStart" class="datepic time" placeholder="วันที่เริ่มต้น" autocomplete="off" value="<?=$getselectdaystart;?>" onchange="date1todate2()">
                                     </div>
                                 </td>
                                 <!-- <td width="1%" align="right">&nbsp;</td> -->
-                                <td width="15%" align="left">
+                                <td width="10%" align="left">
                                     <div class="row input-control">วันที่สิ้นสุด
                                         <input type="text" name="dateEnd" id="dateEnd" class="datepic time" placeholder="วันที่สิ้นสุด" autocomplete="off" value="<?=$getselectdayend;?>">
                                     </div>
                                 </td>
                                 <!-- <td width="1%" align="right">&nbsp;</td> -->
-                                <td width="15%" align="left">
+                                <td width="15%" align="left" hidden>
                                     <div class="row input-control">ระดับความพึงพอใจ
                                         <select class="time" onFocus="$(this).select();" style="width: 100%;" name="satisfaction_level" id="satisfaction_level">
                                             <option value="" selected>-- เลือกระดับความพึงพอใจ --</option>
@@ -293,6 +372,13 @@
                 <!-- แสดงข้อมูลที่ใช้ค้นหา -->
                 <h4>ผลการค้นหา: 
                     <?php
+                        // แสดงชืื่อลูกค้าที่เลือก
+                        if ($customer) {
+                            echo "ลูกค้า: <strong>" . htmlspecialchars($customer) . "</strong> ";
+                        } else {
+                            echo "ลูกค้า: <strong>ทั้งหมด</strong> ";
+                        }
+
                         // แสดงชื่อกลุ่มแบบประเมินที่เลือก
                         if ($getsurvey) {
                             $stmt_survey_name = "SELECT SM_TARGET_GROUP FROM SURVEY_MAIN WHERE SM_ID = ? AND SM_AREA = '$SESSION_AREA'";
